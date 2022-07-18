@@ -1,0 +1,90 @@
+{
+  "name": "@alauda/chart",
+  "version": "0.0.9-beta",
+  "description": "alauda chart",
+  "repository": "git+https://gitlab-ce.alauda.cn/frontend/alauda-chart",
+  "author": "alauda",
+  "license": "ISC",
+  "main": "dist/chart.js",
+  "unpkg": "dist/chart.min.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "alauda",
+    "chart",
+    "d3"
+  ],
+  "scripts": {
+    "build": "npx gulp dist",
+    "build-storybook": "build-storybook",
+    "dev": "start-storybook -p 6006",
+    "lint": "run-p lint:*",
+    "lint:es": "eslint . -f friendly",
+    "lint:style": "stylelint . --cache",
+    "lint:tsc": "tsc --noEmit",
+    "postinstall": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0"
+  },
+  "peerDependencies": {
+    "d3": "^7.1.1",
+    "lodash": "^4.17.21"
+  },
+  "dependencies": {
+    "d3": "^7.1.1"
+  },
+  "devDependencies": {
+    "@1stg/app-config": "^2.4.1",
+    "@babel/core": "^7.15.8",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "@storybook/addon-actions": "^6.3.10",
+    "@storybook/addon-essentials": "^6.3.10",
+    "@storybook/addon-links": "^6.3.10",
+    "@storybook/builder-webpack5": "^6.3.10",
+    "@storybook/cli": "^6.3.10",
+    "@storybook/html": "^6.3.10",
+    "@storybook/manager-webpack5": "^6.3.10",
+    "@storybook/preset-scss": "^1.0.3",
+    "@types/d3": "^7.0.0",
+    "@types/lodash": "^4.14.176",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
+    "babel-loader": "^8.2.2",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-dart-sass": "^1.0.2",
+    "rollup": "^2.59.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "sass": "^1.42.1",
+    "sass-loader": "^12.1.0",
+    "tsconfig-paths-webpack-plugin": "^3.5.1",
+    "tslib": "^2.3.1",
+    "ttypescript": "^1.5.12",
+    "typescript": "^4.4.3",
+    "typescript-transform-paths": "^3.3.1",
+    "undertaker-forward-reference": "^1.0.2",
+    "webpack": "^5.58.2",
+    "webpack-cli": "^4.9.0"
+  },
+  "resolutions": {
+    "prettier": "^2.4.1"
+  },
+  "browserslist": "extends @1stg/browserslist-config/alauda",
+  "commitlint": {
+    "extends": "@1stg"
+  },
+  "eslintIgnore": [
+    "dist",
+    "!/.storybook",
+    "!/.*.js"
+  ],
+  "markuplint": {
+    "extends": "@1stg/markuplint-config"
+  },
+  "prettier": "@1stg/prettier-config/semi"
+}

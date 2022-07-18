@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "@1stg/stylelint-config/scss/loose"
+  ],
+  "rules": {
+    "no-descending-specificity": null,
+    "no-invalid-position-at-import-rule": null,
+    "selector-type-no-unknown": true
+  },
+  "ignoreFiles": [
+    "dist",
+    "node_modules"
+  ]
+}
