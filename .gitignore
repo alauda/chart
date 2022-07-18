@@ -2,4 +2,5 @@ dist
 node_modules
 .*cache
 .idea
-tsconfig.tsbuildinfo
+lib
+*.tsbuildinfo

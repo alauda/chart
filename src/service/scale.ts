@@ -1,8 +1,8 @@
-import { DEFAULT_Y_SCALE_MAX, DEFAULT_Y_SCALE_MIN } from '@src/constant';
 import { scaleTime, scaleLinear, scalePoint, scaleBand, ScaleBand } from 'd3';
 
 import { ServiceController } from '../abstract';
 import View from '../chart/view';
+import { DEFAULT_Y_SCALE_MAX, DEFAULT_Y_SCALE_MIN } from '../constant';
 import { AxisOption, BarSeriesOption, ScaleType } from '../types';
 
 export class Scale extends ServiceController {
@@ -67,7 +67,7 @@ export class Scale extends ServiceController {
     // ..
   }
 
-  get xDomain () {
+  get xDomain() {
     return this.owner.options.type === 'bar' && this.isGroup
       ? this.owner.chartData.map(d => d.name)
       : getXDomain(this.xSeriesValue, this.scaleType);
@@ -88,9 +88,7 @@ export class Scale extends ServiceController {
       .domain(this.xSeriesValue as string[]);
   }
 
-
-
-  get yDomain () {
+  get yDomain() {
     const defaultDomain = getMaxMinValue(this.ySeriesValue);
     const min = Math.min(
       0,
@@ -102,7 +100,7 @@ export class Scale extends ServiceController {
       this.yOptions.max || DEFAULT_Y_SCALE_MAX,
       defaultDomain[1],
     );
-    return [min, max]
+    return [min, max];
   }
 
   get y() {

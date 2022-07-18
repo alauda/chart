@@ -1,6 +1,6 @@
 import { select as d3Select } from 'd3';
 
-import { D3EelSelection, D3Selection, Options } from '@src/types';
+import { D3EelSelection, D3Selection, Options } from '../types';
 import { getChartSize, getElement, resizeOn } from '../utils';
 
 import View from './view';
@@ -25,7 +25,7 @@ function parseContructorOption(options: Options) {
 export default class Chart extends View {
   ele: Element | HTMLElement;
 
-  private resizeOn: () => void
+  private resizeOn: () => void;
 
   constructor(options: Options) {
     super(parseContructorOption(options));
@@ -39,11 +39,11 @@ export default class Chart extends View {
   }
 
   private bindResize() {
-    this.resizeOn = resizeOn(this.ele, this.onResize)
+    this.resizeOn = resizeOn(this.ele, this.onResize);
   }
 
   private unbindResize() {
-    this.resizeOn()
+    this.resizeOn();
   }
 
   private readonly onResize = () => {

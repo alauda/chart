@@ -3,20 +3,21 @@ import {
   curveMonotoneX,
   line,
   ScaleBand,
+  ScaleLinear,
   ScaleTime,
   select,
   Selection,
 } from 'd3';
 
-import { UIController } from '@src/abstract';
-import View from '@src/chart/view';
+import { UIController } from '../abstract';
+import View from '../chart/view';
 import {
   CLASS_NAME,
   DEFAULT_LINE_WIDTH,
   DEFAULT_SCATTER_OPTIONS,
   GRADIENT_PREFIX,
   STROKE_WIDTH,
-} from '@src/constant';
+} from '../constant';
 import {
   AreaSeriesOption,
   BarSeriesOption,
@@ -28,8 +29,18 @@ import {
   LineSeriesOption,
   ScatterOption,
   XData,
-} from '@src/types';
-import { abs, defined, removeSymbol } from '@src/utils';
+} from '../types';
+import { abs, defined, removeSymbol } from '../utils';
+
+function handleData(d: ChartData) {
+  return d.values
+    .filter(d => d.y)
+    .map(item => ({
+      ...item,
+      name: d.name,
+      total: d.values.filter(d => d.y)?.length,
+    }));
+}
 
 export class Series extends UIController {
   eventContainer!: D3Selection;
@@ -196,6 +207,7 @@ export class Series extends UIController {
       .raise();
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private updateBarSeries(isClone?: boolean) {
     const container = isClone ? this.eventContainer : this.container;
     const className = isClone ? CLASS_NAME.cloneBar : CLASS_NAME.bar;
@@ -213,15 +225,7 @@ export class Series extends UIController {
 
     const barRectItem = barRes
       .selectAll(`.${className}`)
-      .data(d => {
-        return d.values
-          .filter(d => d.y)
-          .map(item => ({
-            ...item,
-            name: d.name,
-            total: d.values.filter(d => d.y)?.length,
-          }));
-      })
+      .data(handleData)
       .enter()
       .append('rect')
       .attr('class', CLASS_NAME.barItem);
@@ -266,15 +270,7 @@ export class Series extends UIController {
       const clipPath = barRes
         .append('defs')
         .selectAll(`.${className}`)
-        .data(d => {
-          return d.values
-            .filter(d => d.y)
-            .map(item => ({
-              ...item,
-              name: d.name,
-              total: d.values.filter(d => d.y)?.length,
-            }));
-        })
+        .data(handleData)
         .enter()
         .append('clipPath');
 
@@ -304,20 +300,7 @@ export class Series extends UIController {
       )
       .attr('rx', radius)
       .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) => {
-        const preTarget = target[index - 1];
-        const curTarget = target[index];
-        const preEl = index ? preTarget.getBBox() : { height: 0, y: 0 };
-        if (this.isRotated && !this.isStack) {
-          return 0;
-        }
-        if (this.isStack && this.isRotated) {
-          return this.getStackX(preTarget, index);
-        }
-        return this.isStack
-          ? index
-            ? preEl.y - curTarget.getBBox().height
-            : +y(d.y)
-          : +y(d.y);
+        return this.handleRectXY(d, index, target, y);
       });
   }
 
@@ -372,9 +355,9 @@ export class Series extends UIController {
       .attr('r', d => {
         if (type === 'bubble') {
           const val = d.size || size || def.size;
-          const min = Math.max(...[val, minSize || def.minSize]);
-          const max = Math.min(...[val, maxSize || def.maxSize]);
-          return Math.max(...[min, max]);
+          const min = Math.max(val, minSize || def.minSize);
+          const max = Math.min(val, maxSize || def.maxSize);
+          return Math.max(min, max);
         }
         return size;
       })
@@ -394,6 +377,29 @@ export class Series extends UIController {
     }
   }
 
+  handleRectXY(
+    d: any,
+    index: number,
+    target: SVGRectElement[] | ArrayLike<SVGRectElement>,
+    y: ScaleLinear<number, number>,
+  ) {
+    const preTarget = target[index - 1];
+    const curTarget = target[index];
+    const preEl = index ? preTarget.getBBox() : { height: 0, y: 0 };
+    if (this.isRotated && !this.isStack) {
+      return 0;
+    }
+    if (this.isStack && this.isRotated) {
+      return this.getStackX(preTarget, index);
+    }
+    return this.isStack
+      ? index
+        ? preEl.y - curTarget.getBBox().height
+        : +y(d.y as number)
+      : +y(d.y as number);
+  }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private setBarItemAttr(
     rect: Selection<
       SVGRectElement,
@@ -437,21 +443,9 @@ export class Series extends UIController {
         );
       })
       .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) => {
-        const preTarget = target[index - 1];
-        const curTarget = target[index];
-        const preEl = index ? preTarget.getBBox() : { height: 0, y: 0 };
-        if (this.isRotated && !this.isStack) {
-          return 0;
-        }
-        if (this.isStack && this.isRotated) {
-          return this.getStackX(preTarget, index);
-        }
-        return this.isStack
-          ? index
-            ? preEl.y - curTarget.getBBox().height
-            : +y(d.y)
-          : +y(d.y);
+        return this.handleRectXY(d, index, target, y);
       });
+
     if (!isClip && this.isStack) {
       itemsRect
         .attr('clip-path', (d, index) => {
@@ -473,6 +467,7 @@ export class Series extends UIController {
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private updateDefaultBarSeries(isClone?: boolean) {
     const container = isClone ? this.eventContainer : this.container;
     const className = isClone ? CLASS_NAME.cloneBar : CLASS_NAME.bar;

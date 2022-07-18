@@ -1,7 +1,7 @@
 import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
 
-import { Chart, AChart } from '../src';
+import { Chart } from '../src';
 import { ScaleType } from '../src/types';
 
 import { data } from './data';
@@ -14,7 +14,7 @@ export default {
 
 const Template: Story = () => {
   setTimeout(() => {
-    const chart: AChart = Chart({
+    Chart({
       container: '#chart',
       type: 'line',
       title: {
@@ -43,7 +43,7 @@ const Template: Story = () => {
         values: d.values.map(a => ({
           ...a,
           x: a.x * 1000,
-          y: a.y * 1000000000000,
+          y: a.y * 1_000_000_000_000,
         })),
       })),
       yAxis: {

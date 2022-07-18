@@ -1,13 +1,13 @@
 import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
+import { round } from 'lodash';
 
-import { Chart, AChart } from '../src';
+import { Chart } from '../src';
 import { ScaleType } from '../src/types';
 
 import { ScatterData } from './data';
 
 import '../src/theme/default.scss';
-import { round } from 'lodash';
 
 export default {
   title: 'Scatter',
@@ -15,7 +15,7 @@ export default {
 
 const Template: Story = () => {
   setTimeout(() => {
-    const chart: AChart = Chart({
+    Chart({
       container: '#chart',
       type: 'scatter',
       title: {

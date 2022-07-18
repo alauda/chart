@@ -1,7 +1,6 @@
 import { Story, Meta } from '@storybook/html';
 
 import { Chart } from '../src';
-import { PIE_EVENTS } from '../src/constant';
 
 import { groupPieData } from './data';
 import '../src/theme/default.scss';
@@ -34,13 +33,13 @@ const Template: Story = () => {
         },
         itemStyle: {
           borderRadius: 2,
-          borderWidth: 2
+          borderWidth: 2,
         },
         innerDisc: true,
       },
       tooltip: {
         trigger: 'item',
-        hideTitle: true
+        hideTitle: true,
       },
       data: groupPieData,
     });
@@ -51,7 +50,7 @@ const Template: Story = () => {
     //   console.log(e);
     // });
     setTimeout(() => {
-    // chart.data(groupPieData);
+      // chart.data(groupPieData);
       chart.updatePie({
         label: {
           text: '<div>2222</div>',

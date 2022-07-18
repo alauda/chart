@@ -1,21 +1,15 @@
 {
-  "extends": "@1stg/tsconfig/tsconfig",
+  "extends": "@1stg/tsconfig/dom-lib",
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "es6",
-    "lib": ["DOM", "ESNext", "ES2019"],
-    "noImplicitOverride": true,
-    "declaration": true,
-    "declarationDir": ".",
     "strictPropertyInitialization": false,
     "strictNullChecks": false,
     "paths": {
-      "@src/*": ["src/*"]
+      "@alauda/chart": ["src"]
     },
     "outDir": "dist",
     "noImplicitAny": false,
-    "isolatedModules": true
-  },
-  "include": ["src/!(types)/**/*.ts", "src/*.ts", "stories/**/*.ts"],
-  "exclude": ["src/types/**"]
+    "isolatedModules": true,
+    "strictFunctionTypes": false
+  }
 }

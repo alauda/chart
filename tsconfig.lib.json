@@ -1,0 +1,11 @@
+{
+  "extends": "@1stg/tsconfig/dom-lib",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",
+    "outDir": "lib",
+    "strictFunctionTypes": false,
+    "strictNullChecks": false
+  },
+  "include": ["src"]
+}

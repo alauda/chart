@@ -1,5 +1,9 @@
+import { isFunction } from 'lodash';
+
 import { UIController } from '../abstract';
 import View from '../chart/view';
+import { CLASS_NAME, STROKE_DASHARRAY, STROKE_WIDTH } from '../constant';
+import { Scale } from '../service';
 import {
   D3Selection,
   TooltipContext,
@@ -7,10 +11,7 @@ import {
   XScaleValue,
 } from '../types';
 import { YPlotLineOptions } from '../types/options';
-import { Scale } from '@src/service';
-import { CLASS_NAME, STROKE_DASHARRAY, STROKE_WIDTH } from '@src/constant';
-import { isFunction } from 'lodash';
-import { rgbColor, template } from '@src/utils';
+import { rgbColor, template } from '../utils';
 
 export class YPlotLine extends UIController<YPlotLineOptions> {
   container: D3Selection;
@@ -100,9 +101,10 @@ export class YPlotLine extends UIController<YPlotLineOptions> {
     const { clientWidth: tipWidth, clientHeight: tipHight } =
       this.tipContainer.node() as HTMLElement;
     const mainW = this.owner.size.main.width;
-    const offsetX = x + this.owner.basics.margin.left
-    const containerX = offsetX - tipWidth / 2
-    const position = tipWidth / 2 + (containerX + this.owner.basics.margin.left);
+    const offsetX = x + this.owner.basics.margin.left;
+    const containerX = offsetX - tipWidth / 2;
+    const position =
+      tipWidth / 2 + (containerX + this.owner.basics.margin.left);
     const offset = position > mainW ? containerX - tipWidth / 2 : containerX;
 
     const {

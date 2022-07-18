@@ -1,25 +1,3 @@
 {
-  "settings": {
-    "import/resolver": {
-      "typescript": {}
-    }
-  },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.eslint.json",
-    "tsconfigRootDir": "./"
-  },
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/ban-ts-ignore": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
-  },
-  "plugins": [
-    "@typescript-eslint",
-    "import"
-  ],
-  "extends": [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
-  ]
+  "extends": "@1stg/eslint-config/loose"
 }

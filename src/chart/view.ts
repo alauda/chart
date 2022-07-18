@@ -5,7 +5,7 @@ import {
   ControllerCtor,
   ServiceController,
   UIController,
-} from '@src/abstract';
+} from '../abstract';
 import {
   Axis,
   Legend,
@@ -14,16 +14,18 @@ import {
   Title,
   Tooltip,
   XPlotLine,
-} from '@src/components';
+} from '../components';
+import { Pie } from '../components/pie';
+import { Zoom } from '../components/zoom';
 import {
   basics,
   CHART_DEPENDS_MAP,
   CLASS_NAME,
   LEGEND_EVENTS,
   VIEW_HOOKS,
-} from '@src/constant';
-import EventEmitter from '@src/event-emitter';
-import { Scale, ControllerContextService } from '@src/service';
+} from '../constant';
+import EventEmitter from '../event-emitter';
+import { Scale, ControllerContextService } from '../service';
 import {
   BarSeriesOption,
   ChartData,
@@ -39,10 +41,8 @@ import {
   ViewProps,
   XData,
   XPlotLineOptions,
-} from '@src/types';
-import { generateUID, getChartColor, getTextWidth, template } from '@src/utils';
-import { Zoom } from '../components/zoom';
-import { Pie } from '../components/pie';
+} from '../types';
+import { generateUID, getChartColor, getTextWidth, template } from '../utils';
 
 export default class View extends EventEmitter {
   chartEle!: ChartEle;
@@ -116,15 +116,15 @@ export default class View extends EventEmitter {
   }
 
   get headerHeight() {
-    const title = document.getElementsByClassName(
-      CLASS_NAME.title,
+    const title = document.querySelector(
+      `.${CLASS_NAME.title}`,
     )[0] as SVGGElement;
-    const legend = document.getElementsByClassName(
-      CLASS_NAME.legend,
+    const legend = document.querySelector(
+      `.${CLASS_NAME.legend}`,
     )[0] as SVGGElement;
     const titleH = title?.getBBox?.()?.height || title?.clientHeight;
     const legendH = legend?.getBBox?.()?.height || legend?.clientHeight;
-    return Math.max(...[titleH || 25, legendH || 0, 0]);
+    return Math.max(titleH || 25, legendH || 0, 0);
   }
 
   get headerTotalHeight() {
@@ -172,11 +172,10 @@ export default class View extends EventEmitter {
   }
 
   handelData(data: ChartData[]) {
-    const res = data.map((d, index) => ({
+    return data.map((d, index) => ({
       ...d,
       ...(d.color ? {} : { color: getChartColor(index) }),
     }));
-    return res;
   }
 
   init() {
@@ -498,7 +497,7 @@ export default class View extends EventEmitter {
       | ((value?: any) => string | ((value: any) => string)),
   ) {
     const text = isNaN(+parseInt(value as string))
-      ? value 
+      ? value
       : parseInt(value as string);
     if (tickFormatter) {
       if (isFunction(tickFormatter)) {

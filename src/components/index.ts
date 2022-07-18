@@ -4,5 +4,5 @@ export * from './pie';
 export * from './series';
 export * from './title';
 export * from './tooltip';
-export * from './yPlotLine';
-export * from './xPlotLine';
+export * from './x-plot-line';
+export * from './y-plot-line';
