@@ -49,11 +49,14 @@
   "main": "lib/index.cjs",
   "module": "lib/index.js",
   "exports": {
-    "types": "./lib/index.d.ts",
-    "fesm2020": "./lib/index.es2020.mjs",
-    "fesm2015": "./lib/index.es2015.mjs",
-    "import": "./lib/index.js",
-    "require": "./lib.index.cjs"
+    ".": {
+      "types": "./lib/index.d.ts",
+      "fesm2020": "./lib/index.es2020.mjs",
+      "fesm2015": "./lib/index.es2015.mjs",
+      "import": "./lib/index.js",
+      "require": "./lib.index.cjs"
+    },
+    "./default.css": "./lib/default.css"
   },
   "fesm2020": "lib/index.es2020.mjs",
   "fesm2015": "lib/index.es2015.mjs",
