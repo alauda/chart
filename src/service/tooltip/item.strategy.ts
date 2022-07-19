@@ -2,11 +2,11 @@ import * as d3 from 'd3';
 import { BaseType } from 'd3';
 import { get } from 'lodash';
 
-import { CLASS_NAME, PIE_EVENTS, SCATTER_EVENTS } from '../../constant';
-import { ChartData } from '../../types';
-import { removeSymbol } from '../../utils';
+import { CLASS_NAME, PIE_EVENTS, SCATTER_EVENTS } from '../../constant.js';
+import { ChartData } from '../../types/index.js';
+import { removeSymbol } from '../../utils/index.js';
 
-import { TooltipStrategy } from './strategy';
+import { TooltipStrategy } from './strategy.js';
 
 export class ItemTooltipStrategy extends TooltipStrategy {
   registerPaths(paths: d3.Selection<BaseType, any, any, any>) {

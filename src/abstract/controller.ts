@@ -1,7 +1,7 @@
-import { View } from '../chart';
+import { View } from '../chart/index.js';
 
-import { ServiceController } from './service-controller';
-import { UIController } from './ui-controller';
+import { ServiceController } from './service-controller.js';
+import { UIController } from './ui-controller.js';
 
 export type ControllerCtor<T = any> = new (view: View) =>
   | UIController<T>

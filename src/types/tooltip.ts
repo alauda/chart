@@ -1,4 +1,4 @@
-import { XData } from './options';
+import { XData } from './options.js';
 
 export interface TooltipContext {
   title: Date | number | string;

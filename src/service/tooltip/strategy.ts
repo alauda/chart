@@ -1,5 +1,5 @@
-import { View } from '../../chart';
-import { ChartData, D3Selection } from '../../types';
+import { View } from '../../chart/index.js';
+import { ChartData, D3Selection } from '../../types/index.js';
 
 export abstract class TooltipStrategy {
   constructor(public owner: View) {}

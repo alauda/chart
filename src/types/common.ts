@@ -1,6 +1,6 @@
 import { NumberValue, Selection } from 'd3';
 
-import { ChartData, Options } from '../types';
+import { ChartData, Options } from '../types/index.js';
 
 export type D3EelSelection = Selection<HTMLElement, unknown, null, undefined>;
 

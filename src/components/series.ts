@@ -9,15 +9,15 @@ import {
   Selection,
 } from 'd3';
 
-import { UIController } from '../abstract';
-import { View } from '../chart';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
 import {
   CLASS_NAME,
   DEFAULT_LINE_WIDTH,
   DEFAULT_SCATTER_OPTIONS,
   GRADIENT_PREFIX,
   STROKE_WIDTH,
-} from '../constant';
+} from '../constant.js';
 import {
   AreaSeriesOption,
   BarSeriesOption,
@@ -29,8 +29,8 @@ import {
   LineSeriesOption,
   ScatterOption,
   XData,
-} from '../types';
-import { abs, defined, removeSymbol } from '../utils';
+} from '../types/index.js';
+import { abs, defined, removeSymbol } from '../utils/index.js';
 
 function handleData(d: ChartData) {
   return d.values

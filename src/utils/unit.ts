@@ -1,7 +1,7 @@
 import { template as _template } from 'lodash';
 
-import { DEFAULT_COLORS } from '../constant';
-import { Data, XData } from '../types';
+import { DEFAULT_COLORS } from '../constant.js';
+import { Data, XData } from '../types/index.js';
 
 export function getChartColor(index: number) {
   const colorIndex = index % DEFAULT_COLORS.length;

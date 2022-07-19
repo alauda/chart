@@ -42,6 +42,10 @@
   },
   "funding": "https://opencollective.com/unts",
   "license": "MIT",
+  "packageManager": "yarn@1.22.19",
+  "engines": {
+    "node": "^12.20.0 || ^14.18.0 || >=16.0.0"
+  },
   "main": "lib/index.cjs",
   "module": "lib/index.js",
   "exports": {
@@ -65,12 +69,12 @@
   "scripts": {
     "build": "run-p build:*",
     "build:r": "r -f cjs,es2015,es2020",
-    "build:scss": "sass src/theme/default.scss ./lib/default.css",
-    "build:tsc": "tsc -p tsconfig.lib.json",
-    "clean": "rimraf lib '*.tsbuildinfo'",
+    "build:sass": "sass src/theme/default.scss ./lib/default.css",
+    "build:tsc": "tsc -p src",
+    "clean": "rimraf .type-coverage dist lib '.*cache' '*.tsbuildinfo'",
     "dev": "start-storybook",
     "lint": "run-p lint:*",
-    "lint:es": "eslint . -f friendly",
+    "lint:es": "eslint . --cache -f friendly",
     "lint:style": "stylelint . --cache",
     "lint:tsc": "tsc --noEmit",
     "prepare": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0",

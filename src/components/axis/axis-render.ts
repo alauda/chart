@@ -1,11 +1,11 @@
 import { axisBottom, axisLeft, AxisScale, format } from 'd3';
 import { isFunction, isNumber } from 'lodash';
 
-import { UIController } from '../../abstract';
-import { View } from '../../chart';
-import { CLASS_NAME, STROKE_DASHARRAY } from '../../constant';
-import { AxisOption, D3Selection } from '../../types';
-import { template } from '../../utils';
+import { UIController } from '../../abstract/index.js';
+import { View } from '../../chart/index.js';
+import { CLASS_NAME, STROKE_DASHARRAY } from '../../constant.js';
+import { AxisOption, D3Selection } from '../../types/index.js';
+import { template } from '../../utils/index.js';
 
 interface config {
   range: number[];

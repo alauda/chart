@@ -1,10 +1,10 @@
 import { CurveFactory } from 'd3';
 
-import { View } from '../chart';
-import { LegendItem, AreaParams } from '../components';
+import { View } from '../chart/index.js';
+import { LegendItem, AreaParams } from '../components/index.js';
 
-import { Percentage } from './helpers';
-import { TooltipContext, TooltipContextItem } from './tooltip';
+import { Percentage } from './helpers.js';
+import { TooltipContext, TooltipContextItem } from './tooltip.js';
 
 export enum ScaleType {
   TIME = 'time',

@@ -1,3 +1,3 @@
-export * from './controller';
-export * from './service-controller';
-export * from './ui-controller';
+export * from './controller.js';
+export * from './service-controller.js';
+export * from './ui-controller.js';

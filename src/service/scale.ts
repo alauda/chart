@@ -1,9 +1,9 @@
 import { scaleTime, scaleLinear, scalePoint, scaleBand, ScaleBand } from 'd3';
 
-import { ServiceController } from '../abstract';
-import { View } from '../chart/view';
-import { DEFAULT_Y_SCALE_MAX, DEFAULT_Y_SCALE_MIN } from '../constant';
-import { AxisOption, BarSeriesOption, ScaleType } from '../types';
+import { ServiceController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { DEFAULT_Y_SCALE_MAX, DEFAULT_Y_SCALE_MIN } from '../constant.js';
+import { AxisOption, BarSeriesOption, ScaleType } from '../types/index.js';
 
 export class Scale extends ServiceController {
   xOptions: AxisOption;
