@@ -1,3 +1,5 @@
+import ResolveTypeScriptPlugin from 'resolve-typescript-plugin';
+
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { Configuration } from 'webpack';
 
@@ -24,6 +26,8 @@ export function webpackFinal(config: Configuration) {
   config.resolve!.plugins = [
     // @ts-expect-error
     ...(config.resolve.plugins || []),
+    // @ts-expect-error
+    new ResolveTypeScriptPlugin(),
     // @ts-expect-error
     new TsconfigPathsPlugin(),
   ];
