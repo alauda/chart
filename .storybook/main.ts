@@ -24,11 +24,8 @@ export const features = {
 
 export function webpackFinal(config: Configuration) {
   config.resolve!.plugins = [
-    // @ts-expect-error
-    ...(config.resolve.plugins || []),
-    // @ts-expect-error
+    ...(config.resolve!.plugins || []),
     new ResolveTypeScriptPlugin(),
-    // @ts-expect-error
     new TsconfigPathsPlugin(),
   ];
   return config;

@@ -129,6 +129,7 @@
     "yarn-deduplicate": "^5.0.0"
   },
   "resolutions": {
+    "@types/webpack": "^5.28.0",
     "prettier": "^2.7.1",
     "webpack": "^5.73.0"
   },
