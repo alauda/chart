@@ -77,7 +77,7 @@ export class Scale extends ServiceController {
   }
 
   get xBarScale() {
-    const width = (<ScaleBand<string>>this.x).bandwidth();
+    const width = (this.x as ScaleBand<string>).bandwidth();
     const defaultPadding = 8;
     const barPadding = this.isRotated ? 3 : defaultPadding;
     const spacing = this.dataValues.length / (width / barPadding);

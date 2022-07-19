@@ -2,6 +2,7 @@ dist
 node_modules
 lib
 .idea
+.type-coverage
 .vercel
 .*cache
 *.tsbuildinfo

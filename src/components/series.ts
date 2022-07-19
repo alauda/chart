@@ -352,7 +352,7 @@ export class Series extends UIController {
         STROKE_WIDTH,
         (this.option as LineSeriesOption).lineWidth || DEFAULT_LINE_WIDTH,
       )
-      .attr('cx', d => (<ScaleTime<number, number>>x)(d.x as number))
+      .attr('cx', d => (x as ScaleTime<number, number>)(d.x as number))
       .attr('cy', d => y(d.y))
       .attr('r', d => {
         if (type === 'bubble') {
@@ -494,7 +494,7 @@ export class Series extends UIController {
       .attr('class', CLASS_NAME.barItem);
 
     const { x, y } = this.owner.getController('scale');
-    const scaleX = <ScaleBand<string>>x;
+    const scaleX = x as ScaleBand<string>;
 
     if (!isClone) {
       this.owner
@@ -567,7 +567,7 @@ export class Series extends UIController {
     return line<Data<XData>>()
       .defined(defined)
       .curve((this.option as AreaSeriesOption).curveType || curveMonotoneX)
-      .x(d => (<ScaleTime<number, number>>x)(d.x as number))
+      .x(d => (x as ScaleTime<number, number>)(d.x as number))
       .y(d => y(d.y) || 0);
   }
 
@@ -576,7 +576,7 @@ export class Series extends UIController {
     return area<Data<XData>>()
       .defined(defined)
       .curve((this.option as AreaSeriesOption).curveType || curveMonotoneX)
-      .x(d => (<ScaleTime<number, number>>x)(d.x as number))
+      .x(d => (x as ScaleTime<number, number>)(d.x as number))
       .y0(y.range()[0])
       .y1(d => y(d.y) || 0);
   }
