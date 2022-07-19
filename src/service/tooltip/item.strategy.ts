@@ -48,7 +48,7 @@ export class ItemTooltipStrategy extends TooltipStrategy {
           }
         },
       )
-      .on('mousemove', (event: MouseEvent, res: any) => {
+      .on('mousemove', (event: MouseEvent, res) => {
         const value = res as {
           data: ChartData;
           name: string;
