@@ -6,8 +6,7 @@ on:
       - main
 
 jobs:
-  deploy_stories:
-    name: Deploy GitHub Pages
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
