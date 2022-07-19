@@ -76,8 +76,9 @@
     "prepare": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0",
     "prerelease": "yarn build",
     "release": "changeset publish",
+    "storybook:build": "build-storybook -o dist",
     "typecov": "type-coverage",
-    "vercel-build": "build-storybook -o dist"
+    "vercel-build": "yarn storybook:build"
   },
   "peerDependencies": {
     "d3": "^7.1.1",
