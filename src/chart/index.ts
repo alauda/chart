@@ -1,11 +1,11 @@
 import { select as d3Select } from 'd3';
 
-import { D3EelSelection, D3Selection, Options } from '../types';
-import { getChartSize, getElement, resizeOn } from '../utils';
+import { D3EelSelection, D3Selection, Options } from '../types/index.js';
+import { getChartSize, getElement, resizeOn } from '../utils/index.js';
 
-import { View } from './view';
+import { View } from './view.js';
 
-export * from './view';
+export * from './view.js';
 
 function createSvg(el: D3Selection) {
   return el.append('svg').style('overflow', 'hidden').style('display', 'block');

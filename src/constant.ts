@@ -1,7 +1,7 @@
-import { ControllerCtor } from './abstract';
-import { Pie, Series, Axis } from './components';
-import { Scale } from './service';
-import { ChartType } from './types';
+import { ControllerCtor } from './abstract/index.js';
+import { Pie, Series, Axis } from './components/index.js';
+import { Scale } from './service/index.js';
+import { ChartType } from './types/index.js';
 
 export enum LEGEND_EVENTS {
   // click 事件

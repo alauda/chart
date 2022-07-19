@@ -1,17 +1,17 @@
 import { isFunction } from 'lodash';
 
-import { UIController } from '../abstract';
-import { View } from '../chart/view';
-import { CLASS_NAME, STROKE_DASHARRAY, STROKE_WIDTH } from '../constant';
-import { Scale } from '../service';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { CLASS_NAME, STROKE_DASHARRAY, STROKE_WIDTH } from '../constant.js';
+import { Scale } from '../service/index.js';
 import {
   D3Selection,
   TooltipContext,
   TooltipContextItem,
   XScaleValue,
   YPlotLineOptions,
-} from '../types';
-import { rgbColor, template } from '../utils';
+} from '../types/index.js';
+import { rgbColor, template } from '../utils/index.js';
 
 export class YPlotLine extends UIController<YPlotLineOptions> {
   container: D3Selection;

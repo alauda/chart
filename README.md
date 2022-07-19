@@ -96,7 +96,7 @@
 
 ### Install
 
-```sh
+```shell
 # pnpm
 pnpm add @alauda/chart
 

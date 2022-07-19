@@ -8,11 +8,20 @@ import {
   DEFAULT_LINE_WIDTH,
   RECT_EVENTS,
   STROKE_WIDTH,
-} from '../../constant';
-import { ChartData, D3Selection, LineSeriesOption, Nilable } from '../../types';
-import { findClosestPointIndex, getPos, removeSymbol } from '../../utils';
+} from '../../constant.js';
+import {
+  ChartData,
+  D3Selection,
+  LineSeriesOption,
+  Nilable,
+} from '../../types/index.js';
+import {
+  findClosestPointIndex,
+  getPos,
+  removeSymbol,
+} from '../../utils/index.js';
 
-import { TooltipStrategy } from './strategy';
+import { TooltipStrategy } from './strategy.js';
 
 export class AxisTooltipStrategy extends TooltipStrategy {
   registerPaths(

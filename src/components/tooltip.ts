@@ -1,22 +1,22 @@
 import { isFunction, noop } from 'lodash';
 
-import { UIController } from '../abstract';
-import { View } from '../chart';
-import { CLASS_NAME } from '../constant';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { CLASS_NAME } from '../constant.js';
 import {
   AxisTooltipStrategy,
   ItemTooltipStrategy,
   NoneTooltipStrategy,
   TooltipStrategy,
-} from '../service';
+} from '../service/index.js';
 import {
   ChartData,
   D3Selection,
   TooltipContext,
   TooltipContextItem,
   TooltipOption,
-} from '../types';
-import { isHtml, rgbColor, template } from '../utils';
+} from '../types/index.js';
+import { isHtml, rgbColor, template } from '../utils/index.js';
 
 export class Tooltip extends UIController<TooltipOption> {
   container!: D3Selection;

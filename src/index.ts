@@ -1,15 +1,15 @@
-/// <reference types="typed-query-selector/strict" />
+/// <reference types="typed-query-selector/strict.js" />
 
-import { Chart as AChart, View as AView } from './chart';
-import { Options, Theme } from './types';
+import { Chart as AChart, View as AView } from './chart/index.js';
+import { Options, Theme } from './types/index.js';
 
 export const Chart = (options: Options) => new AChart(options);
 
 export const setTheme = (theme: Theme) => AView.setTheme(theme);
 
-export { Chart as AChart, View as AView } from './chart';
-export * from './components';
-export * from './constant';
-export * from './service';
-export * from './types';
-export * from './utils';
+export { Chart as AChart, View as AView } from './chart/index.js';
+export * from './components/index.js';
+export * from './constant.js';
+export * from './service/index.js';
+export * from './types/index.js';
+export * from './utils/index.js';

@@ -1,4 +1,4 @@
-import { ChartSize } from '../types';
+import { ChartSize } from '../types/index.js';
 
 function getElementSize(ele: Element | HTMLElement) {
   return {

@@ -5,7 +5,7 @@ import {
   ControllerCtor,
   ServiceController,
   UIController,
-} from '../abstract';
+} from '../abstract/index.js';
 import {
   Axis,
   Legend,
@@ -16,16 +16,16 @@ import {
   XPlotLine,
   Pie,
   Zoom,
-} from '../components';
+} from '../components/index.js';
 import {
   basics,
   CHART_DEPENDS_MAP,
   CLASS_NAME,
   LEGEND_EVENTS,
   VIEW_HOOKS,
-} from '../constant';
-import EventEmitter from '../event-emitter';
-import { Scale, ControllerContextService } from '../service';
+} from '../constant.js';
+import EventEmitter from '../event-emitter.js';
+import { Scale, ControllerContextService } from '../service/index.js';
 import {
   BarSeriesOption,
   ChartData,
@@ -41,8 +41,13 @@ import {
   ViewProps,
   XData,
   XPlotLineOptions,
-} from '../types';
-import { generateUID, getChartColor, getTextWidth, template } from '../utils';
+} from '../types/index.js';
+import {
+  generateUID,
+  getChartColor,
+  getTextWidth,
+  template,
+} from '../utils/index.js';
 
 export class View extends EventEmitter {
   chartEle!: ChartEle;

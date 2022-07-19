@@ -1,8 +1,8 @@
-import { UIController } from '../abstract';
-import { View } from '../chart';
-import { CLASS_NAME, STROKE_WIDTH } from '../constant';
-import { D3Selection, XPlotLineOptions } from '../types';
-import { getTextWidth, rgbColor } from '../utils';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { CLASS_NAME, STROKE_WIDTH } from '../constant.js';
+import { D3Selection, XPlotLineOptions } from '../types/index.js';
+import { getTextWidth, rgbColor } from '../utils/index.js';
 
 export class XPlotLine extends UIController<XPlotLineOptions> {
   container: D3Selection;

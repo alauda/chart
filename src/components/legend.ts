@@ -1,11 +1,11 @@
 import { select, Selection } from 'd3';
 import { clone } from 'lodash';
 
-import { UIController } from '../abstract';
-import { View } from '../chart';
-import { CLASS_NAME, LEGEND_EVENTS } from '../constant';
-import { D3Selection, Data, LegendOption } from '../types';
-import { getChartColor, template } from '../utils';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { CLASS_NAME, LEGEND_EVENTS } from '../constant.js';
+import { D3Selection, Data, LegendOption } from '../types/index.js';
+import { getChartColor, template } from '../utils/index.js';
 
 export interface LegendItem {
   name: string;

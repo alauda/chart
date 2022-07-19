@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash';
 
-import { View } from '../chart/view';
-import { Percentage } from '../types';
+import { View } from '../chart/index.js';
+import { Percentage } from '../types/index.js';
 
 export function getPos(
   e: MouseEvent,

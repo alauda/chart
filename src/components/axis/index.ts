@@ -1,8 +1,8 @@
-import { UIController } from '../../abstract';
-import { View } from '../../chart';
-import { AxisOption, D3Selection } from '../../types';
+import { UIController } from '../../abstract/index.js';
+import { View } from '../../chart/index.js';
+import { AxisOption, D3Selection } from '../../types/index.js';
 
-import AxisRender from './axis-render';
+import AxisRender from './axis-render.js';
 
 const ORIENT: Record<string, string> = {
   x: 'bottom',

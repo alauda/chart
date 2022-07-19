@@ -1,4 +1,4 @@
-import { ControllerCtor } from '../abstract';
+import { ControllerCtor } from '../abstract/index.js';
 
 export class ControllerContextService {
   private readonly LOADED_COMPONENTS: Set<ControllerCtor> = new Set();

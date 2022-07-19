@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 
-import { UIController } from '../abstract';
-import { View } from '../chart/view';
-import { PIE_EVENTS, CLASS_NAME } from '../constant';
-import { ChartData, PieSeriesOption } from '../types';
-import { getChartColor, isPercentage, rgbColor } from '../utils';
+import { UIController } from '../abstract/index.js';
+import { View } from '../chart/index.js';
+import { PIE_EVENTS, CLASS_NAME } from '../constant.js';
+import { ChartData, PieSeriesOption } from '../types/index.js';
+import { getChartColor, isPercentage, rgbColor } from '../utils/index.js';
 
 const DEFAULT_RADIUS_DIFF = 8;
 const ACTIVE_RADIUS_ENLARGE_SIZE = 4;
