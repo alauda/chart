@@ -40,7 +40,7 @@ export class ItemTooltipStrategy extends TooltipStrategy {
             });
           }
           if (value.data && type === 'pie') {
-            owner.emit(PIE_EVENTS.ITEM_HOVERD, {
+            owner.emit(PIE_EVENTS.ITEM_HOVERED, {
               self: this,
               event,
               data: value,

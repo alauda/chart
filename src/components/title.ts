@@ -1,8 +1,7 @@
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart/view';
 import { CLASS_NAME } from '../constant';
-import { D3Selection } from '../types';
-import { TitleOption } from '../types/options';
+import { D3Selection, TitleOption } from '../types';
 import { template } from '../utils';
 
 const OFFSET = {

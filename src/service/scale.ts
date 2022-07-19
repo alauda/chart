@@ -1,7 +1,7 @@
 import { scaleTime, scaleLinear, scalePoint, scaleBand, ScaleBand } from 'd3';
 
 import { ServiceController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart/view';
 import { DEFAULT_Y_SCALE_MAX, DEFAULT_Y_SCALE_MIN } from '../constant';
 import { AxisOption, BarSeriesOption, ScaleType } from '../types';
 
@@ -16,7 +16,6 @@ export class Scale extends ServiceController {
 
   constructor(owner: View) {
     super(owner);
-    this.owner = owner;
     this.xOptions = this.owner.options.xAxis || {};
     this.yOptions = this.owner.options.yAxis || {};
   }

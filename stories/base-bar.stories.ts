@@ -1,12 +1,14 @@
 import { Story, Meta } from '@storybook/html';
-
-import { Chart } from '../src';
-import { barData } from './data';
-import '../src/theme/default.scss';
 import { timeFormat } from 'd3';
 
+import { barData } from './data';
+
+import { Chart } from '@alauda/chart';
+
+import '../src/theme/default.scss';
+
 export default {
-  title: 'Basebar',
+  title: 'BaseBar',
 } as Meta;
 
 // More on component templates: https://storybook.js.org/docs/html/writing-stories/introduction#using-args
@@ -19,8 +21,7 @@ const Template: Story = () => {
       title: {
         text: '柱状图',
       },
-      tooltip: {
-      },
+      tooltip: {},
       seriesOption: {
         // stack: true,
         // radius: 5,
@@ -36,4 +37,4 @@ const Template: Story = () => {
   return `<div style="width: 100%; height: 220px" id="baseBar"></div>`;
 };
 
-export const Basebar = Template.bind({});
+export const BaseBar = Template.bind({});

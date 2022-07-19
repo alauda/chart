@@ -3,12 +3,15 @@ import { select as d3Select } from 'd3';
 import { D3EelSelection, D3Selection, Options } from '../types';
 import { getChartSize, getElement, resizeOn } from '../utils';
 
-import View from './view';
+import { View } from './view';
+
+export * from './view';
 
 function createSvg(el: D3Selection) {
   return el.append('svg').style('overflow', 'hidden').style('display', 'block');
 }
-function parseContructorOption(options: Options) {
+
+function parseConstructorOption(options: Options) {
   const { container, width, height } = options;
   const ele = getElement(container);
   const d3El = d3Select(ele);
@@ -22,13 +25,14 @@ function parseContructorOption(options: Options) {
     options,
   };
 }
-export default class Chart extends View {
+
+export class Chart extends View {
   ele: Element | HTMLElement;
 
   private resizeOn: () => void;
 
   constructor(options: Options) {
-    super(parseContructorOption(options));
+    super(parseConstructorOption(options));
     this.ele = getElement(options.container);
     this.bindResize();
   }

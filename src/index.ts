@@ -1,14 +1,13 @@
-import _Chart from './chart';
-import _View from './chart/view';
+/// <reference types="typed-query-selector/strict" />
+
+import { Chart as AChart, View as AView } from './chart';
 import { Options, Theme } from './types';
 
-export const Chart = (options: Options) => new _Chart(options);
+export const Chart = (options: Options) => new AChart(options);
 
-export const setTheme = (theme: Theme) => _View.setTheme(theme);
+export const setTheme = (theme: Theme) => AView.setTheme(theme);
 
-// export * from './chart/view';
-export { default as AChart } from './chart';
-export { default as AView } from './chart/view';
+export { Chart as AChart, View as AView } from './chart';
 export * from './components';
 export * from './constant';
 export * from './service';

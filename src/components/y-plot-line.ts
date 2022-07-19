@@ -1,7 +1,7 @@
 import { isFunction } from 'lodash';
 
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart/view';
 import { CLASS_NAME, STROKE_DASHARRAY, STROKE_WIDTH } from '../constant';
 import { Scale } from '../service';
 import {
@@ -9,8 +9,8 @@ import {
   TooltipContext,
   TooltipContextItem,
   XScaleValue,
+  YPlotLineOptions,
 } from '../types';
-import { YPlotLineOptions } from '../types/options';
 import { rgbColor, template } from '../utils';
 
 export class YPlotLine extends UIController<YPlotLineOptions> {

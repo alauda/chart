@@ -10,7 +10,7 @@ import {
 } from 'd3';
 
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart';
 import {
   CLASS_NAME,
   DEFAULT_LINE_WIDTH,
@@ -275,11 +275,13 @@ export class Series extends UIController {
         .append('clipPath');
 
       const clipRect = clipPath
-        .attr('id', d => {
-          return `bar-item-clip-${removeSymbol(d.name)}-${removeSymbol(
-            d.x as string,
-          )}`;
-        })
+        .attr(
+          'id',
+          d =>
+            `bar-item-clip-${removeSymbol(d.name)}-${removeSymbol(
+              d.x as string,
+            )}`,
+        )
         .append('rect');
       this.setBarItemAttr(barRectItem, xScale);
       this.setBarItemAttr(clipRect, xScale, true);
@@ -299,9 +301,9 @@ export class Series extends UIController {
         !d.y ? 0 : abs(this.isRotated ? y(d.y) : h - y(d.y) || 0),
       )
       .attr('rx', radius)
-      .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) => {
-        return this.handleRectXY(d, index, target, y);
-      });
+      .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) =>
+        this.handleRectXY(d, index, target, y),
+      );
   }
 
   private updateScatterSeries(isClone?: boolean) {
@@ -322,15 +324,15 @@ export class Series extends UIController {
     const { x, y } = this.owner.getController('scale');
     const scatterItem = scatterRes
       .selectAll(`.${className}`)
-      .data(item => {
-        return item.values.map(d => ({
+      .data(item =>
+        item.values.map(d => ({
           pName: item.name,
           name: d.x,
           color: item.color,
           value: d.y,
           ...d,
-        }));
-      })
+        })),
+      )
       .enter()
       .append('circle')
       .attr(
@@ -442,28 +444,24 @@ export class Series extends UIController {
           (!d.y ? 0 : abs(this.isRotated ? y(d.y) : h - y(d.y))) + num || 0
         );
       })
-      .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) => {
-        return this.handleRectXY(d, index, target, y);
-      });
+      .attr(`${this.isRotated ? 'x' : 'y'}`, (d, index, target) =>
+        this.handleRectXY(d, index, target, y),
+      );
 
     if (!isClip && this.isStack) {
       itemsRect
-        .attr('clip-path', (d, index) => {
-          return (!index && d.total === 1) || closeRadiusLadder
+        .attr('clip-path', (d, index) =>
+          (!index && d.total === 1) || closeRadiusLadder
             ? ''
             : `url(#bar-item-clip-${removeSymbol(d.name)}-${removeSymbol(
                 d.x as string,
-              )})`;
-        })
+              )})`,
+        )
         .attr('rx', (_, index) => (index ? 0 : radius));
     } else {
-      itemsRect.attr('rx', (d, index) => {
-        return !index
-          ? 0
-          : index === d.total - 1
-          ? radius
-          : radius - radius / 2;
-      });
+      itemsRect.attr('rx', (d, index) =>
+        !index ? 0 : index === d.total - 1 ? radius : radius - radius / 2,
+      );
     }
   }
 
@@ -483,14 +481,14 @@ export class Series extends UIController {
 
     const barRectItem = barRes
       .selectAll(`.${className}`)
-      .data(item => {
-        return item.values.map(d => ({
+      .data(item =>
+        item.values.map(d => ({
           name: d.x,
           color: item.color,
           value: d.y,
           ...d,
-        }));
-      })
+        })),
+      )
       .enter()
       .append('rect')
       .attr('class', CLASS_NAME.barItem);

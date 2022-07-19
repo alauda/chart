@@ -6,3 +6,4 @@ export * from './title';
 export * from './tooltip';
 export * from './x-plot-line';
 export * from './y-plot-line';
+export * from './zoom';

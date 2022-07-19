@@ -1,10 +1,9 @@
 import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
 
-import { Chart } from '../src';
-import { ScaleType } from '../src/types';
-
 import { data } from './data';
+
+import { Chart, ScaleType } from '@alauda/chart';
 
 import '../src/theme/default.scss';
 
@@ -20,9 +19,7 @@ const Template: Story = () => {
       title: {
         text: '折线图',
         // hide: true,
-        formatter: () => {
-          return '折线图';
-        },
+        formatter: () => '折线图',
         // offsetX: 20,
         // offsetY: 30,
         // hide: true,

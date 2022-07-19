@@ -1,9 +1,9 @@
-interface EventType {
+export interface EventType {
   readonly callback: (...args: unknown[]) => void;
   readonly once: boolean;
 }
 
-type EventsType = Record<string, EventType[]>;
+export type EventsType = Record<string, EventType[]>;
 
 const WILDCARD = '*';
 
@@ -63,6 +63,7 @@ export default class EventEmitter {
           }
 
           length--;
+          // eslint-disable-next-line sonar/updated-loop-counter
           i--;
         }
         callback.apply(this, args);
@@ -74,10 +75,9 @@ export default class EventEmitter {
   }
 
   /**
-   * 取消监听一个事件，或者一个channel
-   * @param evt
-   * @param callback
+   * 取消监听一个事件，或者一个 channel
    */
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   off(evt?: string, callback?: () => void) {
     if (!evt) {
       // evt 为空全部清除
@@ -95,6 +95,7 @@ export default class EventEmitter {
           if (events[i].callback === callback) {
             events.splice(i, 1);
             length--;
+            // eslint-disable-next-line sonar/updated-loop-counter
             i--;
           }
         }

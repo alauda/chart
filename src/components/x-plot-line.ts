@@ -1,8 +1,7 @@
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart';
 import { CLASS_NAME, STROKE_WIDTH } from '../constant';
-import { D3Selection } from '../types';
-import { XPlotLineOptions } from '../types/options';
+import { D3Selection, XPlotLineOptions } from '../types';
 import { getTextWidth, rgbColor } from '../utils';
 
 export class XPlotLine extends UIController<XPlotLineOptions> {

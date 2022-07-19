@@ -1,7 +1,7 @@
 import { isFunction, noop } from 'lodash';
 
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart';
 import { CLASS_NAME } from '../constant';
 import {
   AxisTooltipStrategy,
@@ -173,7 +173,9 @@ export class Tooltip extends UIController<TooltipOption> {
     const marginX = margin.left + 20 + vX;
     const tipMargin = width / 2 + vX;
     const x = this.isRotated ? offsetY + tipMargin + 10 : offsetX + marginX;
-    const y = this.isRotated ? offsetX + vY : offsetY + vY + this.owner.options.grid.top;
+    const y = this.isRotated
+      ? offsetX + vY
+      : offsetY + vY + this.owner.options.grid.top;
 
     const eventTop = (event.target as HTMLElement).getBoundingClientRect().top;
     // 实际tip top 的位置
@@ -270,7 +272,7 @@ export class Tooltip extends UIController<TooltipOption> {
     };
   }
 
-  private generateTooltipItem = (values: TooltipContextItem[]) => {
+  private readonly generateTooltipItem = (values: TooltipContextItem[]) => {
     const { nameFormatter, valueFormatter } = this.option;
     const isCircle = ['pie', 'scatter'].includes(this.owner.options.type);
     return values

@@ -1,8 +1,9 @@
 import { Story, Meta } from '@storybook/html';
 
-import { Chart } from '../src';
-
 import { groupPieData } from './data';
+
+import { Chart } from '@alauda/chart';
+
 import '../src/theme/default.scss';
 
 export default {
@@ -43,7 +44,7 @@ const Template: Story = () => {
       },
       data: groupPieData,
     });
-    // chart.on(PIE_EVENTS.ITEM_HOVERD, function (e) {
+    // chart.on(PIE_EVENTS.ITEM_HOVERED, function (e) {
     //   console.log(e);
     // });
     // chart.on(PIE_EVENTS.ITEM_MOUSEOUT, function (e) {

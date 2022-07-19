@@ -14,9 +14,9 @@ import {
   Title,
   Tooltip,
   XPlotLine,
+  Pie,
+  Zoom,
 } from '../components';
-import { Pie } from '../components/pie';
-import { Zoom } from '../components/zoom';
 import {
   basics,
   CHART_DEPENDS_MAP,
@@ -44,7 +44,7 @@ import {
 } from '../types';
 import { generateUID, getChartColor, getTextWidth, template } from '../utils';
 
-export default class View extends EventEmitter {
+export class View extends EventEmitter {
   chartEle!: ChartEle;
 
   chartUId: string;
@@ -116,12 +116,8 @@ export default class View extends EventEmitter {
   }
 
   get headerHeight() {
-    const title = document.querySelector(
-      `.${CLASS_NAME.title}`,
-    )[0] as SVGGElement;
-    const legend = document.querySelector(
-      `.${CLASS_NAME.legend}`,
-    )[0] as SVGGElement;
+    const title = document.querySelector(`svg.${CLASS_NAME.title}`);
+    const legend = document.querySelector(`svg.${CLASS_NAME.legend}`);
     const titleH = title?.getBBox?.()?.height || title?.clientHeight;
     const legendH = legend?.getBBox?.()?.height || legend?.clientHeight;
     return Math.max(titleH || 25, legendH || 0, 0);

@@ -2,10 +2,9 @@ import { drag, DragBehavior, NumberValue } from 'd3';
 import { get } from 'lodash';
 
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart';
 import { CLASS_NAME, CLONE_PATCH_EVENTS, RECT_EVENTS } from '../constant';
-import { D3Selection, Nilable } from '../types';
-import { ZoomOption } from '../types/options';
+import { D3Selection, Nilable, ZoomOption } from '../types';
 import { findClosestPointIndex, getPos } from '../utils';
 
 export interface AreaParams {

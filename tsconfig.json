@@ -1,15 +1,11 @@
 {
-  "extends": "@1stg/tsconfig/dom-lib",
+  "extends": "@1stg/tsconfig/node",
   "compilerOptions": {
     "baseUrl": ".",
-    "strictPropertyInitialization": false,
-    "strictNullChecks": false,
     "paths": {
       "@alauda/chart": ["src"]
     },
-    "outDir": "dist",
-    "noImplicitAny": false,
-    "isolatedModules": true,
-    "strictFunctionTypes": false
+    "strictFunctionTypes": false,
+    "strictNullChecks": false
   }
 }

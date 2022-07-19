@@ -1,5 +1,5 @@
 import { UIController } from '../../abstract';
-import View from '../../chart/view';
+import { View } from '../../chart';
 import { AxisOption, D3Selection } from '../../types';
 
 import AxisRender from './axis-render';

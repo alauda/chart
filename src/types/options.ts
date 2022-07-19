@@ -1,16 +1,15 @@
 import { CurveFactory } from 'd3';
 
-import View from '../chart/view';
-import { LegendItem } from '../components/legend';
-import { AreaParams } from '../components/zoom';
+import { View } from '../chart';
+import { LegendItem, AreaParams } from '../components';
 
 import { Percentage } from './helpers';
 import { TooltipContext, TooltipContextItem } from './tooltip';
 
 export enum ScaleType {
-  'TIME' = 'time',
-  'LINEAR' = 'linear',
-  'ORDINAL' = 'ordinal',
+  TIME = 'time',
+  LINEAR = 'linear',
+  ORDINAL = 'ordinal',
 }
 
 export type ChartType = 'area' | 'bar' | 'line' | 'pie' | 'scatter';

@@ -2,10 +2,9 @@ import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
 import { round } from 'lodash';
 
-import { Chart } from '../src';
-import { ScaleType } from '../src/types';
-
 import { ScatterData } from './data';
+
+import { Chart, ScaleType } from '@alauda/chart';
 
 import '../src/theme/default.scss';
 

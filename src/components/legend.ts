@@ -2,7 +2,7 @@ import { select, Selection } from 'd3';
 import { clone } from 'lodash';
 
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart';
 import { CLASS_NAME, LEGEND_EVENTS } from '../constant';
 import { D3Selection, Data, LegendOption } from '../types';
 import { getChartColor, template } from '../utils';
@@ -192,13 +192,11 @@ export class Legend extends UIController<LegendOption> {
             ],
             [],
           )
-        : cloneData.map(d => {
-            return {
-              name: d.name,
-              color: d.color || '',
-              activate: !this.disabledLegend.has(d.name),
-            };
-          });
+        : cloneData.map(d => ({
+            name: d.name,
+            color: d.color || '',
+            activate: !this.disabledLegend.has(d.name),
+          }));
   }
 
   private setTargetClass(event: Event, className: string) {
