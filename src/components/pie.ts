@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 
-import { UIController } from '@src/abstract';
-import View from '@src/chart/view';
-import { PIE_EVENTS, CLASS_NAME } from '@src/constant';
-import { ChartData, PieSeriesOption } from '@src/types';
-import { getChartColor, isPercentage, rgbColor } from '@src/utils';
+import { UIController } from '../abstract';
+import { View } from '../chart/view';
+import { PIE_EVENTS, CLASS_NAME } from '../constant';
+import { ChartData, PieSeriesOption } from '../types';
+import { getChartColor, isPercentage, rgbColor } from '../utils';
 
 const DEFAULT_RADIUS_DIFF = 8;
 const ACTIVE_RADIUS_ENLARGE_SIZE = 4;
@@ -53,7 +53,7 @@ export class Pie extends UIController<PieSeriesOption> {
   render() {
     this.update();
     this.owner.on(
-      PIE_EVENTS.ITEM_HOVERD,
+      PIE_EVENTS.ITEM_HOVERED,
       (res: { self: unknown; data: PieItemValue; event: MouseEvent }) => {
         const item = res.data;
         const path = getPath({
@@ -146,7 +146,7 @@ export class Pie extends UIController<PieSeriesOption> {
     if (!tooltip || this.owner.options.tooltip?.trigger === 'none') {
       pieItems
         .on('mouseover', function (event: MouseEvent, data) {
-          owner.emit(PIE_EVENTS.ITEM_HOVERD, {
+          owner.emit(PIE_EVENTS.ITEM_HOVERED, {
             self: this as unknown,
             event,
             data,
@@ -257,7 +257,7 @@ function calculatePaths(
             endAngle,
             ...baseConifg,
           },
-          data: null,
+          data: {},
         },
       ]
     : [];
@@ -301,7 +301,7 @@ function calculatePaths(
           endAngle,
           ...baseConifg,
         },
-        data: null,
+        data: {},
       },
       ...innerDisc,
     ],

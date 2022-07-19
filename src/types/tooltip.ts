@@ -1,13 +1,13 @@
-import { XData } from './options'
+import { XData } from './options';
 
 export interface TooltipContext {
-  title: Date | number | string
-  values: TooltipContextItem[]
+  title: Date | number | string;
+  values: TooltipContextItem[];
 }
 export interface TooltipContextItem extends XData {
-  name: string
-  color: string
-  x: string
-  y: number
-  activated?: boolean
+  name: string;
+  color: string;
+  x: string;
+  y: number;
+  activated?: boolean;
 }

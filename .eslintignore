@@ -1,4 +1,4 @@
-tools
 dist
-.storybook
-gulpfile.js
+lib
+!/.github
+!/.*.cjs

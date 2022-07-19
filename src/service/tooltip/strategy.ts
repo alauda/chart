@@ -1,11 +1,8 @@
-import View from '../../chart/view';
+import { View } from '../../chart';
 import { ChartData, D3Selection } from '../../types';
 
 export abstract class TooltipStrategy {
-  owner: View;
-  constructor(owner: View) {
-    this.owner = owner;
-  }
+  constructor(public owner: View) {}
 
   abstract registerPaths(
     paths?: d3.Selection<any, ChartData, any, any>,

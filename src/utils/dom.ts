@@ -17,8 +17,8 @@ export function getChartSize(
   if (!w && !h) {
     const size = getElementSize(ele);
 
-    w = size.width ? size.width : w;
-    h = size.height ? size.height : h;
+    w = size.width || w;
+    h = size.height || h;
   }
   return {
     width: w,

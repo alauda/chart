@@ -1,13 +1,12 @@
 import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
-
-import { Chart, AChart } from '../src';
-import { ScaleType } from '../src/types';
+import { round } from 'lodash';
 
 import { ScatterData } from './data';
 
+import { Chart, ScaleType } from '@alauda/chart';
+
 import '../src/theme/default.scss';
-import { round } from 'lodash';
 
 export default {
   title: 'Scatter',
@@ -15,7 +14,7 @@ export default {
 
 const Template: Story = () => {
   setTimeout(() => {
-    const chart: AChart = Chart({
+    Chart({
       container: '#chart',
       type: 'scatter',
       title: {

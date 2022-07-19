@@ -1,16 +1,15 @@
-import View from '@src/chart/view';
-import { AreaParams } from '@src/components/zoom';
 import { CurveFactory } from 'd3';
 
-import { LegendItem } from '../components/legend';
+import { View } from '../chart';
+import { LegendItem, AreaParams } from '../components';
 
 import { Percentage } from './helpers';
 import { TooltipContext, TooltipContextItem } from './tooltip';
 
 export enum ScaleType {
-  'TIME' = 'time',
-  'LINEAR' = 'linear',
-  'ORDINAL' = 'ordinal',
+  TIME = 'time',
+  LINEAR = 'linear',
+  ORDINAL = 'ordinal',
 }
 
 export type ChartType = 'area' | 'bar' | 'line' | 'pie' | 'scatter';
@@ -28,7 +27,7 @@ export interface Options {
   height?: number;
   offset?: { x?: number; y?: number };
   grid?: { top?: number };
-  container?: HTMLElement | string;
+  container: HTMLElement | string;
   type?: ChartType;
   data?: ChartData[]; // 数据源
   title?: TitleOption;
@@ -170,7 +169,7 @@ export interface PieSeriesOption {
 export interface ScatterOption {
   size?: number; // 圆大小  默认 5
   minSize?: number; // 默认 5
-  maxSize?: number  // 默认 20
+  maxSize?: number; // 默认 20
   type?: 'bubble'; // 设置 bubble 会默认使用 气泡样式渲染
   opacity?: number; // bubble 透明度 默认 0.2
 }
@@ -197,7 +196,7 @@ export type Data<T extends object = object> = T &
 export interface XData {
   x: Date | number | string;
   y: number;
-  name?: string
+  name?: string;
   size?: number;
   color?: string;
 }

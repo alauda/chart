@@ -2,7 +2,7 @@ import { axisBottom, axisLeft, AxisScale, format } from 'd3';
 import { isFunction, isNumber } from 'lodash';
 
 import { UIController } from '../../abstract';
-import View from '../../chart/view';
+import { View } from '../../chart';
 import { CLASS_NAME, STROKE_DASHARRAY } from '../../constant';
 import { AxisOption, D3Selection } from '../../types';
 import { template } from '../../utils';
@@ -64,6 +64,7 @@ export default class AxisRender extends UIController<AxisOption> {
     // ..
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   updateTick() {
     this.updateConfig();
     const { orient } = this.config;
@@ -109,9 +110,9 @@ export default class AxisRender extends UIController<AxisOption> {
     }
 
     if (!tickFormatter && d3Axis === axisLeft) {
-      axis.tickFormat((value: string) => {
-        return isNumber(value) ? format('d')(value) : value;
-      });
+      axis.tickFormat((value: string) =>
+        isNumber(value) ? format('d')(value) : value,
+      );
     }
     this.g
       .attr('class', this.isXAxis ? CLASS_NAME.xAxis : CLASS_NAME.yAxis)
@@ -127,7 +128,12 @@ export default class AxisRender extends UIController<AxisOption> {
         const { width } = this.owner.size.grid;
         const text = lastTick.select('text');
         if (lastTick?.size()) {
-          const x = Number(lastTick?.attr('transform').replace(/[^0-9\-,.]/g, '').split(',')[0]);
+          const x = Number(
+            lastTick
+              ?.attr('transform')
+              .replace(/[^\d,.-]/g, '')
+              .split(',')[0],
+          );
           const textWidth = (text.node() as SVGTextElement)?.getBBox()?.width;
           const textX = x + textWidth / 2;
           const left = textX > width ? textX - width : 0;
@@ -145,11 +151,11 @@ export default class AxisRender extends UIController<AxisOption> {
     const h = this.isRotated ? width : height;
     this.g.selectAll('.tick-line').remove();
     this.g
-      .call(g => {
-        return g
+      .call(g =>
+        g
           .select('.domain')
-          .attr('d', `M-6,${h}H0V${this.owner.headerTotalHeight}H0`);
-      })
+          .attr('d', `M-6,${h}H0V${this.owner.headerTotalHeight}H0`),
+      )
       .call(g => {
         const line = g.selectAll('.tick line');
         const tickLine = line.clone();

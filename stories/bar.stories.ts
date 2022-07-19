@@ -1,9 +1,9 @@
 import { Story, Meta } from '@storybook/html';
 
-import { Chart } from '../src';
-import { ScaleType } from '../src/types';
-
 import { groupBarData } from './data';
+
+import { Chart, ScaleType } from '@alauda/chart';
+
 import '../src/theme/default.scss';
 
 export default {

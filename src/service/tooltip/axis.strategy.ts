@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { BaseType, NumberValue, ScalePoint } from 'd3';
+
 import {
   ACTIVE_STROKE_WIDTH,
   CLASS_NAME,
@@ -31,8 +32,10 @@ export class AxisTooltipStrategy extends TooltipStrategy {
               .selectAll(`.${CLASS_NAME.eventRect} rect`)
               .node() as HTMLElement)
           : null;
-        const { index: closestIndex, value: xValue } =
-          this.getCurrentParams(event, eventDom);
+        const { index: closestIndex, value: xValue } = this.getCurrentParams(
+          event,
+          eventDom,
+        );
         const value = tooltip.getTooltipContext(closestIndex, xValue);
         this.owner.emit(RECT_EVENTS.CLICK, value);
       })

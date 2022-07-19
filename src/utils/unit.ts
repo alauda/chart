@@ -29,6 +29,7 @@ export function defined(d: Data<XData>) {
 }
 
 const TEMPLATE_OPTIONS = {
+  // eslint-disable-next-line regexp/match-any
   interpolate: /{([\S\s]+?)}/g,
 };
 

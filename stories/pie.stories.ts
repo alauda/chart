@@ -1,9 +1,9 @@
 import { Story, Meta } from '@storybook/html';
 
-import { Chart } from '../src';
-import { PIE_EVENTS } from '../src/constant';
-
 import { groupPieData } from './data';
+
+import { Chart } from '@alauda/chart';
+
 import '../src/theme/default.scss';
 
 export default {
@@ -34,24 +34,24 @@ const Template: Story = () => {
         },
         itemStyle: {
           borderRadius: 2,
-          borderWidth: 2
+          borderWidth: 2,
         },
         innerDisc: true,
       },
       tooltip: {
         trigger: 'item',
-        hideTitle: true
+        hideTitle: true,
       },
       data: groupPieData,
     });
-    // chart.on(PIE_EVENTS.ITEM_HOVERD, function (e) {
+    // chart.on(PIE_EVENTS.ITEM_HOVERED, function (e) {
     //   console.log(e);
     // });
     // chart.on(PIE_EVENTS.ITEM_MOUSEOUT, function (e) {
     //   console.log(e);
     // });
     setTimeout(() => {
-    // chart.data(groupPieData);
+      // chart.data(groupPieData);
       chart.updatePie({
         label: {
           text: '<div>2222</div>',

@@ -1,9 +1,8 @@
-import { template } from '@src/utils';
 import { UIController } from '../abstract';
-import View from '../chart/view';
+import { View } from '../chart/view';
 import { CLASS_NAME } from '../constant';
-import { D3Selection } from '../types';
-import { TitleOption } from '../types/options';
+import { D3Selection, TitleOption } from '../types';
+import { template } from '../utils';
 
 const OFFSET = {
   x: 0,
@@ -28,7 +27,7 @@ export class Title extends UIController<TitleOption> {
 
   init() {
     if (this.option.text && !this.option.hide) {
-     this.createContainer()
+      this.createContainer();
     }
   }
 
@@ -38,19 +37,20 @@ export class Title extends UIController<TitleOption> {
 
   update(option?: TitleOption) {
     this.option = option || this.option;
-    this.createContainer()
-    if (this.container && !this.option.hide) {
+    const { formatter, hide } = this.option;
+    this.createContainer();
+    if (this.container && !hide) {
       const { offsetX, offsetY, text } = this.option;
       const y = offsetY || 0;
       const x = this.owner.basics.padding.left + (offsetX || 0);
-      if (typeof this.option.formatter === 'function') {
+      if (typeof formatter === 'function') {
         if (this.hasTpl) {
           this.container.attr(
             'style',
             `position: absolute; top: ${y}px; left: ${x}px`,
           );
         }
-        this.container.html(this.option.formatter(text));
+        this.container.html(formatter(text));
         return;
       }
       this.container.selectAll('*').remove();
@@ -62,7 +62,7 @@ export class Title extends UIController<TitleOption> {
         .append('tspan')
         .attr('x', OFFSET.x)
         .attr('dy', OFFSET.y)
-        .text(template(this.option.formatter, { text }) || text);
+        .text(template(formatter, { text }) || text);
     }
   }
 

@@ -1,5 +1,7 @@
 dist
 node_modules
-.*cache
+lib
 .idea
-tsconfig.tsbuildinfo
+.vercel
+.*cache
+*.tsbuildinfo

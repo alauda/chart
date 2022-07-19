@@ -1,0 +1,10 @@
+{
+  "extends": "@1stg/tsconfig/lib",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "strictFunctionTypes": false,
+    "strictNullChecks": false
+  },
+  "include": ["src"]
+}

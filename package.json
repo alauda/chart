@@ -1,15 +1,61 @@
 {
   "name": "@alauda/chart",
   "version": "0.0.9-beta",
+  "type": "module",
   "description": "alauda chart",
-  "repository": "git+https://gitlab-ce.alauda.cn/frontend/alauda-chart",
-  "author": "alauda",
-  "license": "ISC",
-  "main": "dist/chart.js",
-  "unpkg": "dist/chart.min.js",
-  "types": "dist/src/index.d.ts",
+  "repository": "git+https://github.com/alauda/alauda-chart.git",
+  "author": "Alauda",
+  "contributors": [
+    "zChanges",
+    "JounQin (https://www.1stG.me) <admin@1stg.me>"
+  ],
+  "donate": {
+    "recipients": [
+      {
+        "name": "unts",
+        "platform": "opencollective",
+        "address": "https://opencollective.com/unts",
+        "weight": 60
+      },
+      {
+        "name": "rxts",
+        "platform": "opencollective",
+        "address": "https://opencollective.com/rxts",
+        "weight": 20
+      },
+      {
+        "name": "1stG",
+        "email": "i@1stg.me",
+        "weight": 20,
+        "platforms": [
+          {
+            "platform": "opencollective",
+            "address": "https://opencollective.com/1stG"
+          },
+          {
+            "platform": "patreon",
+            "address": "https://www.patreon.com/1stG"
+          }
+        ]
+      }
+    ]
+  },
+  "funding": "https://opencollective.com/unts",
+  "license": "MIT",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "exports": {
+    "types": "./lib/index.d.ts",
+    "fesm2020": "./lib/index.es2020.mjs",
+    "fesm2015": "./lib/index.es2015.mjs",
+    "import": "./lib/index.js",
+    "require": "./lib.index.cjs"
+  },
+  "fesm2020": "lib/index.es2020.mjs",
+  "fesm2015": "lib/index.es2015.mjs",
+  "types": "lib/index.d.ts",
   "files": [
-    "dist"
+    "lib"
   ],
   "keywords": [
     "alauda",
@@ -17,74 +63,61 @@
     "d3"
   ],
   "scripts": {
-    "build": "npx gulp dist",
-    "build-storybook": "build-storybook",
-    "dev": "start-storybook -p 6006",
+    "build": "run-p build:*",
+    "build:r": "r -f cjs,es2015,es2020",
+    "build:scss": "sass src/theme/default.scss ./lib/default.css",
+    "build:tsc": "tsc -p tsconfig.lib.json",
+    "clean": "rimraf lib '*.tsbuildinfo'",
+    "dev": "start-storybook",
     "lint": "run-p lint:*",
     "lint:es": "eslint . -f friendly",
     "lint:style": "stylelint . --cache",
     "lint:tsc": "tsc --noEmit",
-    "postinstall": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0"
+    "prepare": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0",
+    "prerelease": "yarn build",
+    "release": "changeset publish",
+    "vercel-build": "build-storybook -o dist"
   },
   "peerDependencies": {
     "d3": "^7.1.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21"
   },
-  "dependencies": {
-    "d3": "^7.1.1"
+  "peerDependenciesMeta": {
+    "lodash": {
+      "optional": true
+    },
+    "lodash-es": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@1stg/app-config": "^2.4.1",
-    "@babel/core": "^7.15.8",
-    "@rollup/plugin-typescript": "^8.3.0",
-    "@storybook/addon-actions": "^6.3.10",
-    "@storybook/addon-essentials": "^6.3.10",
-    "@storybook/addon-links": "^6.3.10",
-    "@storybook/builder-webpack5": "^6.3.10",
-    "@storybook/cli": "^6.3.10",
-    "@storybook/html": "^6.3.10",
-    "@storybook/manager-webpack5": "^6.3.10",
+    "@1stg/app-config": "^6.1.4",
+    "@1stg/lib-config": "^9.0.1",
+    "@changesets/changelog-github": "^0.4.5",
+    "@changesets/cli": "^2.23.2",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/cli": "^6.5.9",
+    "@storybook/html": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
     "@storybook/preset-scss": "^1.0.3",
-    "@types/d3": "^7.0.0",
-    "@types/lodash": "^4.14.176",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
-    "babel-loader": "^8.2.2",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
-    "gulp": "^4.0.2",
-    "gulp-clean": "^0.4.0",
-    "gulp-dart-sass": "^1.0.2",
-    "rollup": "^2.59.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "sass": "^1.42.1",
-    "sass-loader": "^12.1.0",
-    "tsconfig-paths-webpack-plugin": "^3.5.1",
-    "tslib": "^2.3.1",
-    "ttypescript": "^1.5.12",
-    "typescript": "^4.4.3",
-    "typescript-transform-paths": "^3.3.1",
-    "undertaker-forward-reference": "^1.0.2",
-    "webpack": "^5.58.2",
-    "webpack-cli": "^4.9.0"
+    "@types/d3": "^7.4.0",
+    "@types/lodash": "^4.14.182",
+    "@types/web": "^0.0.69",
+    "d3": "^7.6.1",
+    "lodash": "^4.17.21",
+    "sass": "^1.53.0",
+    "sass-loader": "^13.0.2",
+    "tsconfig-paths-webpack-plugin": "^3.5.2",
+    "typed-query-selector": "^2.6.1",
+    "typescript": "^4.7.4",
+    "yarn-deduplicate": "^5.0.0"
   },
   "resolutions": {
-    "prettier": "^2.4.1"
-  },
-  "browserslist": "extends @1stg/browserslist-config/alauda",
-  "commitlint": {
-    "extends": "@1stg"
-  },
-  "eslintIgnore": [
-    "dist",
-    "!/.storybook",
-    "!/.*.js"
-  ],
-  "markuplint": {
-    "extends": "@1stg/markuplint-config"
-  },
-  "prettier": "@1stg/prettier-config/semi"
+    "prettier": "^2.7.1",
+    "webpack": "^5.73.0"
+  }
 }

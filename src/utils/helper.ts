@@ -1,6 +1,6 @@
 import { isNumber } from 'lodash';
 
-import View from '../chart/view';
+import { View } from '../chart/view';
 import { Percentage } from '../types';
 
 export function getPos(
@@ -35,11 +35,12 @@ export function isPercentage(num: number | string): num is Percentage {
 }
 
 export function removeSymbol(str: string) {
-  return str?.replace(/\W+/gi, '') || str;
+  return str?.replace(/\W+/g, '') || str;
 }
 
 export function isHtml(str: string) {
-  return /<\/?[a-z][\s\S]*>/i.test(str);
+  // eslint-disable-next-line regexp/match-any
+  return /<\/?[a-z][\S\s]*>/i.test(str);
 }
 
 export function abs(value: number) {

@@ -1,10 +1,10 @@
 import { Story, Meta } from '@storybook/html';
 import { timeFormat } from 'd3';
 
-import { Chart } from '../src';
-import { ScaleType } from '../src/types';
-
 import { data } from './data';
+
+import { Chart, ScaleType } from '@alauda/chart';
+
 import '../src/theme/default.scss';
 
 export default {
@@ -29,7 +29,7 @@ const Template: Story = () => {
         // formatter: (data: ChartData[]) => `<div>11${data[0].name}</div>`,
         // itemFormatter: `legend {name}`,
       },
-      data: data,
+      data,
       xAxis: {
         type: ScaleType.TIME,
         tickFormatter: () => timeFormat('%H:%M'),
@@ -50,12 +50,5 @@ const Template: Story = () => {
     </div>
   `;
 };
-// You can either use a function to create DOM elements or use a plain html string!
-// return `<div>${label}</div>`;
+
 export const area = Template.bind({});
-// More on args: https://storybook.js.org/docs/html/writing-stories/args
-// Primary.args = {
-//   primary: true,
-//   label: 'Button',
-// }
-// const div = document.querySelector('#chart') || ''

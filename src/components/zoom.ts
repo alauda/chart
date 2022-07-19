@@ -1,11 +1,11 @@
-import { UIController } from '../abstract';
-import View from '../chart/view';
-import { D3Selection, Nilable } from '../types';
-import { ZoomOption } from '../types/options';
-import { CLASS_NAME, CLONE_PATCH_EVENTS, RECT_EVENTS } from '../constant';
 import { drag, DragBehavior, NumberValue } from 'd3';
-import { findClosestPointIndex, getPos } from '@src/utils';
 import { get } from 'lodash';
+
+import { UIController } from '../abstract';
+import { View } from '../chart';
+import { CLASS_NAME, CLONE_PATCH_EVENTS, RECT_EVENTS } from '../constant';
+import { D3Selection, Nilable, ZoomOption } from '../types';
+import { findClosestPointIndex, getPos } from '../utils';
 
 export interface AreaParams {
   x: number;
@@ -66,7 +66,7 @@ export class Zoom extends UIController<ZoomOption> {
         const event = get(e, 'sourceEvent') as MouseEvent;
         const params = this.getContext(event);
         start = params.x;
-        this.option.onzoomStart && this.option.onzoomStart(params);
+        this.option?.onzoomStart(params);
         this.container
           .attr('x', params.x)
           .attr('height', this.owner.size.main.height);
@@ -103,17 +103,17 @@ export class Zoom extends UIController<ZoomOption> {
     this.owner.on(CLONE_PATCH_EVENTS.MOUSEUP, this.dragEnd);
   }
 
-  private dragStart = (event: MouseEvent) => {
+  private readonly dragStart = (event: MouseEvent) => {
     this.open = true;
     const params = this.getContext(event);
     this.start = params.x;
-    this.option.onzoomStart && this.option.onzoomStart(params);
+    this.option?.onzoomStart(params);
     this.container
       .attr('x', params.x)
       .attr('height', this.owner.size.main.height);
   };
 
-  private drag = (event: MouseEvent) => {
+  private readonly drag = (event: MouseEvent) => {
     if (this.open) {
       const params = this.getContext(event);
       this.option?.onzoom?.(params);
@@ -129,13 +129,13 @@ export class Zoom extends UIController<ZoomOption> {
     }
   };
 
-  private dragEnd = (event: MouseEvent) => {
+  private readonly dragEnd = (event: MouseEvent) => {
     this.open = false;
     this.option?.onzoomEnd?.(this.getContext(event));
     this.container.attr('width', 0).attr('x', 0);
   };
 
-  private getContext = (event: MouseEvent): AreaParams => {
+  private readonly getContext = (event: MouseEvent): AreaParams => {
     const scale = this.owner.getController('scale');
     const xPos = getPos(event, this.isRotated);
     const closestIndex = findClosestPointIndex(

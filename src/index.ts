@@ -1,16 +1,15 @@
-import _Chart from './chart';
-import _View from './chart/view';
-import {Options, Theme} from '@src/types';
+/// <reference types="typed-query-selector/strict" />
 
-export const Chart = (options: Options) => new _Chart(options);
-export type AChart = _Chart;
-export type View = _View;
-export const setTheme = (theme: Theme) => _View.setTheme(theme);
+import { Chart as AChart, View as AView } from './chart';
+import { Options, Theme } from './types';
 
-export * from './chart/view';
+export const Chart = (options: Options) => new AChart(options);
 
+export const setTheme = (theme: Theme) => AView.setTheme(theme);
+
+export { Chart as AChart, View as AView } from './chart';
+export * from './components';
+export * from './constant';
+export * from './service';
 export * from './types';
 export * from './utils';
-export * from './service';
-export * from './components';
-export * from './constant'

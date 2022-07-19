@@ -1,14 +1,13 @@
 {
-  "extends": [
-    "@1stg/stylelint-config/scss/loose"
-  ],
+  "extends": "@1stg/stylelint-config/loose",
   "rules": {
-    "no-descending-specificity": null,
-    "no-invalid-position-at-import-rule": null,
-    "selector-type-no-unknown": true
-  },
-  "ignoreFiles": [
-    "dist",
-    "node_modules"
-  ]
+    "scss/function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": [
+          "use-rgb"
+        ]
+      }
+    ]
+  }
 }

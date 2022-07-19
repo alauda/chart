@@ -1,11 +1,12 @@
-import { CLASS_NAME, PIE_EVENTS, SCATTER_EVENTS } from '@src/constant';
 import * as d3 from 'd3';
 import { BaseType } from 'd3';
+import { get } from 'lodash';
+
+import { CLASS_NAME, PIE_EVENTS, SCATTER_EVENTS } from '../../constant';
+import { ChartData } from '../../types';
+import { removeSymbol } from '../../utils';
 
 import { TooltipStrategy } from './strategy';
-import { ChartData } from '@src/types';
-import { get } from 'lodash';
-import { removeSymbol } from '@src/utils';
 
 export class ItemTooltipStrategy extends TooltipStrategy {
   registerPaths(paths: d3.Selection<BaseType, any, any, any>) {
@@ -39,7 +40,7 @@ export class ItemTooltipStrategy extends TooltipStrategy {
             });
           }
           if (value.data && type === 'pie') {
-            owner.emit(PIE_EVENTS.ITEM_HOVERD, {
+            owner.emit(PIE_EVENTS.ITEM_HOVERED, {
               self: this,
               event,
               data: value,
@@ -101,9 +102,10 @@ export class ItemTooltipStrategy extends TooltipStrategy {
             );
             const dR = point.attr('defaultR');
             point
-            .transition()
-            .duration(200)
-            .attr('stroke-width', 1).attr('r', dR);
+              .transition()
+              .duration(200)
+              .attr('stroke-width', 1)
+              .attr('r', dR);
 
             owner.emit(SCATTER_EVENTS.ITEM_HOVERED, {
               self: this,

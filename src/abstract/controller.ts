@@ -1,4 +1,4 @@
-import View from '../chart/view';
+import { View } from '../chart';
 
 import { ServiceController } from './service-controller';
 import { UIController } from './ui-controller';
@@ -8,17 +8,13 @@ export type ControllerCtor<T = any> = new (view: View) =>
   | ServiceController<T>;
 
 export abstract class Controller<T = unknown> {
-  owner!: View;
-
-  constructor(owner: View) {
-    this.owner = owner;
-  }
+  constructor(public owner: View) {}
 
   protected option!: T;
 
-  public abstract get name(): string;
+  abstract get name(): string;
 
-  public abstract init(): void;
+  abstract init(): void;
 
-  public abstract destroy?(): void;
+  abstract destroy?(): void;
 }

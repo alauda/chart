@@ -1,0 +1,10 @@
+{
+  "presets": [
+    [
+      "@1stg",
+      {
+        "typescript": true
+      }
+    ]
+  ]
+}

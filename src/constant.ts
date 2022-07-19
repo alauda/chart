@@ -3,8 +3,6 @@ import { Pie, Series, Axis } from './components';
 import { Scale } from './service';
 import { ChartType } from './types';
 
-export enum EVENTS {}
-
 export enum LEGEND_EVENTS {
   // click 事件
   CLICK = 'legendItem:click',
@@ -13,7 +11,7 @@ export enum LEGEND_EVENTS {
 }
 
 export enum PIE_EVENTS {
-  ITEM_HOVERD = 'pieItem:hoverd',
+  ITEM_HOVERED = 'pieItem:hovered',
   ITEM_MOUSEOUT = 'pieItem:mouseout',
   ITEM_CLICK = 'pieItem:click',
 }
@@ -38,15 +36,11 @@ export enum SCATTER_EVENTS {
 }
 
 export enum VIEW_HOOKS {
-  AFTER_RENDER = 'afterrender',
-
-  CHANGE_DATA = 'changedata',
-
-  SET_DATA = 'setdata',
-
-  BEFORE_DESTROY = 'beforedestroy',
-
-  CHANGE_SIZE = 'afterchangesize',
+  AFTER_RENDER = 'after-render',
+  CHANGE_DATA = 'change-data',
+  SET_DATA = 'set-data',
+  BEFORE_DESTROY = 'before-destroy',
+  CHANGE_SIZE = 'change-size',
 }
 
 export const DEFAULT_COLORS = [
@@ -69,14 +63,14 @@ export const DEFAULT_COLORS = [
 
 export const basics = {
   margin: { top: 0, right: 0, bottom: 20, left: 20 },
-  padding: { left: 0 }, // title 
+  padding: { left: 0 }, // title
   main: { top: 20 }, // grid
   tickLabelWidth: 0,
 };
 
 export const AC_PREFIX = 'ac';
 
-export const CLASS_NAME: Record<string, string> = {
+export const CLASS_NAME = {
   title: getPrefixName('title'),
   titleText: getPrefixName('title-text'),
   legend: getPrefixName('legend'),
@@ -99,9 +93,9 @@ export const CLASS_NAME: Record<string, string> = {
   barItem: getPrefixName('bar-item'),
   cloneBar: getPrefixName('clone-bar'),
 
+  scatter: getPrefixName('scatter'),
   scatters: getPrefixName('scatters'),
   cloneScatter: getPrefixName('clone-scatter'),
-  scatter: getPrefixName('scatter'),
   scatterItem: getPrefixName('scatter-item'),
 
   xAxis: getPrefixName('x-axis'),
@@ -132,11 +126,13 @@ export const CLASS_NAME: Record<string, string> = {
   yPlotLineCircle: getPrefixName('y-plot-line-circle'),
   xPlotLine: getPrefixName('x-plot-line'),
 
+  pie: getPrefixName('pie'),
+  pies: getPrefixName('pies'),
   pieGuide: getPrefixName('pie-guide'),
-};
+} as const;
 
-function getPrefixName(name: string) {
-  return `${AC_PREFIX}-${name}`;
+function getPrefixName<T extends string>(name: T) {
+  return `${AC_PREFIX}-${name}` as const;
 }
 
 export const GRADIENT_PREFIX = 'gradient-';
@@ -160,13 +156,14 @@ export const DEFAULT_SCATTER_OPTIONS = {
   opacity: 0.2,
 };
 
-const COMMON_2D_DEPENENCY = [Scale, Series, Axis];
+const COMMON_2D_DEPENDENCY = [Scale, Series, Axis];
+
 export const CHART_DEPENDS_MAP: Record<ChartType, ControllerCtor[]> = {
   pie: [Pie],
-  scatter: COMMON_2D_DEPENENCY,
-  area: COMMON_2D_DEPENENCY,
-  line: COMMON_2D_DEPENENCY,
-  bar: COMMON_2D_DEPENENCY,
+  scatter: COMMON_2D_DEPENDENCY,
+  area: COMMON_2D_DEPENDENCY,
+  line: COMMON_2D_DEPENDENCY,
+  bar: COMMON_2D_DEPENDENCY,
 };
 
 // 环形图hover时，环形放缩半径
