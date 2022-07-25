@@ -2,4 +2,4 @@
 '@alauda/chart': patch
 ---
 
-fix breaking change
+fix: unexpected breaking change
