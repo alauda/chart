@@ -6,9 +6,8 @@ import { PIE_EVENTS, CLASS_NAME } from '../constant.js';
 import { ChartData, PieSeriesOption } from '../types/index.js';
 import { getChartColor, isPercentage, rgbColor } from '../utils/index.js';
 
-const DEFAULT_RADIUS_DIFF = 8;
-const ACTIVE_RADIUS_ENLARGE_SIZE = 2;
-// const SELECT_OFFSET = 4;
+export const DEFAULT_RADIUS_DIFF = 8;
+export const ACTIVE_RADIUS_ENLARGE_SIZE = 2;
 
 interface PieItemConfig {
   startAngle: number;
@@ -56,12 +55,11 @@ export class Pie extends UIController<PieSeriesOption> {
       PIE_EVENTS.ITEM_HOVERED,
       (res: { self: unknown; data: PieItemValue; event: MouseEvent }) => {
         const item = res.data;
-        const increaseValue = ACTIVE_RADIUS_ENLARGE_SIZE;
         const path = getPath({
           ...item.config,
-          innerRadius: item.config.innerRadius - increaseValue,
-          outerRadius: item.config.outerRadius + increaseValue,
-          borderWidth: item.config.borderWidth - increaseValue,
+          innerRadius: item.config.innerRadius - ACTIVE_RADIUS_ENLARGE_SIZE,
+          outerRadius: item.config.outerRadius + ACTIVE_RADIUS_ENLARGE_SIZE,
+          borderWidth: item.config.borderWidth - ACTIVE_RADIUS_ENLARGE_SIZE,
         });
         d3.select(res.self as any)
           .attr('opacity', 0.9)
