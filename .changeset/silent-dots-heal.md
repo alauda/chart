@@ -2,4 +2,4 @@
 '@alauda/chart': patch
 ---
 
-fix export view options type
+fix: export type `ViewOptions`
