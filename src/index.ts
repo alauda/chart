@@ -7,7 +7,7 @@ export const Chart = (options: Options) => new AChart(options);
 
 export const setTheme = (theme: Theme) => View.setTheme(theme);
 
-export { Chart as AChart, View } from './chart/index.js';
+export { Chart as AChart, View, ViewOptions } from './chart/index.js';
 export * from './components/index.js';
 export * from './constant.js';
 export * from './service/index.js';
