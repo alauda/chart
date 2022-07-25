@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.1
+
+### Patch Changes
+
+- [#9](https://github.com/alauda/alauda-chart/pull/9) [`5b6c3a5`](https://github.com/alauda/alauda-chart/commit/5b6c3a5acbc315594d70a0af44a4ba5e8a89fc89) Thanks [@zChanges](https://github.com/zChanges)! - fix: unexpected breaking change
+
 ## 0.1.0
 
 ### Minor Changes
