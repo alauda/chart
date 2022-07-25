@@ -49,6 +49,8 @@ import {
   template,
 } from '../utils/index.js';
 
+export type ViewOptions = Omit<Options, 'container'>;
+
 export class View extends EventEmitter {
   chartEle!: ChartEle;
 
@@ -162,7 +164,7 @@ export class View extends EventEmitter {
     this.options.contextCallbackFunction?.(this);
   }
 
-  setOptions(options: Options) {
+  setOptions(options: ViewOptions) {
     // TODO: 异步修改 option 调整方法
     if (!this.options.contextCallbackFunction) {
       options.contextCallbackFunction?.(this);
@@ -217,7 +219,7 @@ export class View extends EventEmitter {
   }
 
   // TODO: 先手动异步注册 zoom
-  asyncUpdateZoomOption(options: Options) {
+  asyncUpdateZoomOption(options: ViewOptions) {
     if (options?.zoom?.enabled && !this.getController('zoom')) {
       this.context.registerComponent(Zoom);
       const instance = this.buildController(Zoom, this);
