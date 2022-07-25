@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.2
+
+### Patch Changes
+
+- [#11](https://github.com/alauda/alauda-chart/pull/11) [`8b4acb3`](https://github.com/alauda/alauda-chart/commit/8b4acb394eaa6efaf2e78f9de54fd315b7c44db3) Thanks [@zChanges](https://github.com/zChanges)! - fix: export type `ViewOptions`
+
 ## 0.1.1
 
 ### Patch Changes
