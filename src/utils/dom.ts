@@ -1,4 +1,5 @@
-import { ChartSize } from '../types/index.js';
+import { select } from 'd3';
+import { isNumber } from 'lodash';
 
 function getElementSize(ele: Element | HTMLElement) {
   return {
@@ -11,10 +12,10 @@ export function getChartSize(
   ele: Element | HTMLElement,
   width = 0,
   height = 0,
-): ChartSize {
+) {
   let w = width || 0;
   let h = height || 0;
-  if (!w && !h) {
+  if (!w && !h && ele) {
     const size = getElementSize(ele);
 
     w = size.width || w;
@@ -30,4 +31,12 @@ export function getElement(container: HTMLElement | string) {
   return typeof container === 'string'
     ? document.querySelector(container)
     : container;
+}
+
+export function transformD3El(dom: HTMLElement) {
+  return select(dom);
+}
+
+export function getPixel(value: string | number) {
+  return isNumber(+value) ? `${value}px` : value;
 }

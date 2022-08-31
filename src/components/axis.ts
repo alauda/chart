@@ -1,8 +1,8 @@
 import { BaseComponent } from './base.js';
 
-export class tooltip extends BaseComponent {
+export class Axis extends BaseComponent {
   get name() {
-    return this.getName('tooltip');
+    return this.getName('axis');
   }
 
   render() {
