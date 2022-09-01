@@ -1,5 +1,4 @@
 import { select } from 'd3';
-import { isNumber } from 'lodash';
 
 function getElementSize(ele: Element | HTMLElement) {
   return {
@@ -38,5 +37,5 @@ export function transformD3El(dom: HTMLElement) {
 }
 
 export function getPixel(value: string | number) {
-  return isNumber(+value) ? `${value}px` : value;
+  return typeof +value === 'number' && !isNaN(+value) ? `${value}px` : value;
 }

@@ -9,7 +9,7 @@ import { View } from './view.js';
 const CHART_NAME = generateElName('chart');
 
 export class Chart extends View {
-  ele: HTMLElement;
+  el: HTMLElement;
   eleD3: Selection<HTMLElement, unknown, null, null>;
   private svgEl: HTMLElement;
 
@@ -48,7 +48,7 @@ export class Chart extends View {
   constructor() {
     super();
     this.initDom();
-    const size = getChartSize(this.ele, this.width, this.height);
+    const size = getChartSize(this.el, this.width, this.height);
     super.init({
       ...size,
       svgEl: this.svgEl,
@@ -80,7 +80,7 @@ export class Chart extends View {
     container.append(this.svgEl);
     this.svgEl.append(slot);
     this.eleD3 = transformD3El(container);
-    this.ele = container;
+    this.el = container;
     shadowRoot.append(container);
 
     this.initDefaultInteractions(this.defaultInteractions);
@@ -101,7 +101,7 @@ export class Chart extends View {
   }
 
   private readonly onResize = debounce(() => {
-    const { width, height } = getChartSize(this.ele, this.width, this.height);
+    const { width, height } = getChartSize(this.el, this.width, this.height);
     this.changeSize(width, height);
   }, 300);
 
