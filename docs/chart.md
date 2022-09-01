@@ -36,7 +36,7 @@ set(string, int) {
 #### 结论
 
 - 插件化：不使用 prototype 实现，大概：component interaction 都是插件化，都 register 方式注册使用，component interaction 内置 register 实现
-- immutable： chart 默认手动更新 如多次 setData(data) 内部会 nextTick 生效， data 支持 reactive 方式 this.data = data 会自动更新，
+- immutable： chart 默认手动更新， data 支持 reactive 方式，内置 nextTick
 
 ### nextTick
 
@@ -120,7 +120,7 @@ alauda-chart
 
 ```ts
 interface ChartOption {
-  // 绘制的 DOM 可以是 DOM selector  也可以是 DOM 实例
+  // 绘制的 DOM 可以是 DOM select  也可以是 DOM 实例
   container: string | HTMLElement;
   // 图表宽高度 不设置默认根据父容器高度自适应
   width?: number;
@@ -163,3 +163,32 @@ interface Options {
 2. 合并 changeData data data 内置 nextTick （vue nextTick 可否直接使用）
 
 3. event-emitter 可使用第三方 async event 或者 web component 原生的
+
+### 讨论点
+
+nextTick
+
+- 多次 setData setTitle 进入 nextTick 队列，每次更新只更新引用，最后 render
+
+web component attr string property 传入参数只支持 string
+
+1. attr text-offset 将 option 拍平以 xx-xx-xx 格式定义 （array 还是有问题）
+
+2. 框架内 自定义属性 例如 vue 的 :data="data"
+
+3. 不使用 web component （在调研一段事件看是否有好的方式解决）
+
+evemt emmit
+
+- 用第三方插件，事件是全局发送还是当前实例？（个人当前实例 无需 多个实例之间的通讯）
+- uuid 自增即可
+
+插件化
+
+- component 还是以全局方式注册 无需 servie
+- interactions 插件形式 例如 vue.use(plugin) 绑定在当前实例下
+
+组件通讯
+
+- 通过 event 通讯 （散落在各个组件内不好维护）
+- 通过 view 拿到所有组件实例，通过 view 做桥梁组件之间去通讯 （反模式）
