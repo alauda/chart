@@ -6,6 +6,14 @@
 
 ## 调研点
 
+> 插件化 最小打包、用户自定义
+>
+> options reactive next tick
+>
+> web component 优劣
+>
+> 组件通讯 event ? view 桥梁？
+
 ### dayjs 插件化、 immutable
 
 > 插件化 `prototype` 方式实现
@@ -32,23 +40,6 @@ set(string, int) {
   return this.clone().$set(string, int)
 }
 ```
-
-#### 结论
-
-- 插件化：不使用 prototype 实现，大概：component interaction 都是插件化，都 register 方式注册使用，component interaction 内置 register 实现
-- immutable： chart 默认手动更新， data 支持 reactive 方式，内置 nextTick
-
-### nextTick
-
-> 数据变更 => watcher push 事件队列 => 下一次事件触发 => 清空队列
-
-### web-component
-
-> ~~IE 不兼容 有 [polyfills](https://github.com/webcomponents/polyfills) 但一些样式 css 无效 不考虑 ie~~
-
-1. 已经成熟
-
-2. 避免二次包装
 
 ## 结构
 
@@ -154,7 +145,7 @@ interface Options {
 4. nodejs 中使用 d3 node 默认不支持 DOM 需要 jsdom 之类的创建 dom
 5. ~~nextTick 默认先支持手动 render 后面在支持实时更新~~
 
-##
+---
 
 **会议纪要**
 
@@ -163,6 +154,34 @@ interface Options {
 2. 合并 changeData data data 内置 nextTick （vue nextTick 可否直接使用）
 
 3. event-emitter 可使用第三方 async event 或者 web component 原生的
+
+---
+
+### 结论
+
+- 插件化：不使用 prototype 实现
+
+  - compnent 全局 register web-component 全局 defined
+  - interaction 和 Chart 实例绑定 如 vue.use(plugin)
+
+- reactive： chart 默认手动更新， data 支持 reactive 方式，内置 nextTick
+
+##### nextTick
+
+> 数据变更 => watcher push 事件队列 => 下一次事件触发 => 清空队列
+
+##### web-component
+
+> ~~IE 不兼容 有 [polyfills](https://github.com/webcomponents/polyfills) 但一些样式 css 无效 不考虑 ie~~
+
+1. 已经成熟
+
+2. 避免二次包装
+
+- 开发替换成本 替换成功差不太多
+- 场景 避免二次包装
+- 技术难度 参数只支持 string
+- 开源影响 react vue 都有在支持 web component
 
 ### 讨论点
 
@@ -174,7 +193,7 @@ web component attr string property 传入参数只支持 string
 
 1. attr text-offset 将 option 拍平以 xx-xx-xx 格式定义 （array 还是有问题）
 
-2. 框架内 自定义属性 例如 vue 的 :data="data"
+2. 框架内 自定义属性 例如 vue 的 :data="data" （提供序列化方式）
 
 3. 不使用 web component （在调研一段事件看是否有好的方式解决）
 
