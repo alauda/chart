@@ -136,6 +136,7 @@ export interface BarSeriesOption {
   closeRadiusLadder?: boolean; // 关闭叠加 bar 圆角是否阶阶梯优化
   isGroup?: boolean; // 是否分组 [{name: 'xxx1'}, {name: 'xxx2'}]
   columnClick?: (data: BarColumnParams) => void;
+  minHeight?: number; // 单个柱状的高度，如果 isGroup 为 true 时不生效
 }
 
 export interface BarColumnParams {

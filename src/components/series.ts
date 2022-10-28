@@ -508,6 +508,7 @@ export class Series extends UIController {
       radius,
       bandwidth = 0,
       columnClick,
+      minHeight,
     } = this.option as BarSeriesOption;
 
     if (isClone) {
@@ -517,18 +518,28 @@ export class Series extends UIController {
     }
     const { width, height } = this.owner.size.main;
     const h = this.isRotated ? width : height;
+    const gy = (n: number) => {
+      const top = y(n);
+      if (!n) {
+        return top;
+      }
+      if (this.isRotated) {
+        return Math.max(minHeight, top);
+      }
+      return h - top < minHeight ? h - minHeight : top;
+    };
     barRectItem
       .attr('x', d => {
         const width = bandwidth ? (scaleX.bandwidth() - bandwidth) / 2 : 0;
         return this.isRotated ? 0 : scaleX(d.x as string) + width;
       })
-      .attr('y', d => (this.isRotated ? scaleX(d.x as string) : y(d.y)))
+      .attr('y', d => (this.isRotated ? scaleX(d.x as string) : gy(d.y)))
       .attr(
         `${this.isRotated ? 'height' : 'width'}`,
         abs(bandwidth || scaleX.bandwidth()),
       )
       .attr(`${this.isRotated ? 'width' : 'height'}`, d =>
-        abs(this.isRotated ? y(d.y) : h - y(d.y) || 0),
+        abs(this.isRotated ? gy(d.y) : h - gy(d.y) || 0),
       )
       .attr('rx', radius || 0)
       .attr('fill', d => d.color);
