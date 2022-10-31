@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.3
+
+### Patch Changes
+
+- [#17](https://github.com/alauda/chart/pull/17) [`c7f9db1`](https://github.com/alauda/chart/commit/c7f9db1bc6f0fb3196bf2949245f90301ece229f) Thanks [@igauch](https://github.com/igauch)! - feat: bar support minheight
+
 ## 0.1.2
 
 ### Patch Changes
