@@ -27,7 +27,8 @@ export function findClosestPointIndex(
   );
   const count = owner.isBar && owner.isGroup ? owner.chartData.length : max;
   const w = isRotated ? owner.size.grid.height : owner.size.grid.width;
-  return Math.floor((xPos * count) / w);
+  const idx = Math.floor((xPos * count) / w);
+  return Math.min(Math.max(0, idx), count);
 }
 
 export function isPercentage(num: number | string): num is Percentage {
