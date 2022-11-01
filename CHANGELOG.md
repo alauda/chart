@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.4
+
+### Patch Changes
+
+- [#19](https://github.com/alauda/chart/pull/19) [`4916e50`](https://github.com/alauda/chart/commit/4916e508b103b14585cb6cf7cf44c07cd224c85b) Thanks [@igauch](https://github.com/igauch)! - fix: tooltip display problem at the edge of the chart
+
 ## 0.1.3
 
 ### Patch Changes
