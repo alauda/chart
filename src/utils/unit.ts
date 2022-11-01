@@ -60,7 +60,7 @@ export function getTextWidth(text: string | number, font = '12px arial') {
   context.font = font;
   const metrics = context.measureText(text ? String(text) : '');
   canvas.remove();
-  return metrics.width;
+  return Math.ceil(metrics.width);
 }
 
 export function hexToRGB(hex: string, alpha: number) {
