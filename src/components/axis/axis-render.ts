@@ -7,14 +7,14 @@ import { CLASS_NAME, STROKE_DASHARRAY } from '../../constant.js';
 import { AxisOption, D3Selection } from '../../types/index.js';
 import { template } from '../../utils/index.js';
 
-interface config {
+interface Config {
   range: number[];
   orient: string;
 }
 
 interface AxisRenderProps {
   name: string;
-  config: config;
+  config: Config;
   g: D3Selection;
   owner: View;
   option: AxisOption;
@@ -22,7 +22,7 @@ interface AxisRenderProps {
 }
 
 export default class AxisRender extends UIController<AxisOption> {
-  config!: config;
+  config!: Config;
 
   g: D3Selection;
 
@@ -69,7 +69,8 @@ export default class AxisRender extends UIController<AxisOption> {
     this.updateConfig();
     const { orient } = this.config;
     const isBottom = orient === 'bottom';
-    const { x, y, isGroup, xSeriesValue } = this.owner.getController('scale');
+    const { x, y, isGroup, xSeriesValue, ySeriesValue } =
+      this.owner.getController('scale');
     const scale = isBottom ? x : y;
     const d3Axis = isBottom
       ? this.isRotated
@@ -79,7 +80,14 @@ export default class AxisRender extends UIController<AxisOption> {
       ? axisBottom
       : axisLeft;
 
-    const maxTicks = this.getMaxTicks();
+    const maxTicks =
+      this.option.minStep != null
+        ? Math.min(
+            Math.ceil(Math.max(...ySeriesValue) / this.option.minStep) || 1,
+            this.getMaxTicks(),
+          )
+        : this.getMaxTicks();
+
     let axis = d3Axis(scale as AxisScale<any>).ticks(maxTicks);
     // TODO: 优化 ticks
     // if (xSeriesValue.every(d => typeof d === 'number') && this.isYAxis) {
