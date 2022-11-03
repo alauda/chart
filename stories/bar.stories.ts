@@ -39,6 +39,9 @@ const Template: Story = () => {
       xAxis: {
         type: ScaleType.ORDINAL,
       },
+      yAxis: {
+        minStep: 2,
+      },
     });
   }, 0);
   return `

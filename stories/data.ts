@@ -1483,25 +1483,25 @@ export const groupBarData = [
   {
     name: 'deployment',
     values: [
-      { x: 'running', y: 94, index: 0, color: '#0abf5b' },
-      { x: 'pending', y: 0, index: 1, color: '#006eff' },
-      { x: 'stopped', y: 1, index: 2, color: '#999' },
+      { x: 'running', y: 1, index: 0, color: '#0abf5b' },
+      { x: 'pending', y: 2, index: 1, color: '#006eff' },
+      { x: 'stopped', y: 3, index: 2, color: '#999' },
     ],
   },
   {
     name: 'statefulset',
     values: [
-      { x: 'running', y: 20, index: 0, color: '#0abf5b' },
-      { x: 'pending', y: 4, index: 1, color: '#006eff' },
-      { x: 'stopped', y: 5, index: 2, color: '#999' },
+      { x: 'running', y: 4, index: 0, color: '#0abf5b' },
+      { x: 'pending', y: 2, index: 1, color: '#006eff' },
+      { x: 'stopped', y: 1, index: 2, color: '#999' },
     ],
   },
   {
     name: 'daemonset',
     values: [
-      { x: 'running', y: 10, index: 0, color: '#0abf5b' },
-      { x: 'pending', y: 0, index: 1, color: '#006eff' },
-      { x: 'stopped', y: 0, index: 2, color: '#999' },
+      { x: 'running', y: 3, index: 0, color: '#0abf5b' },
+      { x: 'pending', y: 1, index: 1, color: '#006eff' },
+      { x: 'stopped', y: 2, index: 2, color: '#999' },
     ],
   },
 ];

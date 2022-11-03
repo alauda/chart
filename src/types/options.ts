@@ -97,6 +97,7 @@ export interface AxisOption {
   type?: ScaleType;
   min?: number;
   max?: number;
+  minStep?: number; // axis 最小步宽，例如整数可以设置为 1
   tickCount?: number; // 设置 坐标 tick 总数
 }
 

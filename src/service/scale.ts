@@ -38,7 +38,7 @@ export class Scale extends ServiceController {
       : this.owner.chartData[0].values.map(d => d.x);
   }
 
-  get ySeriesValue(): Array<Date | number | string> {
+  get ySeriesValue() {
     const seriesOption = (this.owner.options.seriesOption ||
       {}) as BarSeriesOption;
     if (seriesOption.stack) {
