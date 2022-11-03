@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.6
+
+### Patch Changes
+
+- [#24](https://github.com/alauda/chart/pull/24) [`fefacad`](https://github.com/alauda/chart/commit/fefacad1d7f7693a38547b27ec74c2fa69bef394) Thanks [@JounQin](https://github.com/JounQin)! - feat: add axis minStep support
+
 ## 0.1.5
 
 ### Patch Changes
