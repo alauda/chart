@@ -99,6 +99,7 @@ export interface AxisOption {
   max?: number;
   minStep?: number; // axis 最小步宽，例如整数可以设置为 1
   tickCount?: number; // 设置 坐标 tick 总数
+  ticks?: unknown; // 完全控制的d3.ticks，如果要传递多个参数，可以使用数组形式，参见 https://observablehq.com/@d3/axis-ticks?collection=@d3/d3-axis
 }
 
 export interface TooltipOption {

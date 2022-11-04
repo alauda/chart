@@ -80,15 +80,23 @@ export default class AxisRender extends UIController<AxisOption> {
       ? axisBottom
       : axisLeft;
 
-    const maxTicks =
-      this.option.minStep != null
-        ? Math.min(
-            Math.ceil(Math.max(...ySeriesValue) / this.option.minStep) || 1,
-            this.getMaxTicks(),
-          )
-        : this.getMaxTicks();
-
-    let axis = d3Axis(scale as AxisScale<any>).ticks(maxTicks);
+    let ticks = this.option.ticks;
+    if (!ticks) {
+      ticks =
+        this.option.minStep != null
+          ? Math.min(
+              Math.ceil(Math.max(...ySeriesValue) / this.option.minStep) || 1,
+              this.getMaxTicks(),
+            )
+          : this.getMaxTicks();
+    }
+    if (!Array.isArray(ticks)) {
+      ticks = [ticks];
+    }
+    let axis = d3Axis(scale as AxisScale<any>).ticks(
+      // @ts-expect-error
+      ...ticks,
+    );
     // TODO: 优化 ticks
     // if (xSeriesValue.every(d => typeof d === 'number') && this.isYAxis) {
     //   const tickValues = getNiceTickValues(yDomain, maxTicks);
