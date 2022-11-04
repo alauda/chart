@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.7
+
+### Patch Changes
+
+- [#27](https://github.com/alauda/chart/pull/27) [`e79b8d8`](https://github.com/alauda/chart/commit/e79b8d87f1ecf58b34de1e648e817ef9724eb9c5) Thanks [@igauch](https://github.com/igauch)! - support custom ticks
+
 ## 0.1.6
 
 ### Patch Changes
