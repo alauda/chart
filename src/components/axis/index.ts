@@ -91,7 +91,9 @@ export class Axis extends UIController<AxisOption> {
 
   updateAxis() {
     const { height } = this.owner.size.main;
-    this.x.attr('transform', `translate(0, ${this.isRotated ? 0 : height})`);
+    const maxH = Math.max(height, 0);
+    this.x.attr('transform', `translate(0, ${this.isRotated ? 0 : maxH})`);
+    this.y.attr('transform', `translate(0, ${this.isRotated ? maxH : 0})`);
     this.xAxis.updateTick();
     this.yAxis.updateTick();
   }
