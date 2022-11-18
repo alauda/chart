@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.8
+
+### Patch Changes
+
+- [#31](https://github.com/alauda/chart/pull/31) [`e14aa98`](https://github.com/alauda/chart/commit/e14aa98043bbf0e7f29692611c6b476897f40f97) Thanks [@zChanges](https://github.com/zChanges)! - fix: view change update y axis
+
 ## 0.1.7
 
 ### Patch Changes
