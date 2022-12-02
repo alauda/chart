@@ -43,10 +43,7 @@ export class Legend extends UIController<LegendOption> {
   }
 
   get hasTpl() {
-    return (
-      typeof this.option.formatter === 'function' ||
-      this.owner.options.customHeader
-    );
+    return typeof this.option.formatter === 'function';
   }
 
   get isMount() {
@@ -72,14 +69,13 @@ export class Legend extends UIController<LegendOption> {
   constructor(owner: View) {
     super(owner);
     this.option = owner.options.legend || {};
+    this.init();
   }
 
   init() {
     if (!this.option.hide) {
       const legendEl = this.hasTpl
-        ? (this.owner.chartEle.header || this.owner.chartEle.chart).append(
-            'div',
-          )
+        ? this.owner.chartEle.chart.append('div')
         : this.owner.chartEle.svg.append('g');
       this.container = legendEl;
       this.owner.chartEle.legend = legendEl;
@@ -115,13 +111,14 @@ export class Legend extends UIController<LegendOption> {
         this.setLegendItem();
       }
       if (this.hasTpl) {
-        return this.container.attr('class', CLASS_NAME.legend)
-        .attr(
-          'style',
-          `padding-top: ${offsetY || 0}px; padding-right: ${
-            this.owner.basics.margin.right + (offsetX || 0)
-          }px`,
-        );
+        return this.container
+          .attr('class', CLASS_NAME.legend)
+          .attr(
+            'style',
+            `position: absolute; top: ${offsetY || 0}px; right: ${
+              this.owner.basics.margin.right + (offsetX || 0)
+            }px`,
+          );
       }
       this.container
         .attr('class', CLASS_NAME.legend)
@@ -130,10 +127,8 @@ export class Legend extends UIController<LegendOption> {
   }
 
   setLegendItem() {
-    if (this.hasTpl) {
-      if (typeof this.option.formatter === 'function') {
-        this.container.html(this.option.formatter(this.legendItems));
-      }
+    if (typeof this.option.formatter === 'function') {
+      this.container.html(this.option.formatter(this.legendItems));
     } else {
       this.createLegendItemDom();
     }

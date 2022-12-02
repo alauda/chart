@@ -8,35 +8,18 @@ import { View } from './view.js';
 export * from './view.js';
 
 function createSvg(el: D3Selection) {
-  return el
-    .append('svg')
-    .style('width', '100%')
-    .style('height', '100%')
-    .style('overflow', 'hidden')
-    .style('display', 'inline-block');
+  return el.append('svg').style('overflow', 'hidden').style('display', 'block');
 }
 
 function parseConstructorOption(options: Options) {
   const { container, width, height } = options;
   const ele = getElement(container);
   const d3El = d3Select(ele);
-  let header: D3EelSelection;
   d3El.attr('position', 'relative');
 
-  if (options.customHeader) {
-    header = d3El.append('div');
-    header.attr('class', 'ac-header');
-  }
-  const containerDom = d3El
-    .append('div')
-    .attr('class', 'ac-container')
-    .style('width', '100%')
-    .style('height', '100%');
-  const svg = createSvg(containerDom);
+  const svg = createSvg(d3El);
   return {
     ele: d3El as unknown as D3EelSelection,
-    container: containerDom,
-    header,
     svg,
     size: getChartSize(ele, width, height),
     options,
@@ -45,15 +28,12 @@ function parseConstructorOption(options: Options) {
 
 export class Chart extends View {
   ele: Element | HTMLElement;
-  container: Element | HTMLElement;
 
   private resizeOn: () => void;
 
   constructor(options: Options) {
-    const opt = parseConstructorOption(options);
-    super(opt);
+    super(parseConstructorOption(options));
     this.ele = getElement(options.container);
-    this.container = opt.container.node();
     this.bindResize();
   }
 
@@ -63,16 +43,15 @@ export class Chart extends View {
   }
 
   private bindResize() {
-    this.resizeOn = resizeOn(this.container, this.onResize);
+    this.resizeOn = resizeOn(this.ele, this.onResize);
   }
 
   private unbindResize() {
     this.resizeOn();
   }
 
-  private readonly onResize = (entry: ResizeObserverEntry) => {
+  private readonly onResize = () => {
     const { width: w, height: h } = this.options;
-    const { width, height } = entry.contentRect;
-    this.changeSize(getChartSize(this.container, w || width, h || height));
+    this.changeSize(getChartSize(this.ele, w, h));
   };
 }

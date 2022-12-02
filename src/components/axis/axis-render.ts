@@ -170,7 +170,7 @@ export default class AxisRender extends UIController<AxisOption> {
       .call(g =>
         g
           .select('.domain')
-          .attr('d', this.isRotated ? `M-6,0H0V${-gridH}H0` :  `M-6,${h}H0V${this.owner.headerTotalHeight}H0`),
+          .attr('d', `M-6,${h}H0V${this.owner.headerTotalHeight}H0`),
       )
       .call(g => {
         const line = g.selectAll('.tick line');
