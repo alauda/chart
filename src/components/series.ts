@@ -89,7 +89,7 @@ export class Series extends UIController {
       .append('rect')
       .attr('class', CLASS_NAME.eventRect)
       .attr('width', this.owner.size.grid.width)
-      .attr('height', this.owner.size.grid.height);
+      .attr('height', Math.max(this.owner.size.grid.height, 0));
   }
 
   render() {
@@ -105,7 +105,7 @@ export class Series extends UIController {
       .select(`rect.${CLASS_NAME.chart}`)
       .attr('class', CLASS_NAME.eventRect)
       .attr('width', this.owner.size.grid.width)
-      .attr('height', this.owner.size.grid.height);
+      .attr('height', Math.max(this.owner.size.grid.height, 0));
     switch (this.type) {
       case 'line':
         this.updateLineSeries();
