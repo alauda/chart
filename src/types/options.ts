@@ -27,7 +27,6 @@ export interface Options {
   height?: number;
   offset?: { x?: number; y?: number };
   grid?: { top?: number };
-  customHeader?: boolean;
   container: HTMLElement | string;
   type?: ChartType;
   data?: ChartData[]; // 数据源
