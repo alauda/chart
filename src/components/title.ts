@@ -13,7 +13,10 @@ export class Title extends UIController<TitleOption> {
   container: D3Selection;
 
   get hasTpl() {
-    return typeof this.option.formatter === 'function';
+    return (
+      typeof this.option.formatter === 'function' ||
+      this.owner.options.customHeader
+    );
   }
 
   get name() {
@@ -47,7 +50,7 @@ export class Title extends UIController<TitleOption> {
         if (this.hasTpl) {
           this.container.attr(
             'style',
-            `position: absolute; top: ${y}px; left: ${x}px`,
+            `padding-top: ${y}px; padding-left: ${x}px`,
           );
         }
         this.container.html(formatter(text));
@@ -67,9 +70,11 @@ export class Title extends UIController<TitleOption> {
   }
 
   private createContainer() {
-    this.container?.remove();
+    if (this.container) {
+      return;
+    }
     const title = this.hasTpl
-      ? this.owner.chartEle.chart.append('div')
+      ? (this.owner.chartEle.header || this.owner.chartEle.chart).append('div')
       : this.owner.chartEle.svg.append('g');
     title.attr('class', CLASS_NAME.title);
     this.container = title;
