@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.9
+
+### Patch Changes
+
+- [#36](https://github.com/alauda/chart/pull/36) [`6d0c2bc`](https://github.com/alauda/chart/commit/6d0c2bcfc49aa79101b05998b5dc71daeb290f86) Thanks [@zChanges](https://github.com/zChanges)! - fix: chart header position
+
 ## 0.1.8
 
 ### Patch Changes
