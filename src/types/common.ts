@@ -21,6 +21,7 @@ export type XScaleValue = string & (NumberValue & (Date | NumberValue));
 
 export interface ChartEle {
   chart: D3EelSelection;
+  header: D3EelSelection;
   svg: D3SvgSSelection;
   main: D3SvgGSelection;
   title?: D3SvgGSelection;
@@ -36,6 +37,7 @@ export interface ChartSize {
 export interface ViewProps {
   ele: D3EelSelection;
   svg: D3SvgSSelection;
+  header: D3EelSelection;
   size: ChartSize;
   options: Options;
 }

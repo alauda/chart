@@ -131,7 +131,9 @@ export class View extends EventEmitter {
   }
 
   get headerTotalHeight() {
-    return this.headerHeight + this.basics.main.top;
+    return this.options.customHeader
+      ? this.headerHeight
+      : this.headerHeight + this.basics.main.top;
   }
 
   context = new ControllerContextService();
@@ -143,7 +145,7 @@ export class View extends EventEmitter {
     root.setAttribute('ac-theme-mode', theme);
   }
 
-  constructor({ ele, size, svg, options }: ViewProps) {
+  constructor({ ele, size, svg, header, options }: ViewProps) {
     super();
     this.options = {
       type: 'line',
@@ -154,12 +156,14 @@ export class View extends EventEmitter {
       data: this.handelData(options.data),
     };
     this.handleBasics();
-    this.chartEle = { chart: ele, svg, main: this.createMain(svg) };
+    this.chartEle = { chart: ele, svg, header, main: this.createMain(svg) };
     this.chartUId = `ac-chart-uid-${generateUID()}`;
     this.chartEle.chart.attr('class', `ac-chart-wrapper ${this.chartUId}`);
     this.chartEle.chart.style('width', '100%').style('height', '100%');
     this.chartData = this.options.data;
     this.changeSize(size);
+    this.chartEle.svg.attr('width', '100%');
+    this.chartEle.svg.attr('height', size.height - this.basics.main.top);
     this.init();
     this.options.contextCallbackFunction?.(this);
   }
@@ -368,11 +372,15 @@ export class View extends EventEmitter {
   private computeSize({ width, height }: ChartSize) {
     const { margin, tickLabelWidth } = this.basics;
     const mainW = width - margin.left - tickLabelWidth;
+    const headerH =
+      this.options.legend.hide && this.options.title.hide
+        ? this.headerHeight
+        : this.headerHeight * 2;
     this.size = {
       chart: { width, height },
       main: {
         width: mainW,
-        height: height - this.headerHeight,
+        height: height - headerH,
       },
       grid: {
         width: mainW,

@@ -49,8 +49,14 @@ $ac-prefix: 'ac';
 }
 
 .#{$ac-prefix} {
+  &-header {
+    display: flex;
+    align-items: center;
+  }
+
   &-title {
     font-size: 18px;
+    flex: 1;
     fill: use-rgb(n-1);
   }
 
