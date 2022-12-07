@@ -1,89 +1,45 @@
-import { Selection } from 'd3';
-import { debounce } from 'lodash';
-
-import { generateElName, getChartSize, transformD3El } from '../index.js';
+import {
+  ChartOption,
+  getChartSize,
+  getElement,
+  resizeObserver,
+  Size,
+  Theme,
+} from '../index.js';
+import { Dark, Light } from '../theme/index.js';
 import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
-
 import { View } from './view.js';
 
-const CHART_NAME = generateElName('chart');
-
 export class Chart extends View {
-  el: HTMLElement;
-  eleD3: Selection<HTMLElement, unknown, null, null>;
-  private svgEl: HTMLElement;
+  public ele: HTMLElement;
+  public width: number;
+  public height: number;
 
-  get width() {
-    return +this.getAttribute('width');
-  }
+  private sizeObserver: ResizeObserver;
 
-  set width(value) {
-    if (!value) {
-      this.removeAttribute('width');
-    } else {
-      this.setAttribute('width', String(value));
-    }
-  }
+  private mediaQuery: MediaQueryList;
 
-  get height() {
-    return +this.getAttribute('height');
-  }
-
-  set height(value) {
-    if (!value) {
-      this.removeAttribute('height');
-    } else {
-      this.setAttribute('height', String(value));
-    }
-  }
-
-  get defaultInteractions() {
-    // TODO: 支持 array、obj、boolean等类型
-    const defaultInteractions = this.getAttribute('defaultInteractions');
-    return defaultInteractions
-      ? defaultInteractions.split(',')
-      : DEFAULT_INTERACTIONS;
-  }
-
-  constructor() {
-    super();
-    this.initDom();
-    const size = getChartSize(this.el, this.width, this.height);
-    super.init({
-      ...size,
-      svgEl: this.svgEl,
+  constructor(props: ChartOption) {
+    const {
+      container,
+      width,
+      height,
+      theme,
+      defaultInteractions = DEFAULT_INTERACTIONS,
+      options,
+    } = props;
+    const ele: HTMLElement = getElement(container);
+    super({
+      ele,
+      options,
     });
-  }
-
-  /**
-   * 组件添加document DOM 调用 绑定自适应事件
-   */
-  connectedCallback() {
+    const size = getChartSize(ele, width, height);
+    this.ele = ele;
+    this.width = size.width;
+    this.height = size.height;
+    this.initDefaultInteractions(defaultInteractions);
+    this.initTheme(theme);
     this.bindAutoFit();
-  }
-
-  override disconnectedCallback() {
-    this.unbindAutoFit();
-  }
-
-  /**
-   * 初始化
-   * 创建变量、容器，添加 svg 设置样式
-   */
-  private initDom() {
-    const shadowRoot = this.attachShadow({ mode: 'closed' });
-    const container = document.createElement('div');
-    const slot = document.createElement('slot');
-    this.svgEl = document.createElement('svg');
-    container.setAttribute('id', CHART_NAME);
-    container.setAttribute('style', 'position: relative; height: 100%');
-    container.append(this.svgEl);
-    this.svgEl.append(slot);
-    this.eleD3 = transformD3El(container);
-    this.el = container;
-    shadowRoot.append(container);
-
-    this.initDefaultInteractions(this.defaultInteractions);
   }
 
   private initDefaultInteractions(interactions: string[]) {
@@ -92,18 +48,40 @@ export class Chart extends View {
     }
   }
 
+  /**
+   * 
+   * @param theme 主题
+   * 不设置默认根据系统切换 light dark
+   */
+  private initTheme(theme: Theme) {
+    if (!theme || theme?.type === 'system') {
+      this.bindThemeListener()
+    }
+    this.theme(theme);
+  }
+
+  private systemChangeTheme(e: MediaQueryListEvent) {
+    if(e.matches){
+      this.theme(e.matches ? Dark() : Light())
+    }
+  }
+
+  private bindThemeListener () {
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.mediaQuery.addEventListener('change', this.systemChangeTheme);
+  }
+
+  private unbindThemeListener () {
+    this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
+  }
+
   private bindAutoFit() {
-    window.addEventListener('resize', this.onResize);
+    this.sizeObserver = resizeObserver(this.ele, this.changeSize);
   }
 
   private unbindAutoFit() {
-    window.removeEventListener('resize', this.onResize);
+    this.sizeObserver.disconnect();
   }
-
-  private readonly onResize = debounce(() => {
-    const { width, height } = getChartSize(this.el, this.width, this.height);
-    this.changeSize(width, height);
-  }, 300);
 
   /**
    * 改变图表大小，重新渲染 （由 bbox内部处理）
@@ -111,17 +89,25 @@ export class Chart extends View {
    * @param height
    * @returns Chart
    */
-  changeSize(width: number, height: number) {
+  public changeSize = ({ width, height }: Size) => {
     if (this.width === width && this.height === height) {
       return;
     }
     this.width = width;
     this.height = height;
-    this.bbox.changeSize(width, height);
+    // this.bbox.changeSize(width, height);
     // 重新渲染
     this.render();
     return this;
+  };
+
+  /**
+   * 销毁图表
+   */
+  public override destroy() {
+    super.destroy();
+    this.unbindAutoFit();
+    this.unbindThemeListener();
+    this.ele = null;
   }
 }
-
-customElements.define(CHART_NAME, Chart);

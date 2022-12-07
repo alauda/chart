@@ -1,1 +1,4 @@
-export type Theme = 'light' | 'dark' | 'system';
+export interface Size {
+  width: number;
+  height: number;
+}

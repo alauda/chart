@@ -1,4 +1,6 @@
 import { select } from 'd3';
+import { debounce } from 'lodash';
+import { Size } from '../index.js';
 
 function getElementSize(ele: Element | HTMLElement) {
   return {
@@ -38,4 +40,22 @@ export function transformD3El(dom: HTMLElement) {
 
 export function getPixel(value: string | number) {
   return typeof +value === 'number' && !isNaN(+value) ? `${value}px` : value;
+}
+
+export function resizeObserver(
+  el: HTMLElement,
+  fn: (size: Size) => void,
+): ResizeObserver {
+  const resizeObserver = new ResizeObserver(
+    debounce(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width !== 0 || height !== 0) {
+        console.log(width, height, entry.contentRect)
+        const size = { width, height };
+        fn(size);
+      }
+    }, 200),
+  );
+  resizeObserver.observe(el);
+  return resizeObserver;
 }
