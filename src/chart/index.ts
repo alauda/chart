@@ -8,12 +8,13 @@ import {
 } from '../index.js';
 import { Dark, Light } from '../theme/index.js';
 import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
+
 import { View } from './view.js';
 
 export class Chart extends View {
-  public ele: HTMLElement;
-  public width: number;
-  public height: number;
+  ele: HTMLElement;
+  width: number;
+  height: number;
 
   private sizeObserver: ResizeObserver;
 
@@ -24,16 +25,19 @@ export class Chart extends View {
       container,
       width,
       height,
+      padding,
       theme,
       defaultInteractions = DEFAULT_INTERACTIONS,
       options,
     } = props;
     const ele: HTMLElement = getElement(container);
+    const size = getChartSize(ele, width, height);
     super({
       ele,
+      ...size,
+      padding,
       options,
     });
-    const size = getChartSize(ele, width, height);
     this.ele = ele;
     this.width = size.width;
     this.height = size.height;
@@ -49,29 +53,29 @@ export class Chart extends View {
   }
 
   /**
-   * 
+   *
    * @param theme 主题
    * 不设置默认根据系统切换 light dark
    */
   private initTheme(theme: Theme) {
     if (!theme || theme?.type === 'system') {
-      this.bindThemeListener()
+      this.bindThemeListener();
     }
     this.theme(theme);
   }
 
   private systemChangeTheme(e: MediaQueryListEvent) {
-    if(e.matches){
-      this.theme(e.matches ? Dark() : Light())
+    if (e.matches) {
+      this.theme(e.matches ? Dark() : Light());
     }
   }
 
-  private bindThemeListener () {
+  private bindThemeListener() {
     this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     this.mediaQuery.addEventListener('change', this.systemChangeTheme);
   }
 
-  private unbindThemeListener () {
+  private unbindThemeListener() {
     this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
   }
 
@@ -89,22 +93,21 @@ export class Chart extends View {
    * @param height
    * @returns Chart
    */
-  public changeSize = ({ width, height }: Size) => {
+  changeSize = ({ width, height }: Size) => {
     if (this.width === width && this.height === height) {
       return;
     }
     this.width = width;
     this.height = height;
-    // this.bbox.changeSize(width, height);
     // 重新渲染
-    this.render();
+    this.render({ width, height });
     return this;
   };
 
   /**
    * 销毁图表
    */
-  public override destroy() {
+  override destroy() {
     super.destroy();
     this.unbindAutoFit();
     this.unbindThemeListener();

@@ -1,18 +1,15 @@
-import { generateElName } from '../index.js';
+import { View } from '../chart/view.js';
 
-export abstract class BaseComponent extends HTMLElement {
+export type ComponentCtor<O = any> = new (view: View) => BaseComponent<O>;
+
+export abstract class BaseComponent<O = unknown> {
+  protected option: O;
+
   abstract get name(): string;
 
   abstract render(): void;
 
-  abstract disconnectedCallback(): void;
-
-  getName(value: string) {
-    return generateElName(value);
-  }
-
   constructor() {
-    super();
     this.render();
   }
 }

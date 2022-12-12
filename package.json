@@ -101,6 +101,9 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "uplot": "^1.6.23"
+  },
   "devDependencies": {
     "@1stg/app-config": "^6.1.4",
     "@1stg/lib-config": "^9.0.1",
@@ -134,7 +137,7 @@
     "webpack": "^5.73.0"
   },
   "typeCoverage": {
-    "atLeast": 99.85,
+    "atLeast": 99.91,
     "cache": true,
     "detail": true,
     "ignoreAsAssertion": true,

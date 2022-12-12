@@ -1,5 +1,6 @@
 import { select } from 'd3';
 import { debounce } from 'lodash';
+
 import { Size } from '../index.js';
 
 function getElementSize(ele: Element | HTMLElement) {
@@ -28,7 +29,7 @@ export function getChartSize(
   };
 }
 
-export function getElement(container: HTMLElement | string) {
+export function getElement(container: HTMLElement | string): HTMLElement {
   return typeof container === 'string'
     ? document.querySelector(container)
     : container;
@@ -47,10 +48,10 @@ export function resizeObserver(
   fn: (size: Size) => void,
 ): ResizeObserver {
   const resizeObserver = new ResizeObserver(
-    debounce(([entry]) => {
+    debounce(([entry]: ResizeObserverEntry[]) => {
       const { width, height } = entry.contentRect;
       if (width !== 0 || height !== 0) {
-        console.log(width, height, entry.contentRect)
+        console.log(width, height, entry.contentRect);
         const size = { width, height };
         fn(size);
       }

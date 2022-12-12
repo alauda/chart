@@ -1,9 +1,7 @@
 import { BaseComponent } from '../base.js';
 
 export class Shape extends BaseComponent {
-  get name() {
-    return this.getName('shape');
-  }
+  name = 'shape';
 
   render() {
     // ..

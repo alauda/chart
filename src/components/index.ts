@@ -1,4 +1,6 @@
-const LOADED_COMPONENTS: Map<string, CustomElementConstructor> = new Map();
+import { ComponentCtor } from './base.js';
+
+const LOADED_COMPONENTS: Map<string, ComponentCtor> = new Map();
 
 /**
  * 全局注册组件。
@@ -6,10 +8,7 @@ const LOADED_COMPONENTS: Map<string, CustomElementConstructor> = new Map();
  * @param plugin 注册的组件类
  * @returns void
  */
-export function registerComponent(
-  name: string,
-  plugin: CustomElementConstructor,
-) {
+export function registerComponent(name: string, plugin: ComponentCtor) {
   LOADED_COMPONENTS.set(name, plugin);
 }
 
@@ -35,6 +34,6 @@ export function getComponentNames(): string[] {
  * @param name 组件名
  * @returns 返回组件类
  */
-export function getComponent(name: string): CustomElementConstructor {
+export function getComponent(name: string): ComponentCtor {
   return LOADED_COMPONENTS.get(name);
 }

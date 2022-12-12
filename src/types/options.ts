@@ -17,6 +17,10 @@ export interface ChartOption {
 
 export interface ViewOption {
   readonly ele: HTMLElement;
+  width?: number;
+  height?: number;
+  padding?: number[];
+  data?: Data;
   options?: Options;
 }
 
@@ -24,7 +28,35 @@ export interface Options {
   title?: TitleOption;
 }
 
-export interface TitleOption {
+export type Datum = Record<string, any>;
+export type Data = Datum[];
+
+export type TitleOption = TitleOpt | boolean;
+export interface TitleOpt {
   text?: string;
   formatter?: string | ((text: string) => string);
+}
+
+export type LegendOption = LegendOpt | boolean;
+export interface LegendOpt {
+  position: 'left' | 'right' | 'top' | 'bottom';
+}
+
+export type AxisOption = AxisOpt | boolean;
+export interface AxisOpt {
+  min?: number;
+  max?: number;
+}
+
+export type TooltipOption = TooltipOpt | boolean;
+export interface TooltipOpt {
+  showTitle?: boolean;
+}
+
+export interface ShapeOption {
+  width?: number;
+}
+
+export interface AnnotationOption {
+  text?: string;
 }

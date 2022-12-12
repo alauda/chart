@@ -1,8 +1,6 @@
 # Chart
 
 > 用于提供创建 svg、自适应图表大小等配置, 继承于 View，有着 View 的 api
->
-> 职责：创建 容器 计算大小、resize 重新计算、初始化默认 interaction
 
 ## 职责
 
@@ -11,7 +9,11 @@
 - 图表宽高自适应事件绑定
 - destroy
 
+持续更新...
+![alauda-chart](./alauda-chart.svg)
+
 ## 结构
+
 ```
 alauda-chart
 ├─ src
@@ -44,17 +46,15 @@ alauda-chart
 ```ts
 const chart = new Chart({
   container: 'chart',
-  data: [],
-  options: Options
+  data: [],
+  options: Options, // 所有配置集合
 });
 
-chart.data([])
-chart.tite(option)
-chart.legend(option)
-// ....component
+// 设置图标宽高 根据容器大小动态更新
+chart.changeSize({ width, height });
 ```
 
-#### Option
+## Option
 
 ```ts
 interface ChartOption {
@@ -68,9 +68,10 @@ interface ChartOption {
   // 图表组件等相关的配置。同时支持配置式 和 声明式
   options: Options;
   // 主题
-  theme: Theme
+  theme: Theme;
 }
 
+// 组件配置
 interface Options {
   axis?: Axis;
   legend: Legend;
@@ -78,4 +79,3 @@ interface Options {
   // ....
 }
 ```
-
