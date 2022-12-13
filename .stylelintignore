@@ -5,3 +5,4 @@ LICENSE
 *.json
 *.tsbuildinfo
 *.lock
+docs

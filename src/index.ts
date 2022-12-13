@@ -1,15 +1,13 @@
-/// <reference types="typed-query-selector/strict.js" />
+import { registerComponent } from './components/index.js';
+import { Title } from './components/title.js';
+import { Dark, registerTheme } from './theme/index.js';
 
-import { Chart as AChart, View } from './chart/index.js';
-import { Options, Theme } from './types/index.js';
-
-export const Chart = (options: Options) => new AChart(options);
-
-export const setTheme = (theme: Theme) => View.setTheme(theme);
-
-export { type ViewOptions, Chart as AChart, View } from './chart/index.js';
-export * from './components/index.js';
-export * from './constant.js';
-export * from './service/index.js';
+export * from './chart/index.js';
 export * from './types/index.js';
 export * from './utils/index.js';
+
+// register component
+registerComponent('title', Title);
+
+// 注册黑暗主题
+registerTheme('dark', Dark());

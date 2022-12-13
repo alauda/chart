@@ -1,7 +1,7 @@
 import { BaseComponent } from './base.js';
 
-export class tooltip extends BaseComponent {
-  name = 'tooltip';
+export class Axis extends BaseComponent {
+  name = 'axis';
 
   render() {
     // ..
