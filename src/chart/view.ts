@@ -125,9 +125,10 @@ export class View extends EventEmitter {
   get headerHeight() {
     const title = document.querySelector(`svg.${CLASS_NAME.title}`);
     const legend = document.querySelector(`svg.${CLASS_NAME.legend}`);
+    const header = document.querySelector('.ac-header');
     const titleH = title?.getBBox?.()?.height || title?.clientHeight;
     const legendH = legend?.getBBox?.()?.height || legend?.clientHeight;
-    return Math.max(titleH || 25, legendH || 0, 0);
+    return Math.max(header?.clientHeight || 0, titleH || 0, legendH || 0, 0);
   }
 
   get headerTotalHeight() {
@@ -370,12 +371,13 @@ export class View extends EventEmitter {
 
   // 计算
   private computeSize({ width, height }: ChartSize) {
-    const { margin, tickLabelWidth } = this.basics;
+    const { margin, tickLabelWidth, main } = this.basics;
     const mainW = width - margin.left - tickLabelWidth;
     const headerH =
-      this.options.legend.hide && this.options.title.hide
-        ? this.headerHeight
-        : this.headerHeight * 2;
+      (this.options.legend.hide && this.options.title.hide) ||
+      !this.options.customHeader
+        ? main.top
+        : this.headerHeight + main.top;
     this.size = {
       chart: { width, height },
       main: {
