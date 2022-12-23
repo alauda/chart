@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.10
+
+### Patch Changes
+
+- [#39](https://github.com/alauda/chart/pull/39) [`32003ad`](https://github.com/alauda/chart/commit/32003ad9b3a50a5997b47dfe5aae41fc52011376) Thanks [@zChanges](https://github.com/zChanges)! - fix: chart height bug
+
 ## 0.1.9
 
 ### Patch Changes
