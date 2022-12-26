@@ -22,8 +22,10 @@ import {
   InternalViewStrategy,
 } from '../strategy/index.js';
 import { getTheme } from '../theme/index.js';
+import { CHART_EVENTS } from '../utils/constant.js';
+import EventEmitter from './event-emitter.js';
 
-export class View {
+export class View extends EventEmitter {
   /** 所有的组件 controllers。 */
   components: BaseComponent[] = [];
 
@@ -40,13 +42,22 @@ export class View {
 
   private strategy: ViewStrategy[];
 
+  private mediaQuery: MediaQueryList;
+
+  public systemThemeType: 'light' | 'dark' = 'light';
+
   size: Size = { width: 0, height: 0 };
 
   constructor(props: ViewOption) {
-    const { width, height, ele, options } = props;
+    super();
+    const { width, height, ele, options, data, theme } = props;
     this.container = ele;
-    this.options = options;
+    if (options) {
+      this.options = options;
+    }
+    data && this.data(data);
     this.size = { ...this.size, width, height };
+    this.initTheme(theme);
     this.init();
   }
 
@@ -90,6 +101,33 @@ export class View {
   }
 
   /**
+   *
+   * @param theme 主题
+   * 不设置默认根据系统切换 light dark
+   */
+  private initTheme(theme: Theme) {
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeType = this.mediaQuery.matches ? 'dark' : 'light';
+    if (!theme || theme?.type === 'system') {
+      this.bindThemeListener();
+    }
+    this.theme(theme || this.systemThemeType);
+  }
+
+  private bindThemeListener() {
+    this.mediaQuery.addEventListener('change', this.systemChangeTheme);
+  }
+
+  private unbindThemeListener() {
+    this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
+  }
+
+  private systemChangeTheme = (e: MediaQueryListEvent) => {
+    const theme = e.matches ? 'dark' : 'light';
+    this.theme(theme);
+  };
+
+  /**
    * 设置主题。
    * @param theme 主题名或者主题配置
    * @returns View
@@ -98,6 +136,7 @@ export class View {
     this.themeObject = isObject(theme)
       ? getTheme(theme.type, theme)
       : getTheme(theme);
+    this.emit(CHART_EVENTS.THEME_CHANGE)
     return this;
   }
 
@@ -120,7 +159,7 @@ export class View {
    * 装载数据源。
    *
    * ```ts
-   * chart.data([]);
+   * chart.data();
    * ```
    *
    * @param data 数据源。
@@ -129,6 +168,10 @@ export class View {
   data(data: Data): View {
     set(this.options, 'data', data);
     return this;
+  }
+
+  getData() {
+    return this.options.data;
   }
 
   // -------------- Component ---------------//
@@ -200,5 +243,6 @@ export class View {
    */
   destroy() {
     // ...
+    this.unbindThemeListener();
   }
 }

@@ -2,6 +2,7 @@ import { Theme } from './index.js';
 
 export interface ChartOption {
   container: string | HTMLElement;
+  data?: Data;
   // 图表宽高度 不设置默认根据父容器高度自适应
   width?: number;
   height?: number;
@@ -22,14 +23,22 @@ export interface ViewOption {
   padding?: number[];
   data?: Data;
   options?: Options;
+  /** 主题 */
+  theme?: Theme; // default system
 }
 
 export interface Options {
+  data?: Data;
   title?: TitleOption;
 }
 
-export type Datum = Record<string, any>;
-export type Data = Datum[];
+export type Data = DataItem[];
+
+export interface DataItem {
+  name: string;
+  color?: string;
+  values: Array<{ x: any; y: number }>;
+}
 
 export type TitleOption = TitleOpt | boolean;
 export interface TitleOpt {

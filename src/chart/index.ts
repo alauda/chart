@@ -1,5 +1,4 @@
-import { Dark, Light } from '../theme/index.js';
-import { ChartOption, Size, Theme } from '../types/index.js';
+import { ChartOption, Size } from '../types/index.js';
 import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
 import { getChartSize, getElement, resizeObserver } from '../utils/index.js';
 
@@ -12,17 +11,15 @@ export class Chart extends View {
 
   private sizeObserver: ResizeObserver;
 
-  private mediaQuery: MediaQueryList;
-
   constructor(props: ChartOption) {
     const {
       container,
       width,
       height,
       padding,
-      theme,
       defaultInteractions = DEFAULT_INTERACTIONS,
       options,
+      data,
     } = props;
     const ele: HTMLElement = getElement(container);
     const size = getChartSize(ele, width, height);
@@ -30,13 +27,13 @@ export class Chart extends View {
       ele,
       ...size,
       padding,
+      data,
       options,
     });
     this.ele = ele;
     this.width = size.width;
     this.height = size.height;
     this.initDefaultInteractions(defaultInteractions);
-    this.initTheme(theme);
     this.bindAutoFit();
   }
 
@@ -44,33 +41,6 @@ export class Chart extends View {
     for (const interaction of interactions) {
       this.interaction(interaction);
     }
-  }
-
-  /**
-   *
-   * @param theme 主题
-   * 不设置默认根据系统切换 light dark
-   */
-  private initTheme(theme: Theme) {
-    if (!theme || theme?.type === 'system') {
-      this.bindThemeListener();
-    }
-    this.theme(theme);
-  }
-
-  private systemChangeTheme(e: MediaQueryListEvent) {
-    if (e.matches) {
-      this.theme(e.matches ? Dark() : Light());
-    }
-  }
-
-  private bindThemeListener() {
-    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    this.mediaQuery.addEventListener('change', this.systemChangeTheme);
-  }
-
-  private unbindThemeListener() {
-    this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
   }
 
   private bindAutoFit() {
@@ -104,7 +74,6 @@ export class Chart extends View {
   override destroy() {
     super.destroy();
     this.unbindAutoFit();
-    this.unbindThemeListener();
     this.ele = null;
   }
 }

@@ -23,3 +23,8 @@ export const DEFAULT_INTERACTIONS = [
   'legend-filter',
   'legend-active',
 ];
+
+
+export enum CHART_EVENTS {
+  THEME_CHANGE = 'theme:change'
+}

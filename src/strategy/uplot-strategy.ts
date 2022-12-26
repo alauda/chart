@@ -1,10 +1,13 @@
 import UPlot from 'uplot';
 
-import { Size } from '../index.js';
+import { Data, getChartColor, Size } from '../index.js';
 
 import { ViewStrategy } from './abstract.js';
 import { UPLOT_DEFAULT_OPTIONS } from './config.js';
 import 'uplot/dist/uPlot.min.css';
+import uPlot from 'uplot';
+import { merge } from 'lodash';
+import { CHART_EVENTS } from '../utils/constant.js';
 
 /**
  * 渲染策略
@@ -23,6 +26,19 @@ export class UPlotViewStrategy extends ViewStrategy {
 
   init() {
     // ..
+    this.getChartEvent();
+  }
+
+  /**
+   * 监听 chart 事件
+   */
+  getChartEvent() {
+    // 监听 主题改变
+    this.ctrl.on(CHART_EVENTS.THEME_CHANGE, () => {
+      if (this.uPlot) {
+        this.uPlot.redraw();
+      }
+    });
   }
 
   render(size?: Size) {
@@ -49,12 +65,17 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   private readonly getOption = (): uPlot.Options => {
     const { width, height } = this.ctrl.size;
-    return {
-      width,
-      height,
-      ...UPLOT_DEFAULT_OPTIONS,
-      series: [],
-    };
+    const series = this.getSeries(this.ctrl.getData());
+    const theme = this.getThemeOption();
+    return merge(
+      {
+        width,
+        height,
+        ...UPLOT_DEFAULT_OPTIONS,
+        series,
+      },
+      theme,
+    );
   };
 
   /**
@@ -64,10 +85,63 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   private getData(): uPlot.AlignedData {
     // TODO: test
+    const data = this.ctrl.getData();
+    return this.handleData(data);
+  }
+
+  /**
+   * 将数据处理成 uPlot 数据格式
+   * @param data 源数据
+   * @returns uPlot 数据源哥是
+   */
+  handleData(data: Data): uPlot.AlignedData {
+    const values = data.map(value => value.values);
+    const x = values[0].map(value => value.x);
+    const yItem = values.map(data => data.map(d => d.y));
+    return [x, ...yItem];
+  }
+
+  /**
+   * 获取 series
+   * @param data 源数据
+   * @returns uPlot series
+   */
+  getSeries(data: Data) {
     return [
-      [1_546_300_800, 1_546_387_200], // x-values (timestamps)
-      [35, 71], // y-values (series 1)
-      [90, 15], // y-values (series 2)
+      {},
+      ...data.map(({ color, name }, index) => ({
+        stroke: color || getChartColor(index),
+        label: name,
+        points: {
+          show: false,
+        },
+        paths: uPlot.paths.spline(),
+      })),
     ];
+  }
+
+  getThemeOption() {
+    if (!this.ctrl.getTheme()) {
+      return;
+    }
+    return {
+      axes: [
+        {
+          stroke: () => this.ctrl.getTheme().xAxis.stroke,
+          ticks: {
+            stroke: () => this.ctrl.getTheme().xAxis.tickStroke,
+          },
+        },
+        {
+          stroke: () => this.ctrl.getTheme().yAxis.stroke,
+          grid: {
+            stroke: () => this.ctrl.getTheme().yAxis.gridStroke,
+          },
+          ticks: {
+            stroke: () => this.ctrl.getTheme().yAxis.tickStroke,
+          },
+        },
+      ],
+    };
   }
 }
