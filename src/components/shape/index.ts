@@ -1,9 +1,15 @@
 import { BaseComponent } from '../base.js';
 
 export class Shape extends BaseComponent {
-  name = 'shape';
+  get name(): string {
+    return 'shape';
+  }
 
   render() {
+    // ..
+  }
+
+  update() {
     // ..
   }
 }

@@ -17,6 +17,7 @@ export default class EventEmitter {
    * @param callback
    * @param once
    */
+  // type-coverage:ignore-next-line
   on(evt: string, callback: (args: any) => void, once?: boolean) {
     if (!this._events[evt]) {
       this._events[evt] = [];

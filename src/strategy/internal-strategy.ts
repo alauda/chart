@@ -10,7 +10,7 @@ export class InternalViewStrategy extends ViewStrategy {
   }
 
   get component(): string[] {
-    return ['title', 'legend', 'tooltip', 'pie', 'gauge'];
+    return ['title', 'legend', 'pie', 'gauge'];
   }
 
   init() {

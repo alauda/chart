@@ -6,26 +6,19 @@ import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
-  title: 'Line',
+  title: 'Bar',
 } as Meta;
 
 const Template: Story = () => {
   setTimeout(() => {
-    console.time('render');
     const chart = new Chart({
-      container: '.chart1',
+      container: '.chart-bar',
       data: [
-        {
-          name: 'line1',
-          values: generateData('2023-01-31 09:00:00', 20_000, 60),
-        },
-        {
-          name: 'line2',
-          values: generateData('2023-01-31 09:00:00', 20_000, 60),
-        },
+        { name: 'bar1', values: generateData('2023-01-31 09:00:00', 20, 60) },
+        { name: 'bar2', values: generateData('2023-01-31 09:00:00', 20, 60) },
       ],
       options: {
-        title: { text: 'chart' },
+        title: { text: 'bar chart' },
         // legend: {
         //   position: 'bottom-right',
         // }
@@ -38,16 +31,14 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    // chart.shape('line');
-    // chart.shape('bar', { name: 'line2' });
+    chart.shape('bar');
+    // chart.shape('line', { name: 'bar2' });
     chart.render();
   });
-  return `
-    <div class="chart1" style="width: 100%; height: 200px; "></div>
-  `;
+  return `<div class="chart-bar" style="width: 100%; height: 200px; "></div>`;
 };
 
-export const line = Template.bind({});
+export const Bar = Template.bind({});
 
 // 图表类型  line area bar
 // 大数据量

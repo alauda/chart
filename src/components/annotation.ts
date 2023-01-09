@@ -6,4 +6,8 @@ export class Annotation extends BaseComponent {
   render() {
     // ..
   }
+
+  update() {
+    // ..
+  }
 }

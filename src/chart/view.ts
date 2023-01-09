@@ -1,6 +1,13 @@
 import { isBoolean, isObject, set } from 'lodash';
 
 import { BaseComponent } from '../components/base.js';
+import { ViewStrategy } from '../strategy/abstract.js';
+import {
+  UPlotViewStrategy,
+  ViewStrategyManager,
+  InternalViewStrategy,
+} from '../strategy/index.js';
+import { getTheme } from '../theme/index.js';
 import {
   AnnotationOption,
   AxisOption,
@@ -14,20 +21,14 @@ import {
   TitleOption,
   TooltipOption,
   ViewOption,
-} from '../index.js';
-import { ViewStrategy } from '../strategy/abstract.js';
-import {
-  UPlotViewStrategy,
-  ViewStrategyManager,
-  InternalViewStrategy,
-} from '../strategy/index.js';
-import { getTheme } from '../theme/index.js';
+} from '../types/index.js';
 import { CHART_EVENTS } from '../utils/constant.js';
+
 import EventEmitter from './event-emitter.js';
 
 export class View extends EventEmitter {
   /** 所有的组件 controllers。 */
-  components: BaseComponent[] = [];
+  components: Map<string, BaseComponent> = new Map();
 
   // 配置信息存储
   protected options: Options = {};
@@ -44,7 +45,7 @@ export class View extends EventEmitter {
 
   private mediaQuery: MediaQueryList;
 
-  public systemThemeType: 'light' | 'dark' = 'light';
+  systemThemeType: 'light' | 'dark' = 'light';
 
   size: Size = { width: 0, height: 0 };
 
@@ -64,7 +65,7 @@ export class View extends EventEmitter {
   init() {
     this.initViewStrategy();
     this.initComponent();
-    this.render();
+    // this.render();
   }
 
   render(size?: Size) {
@@ -85,7 +86,9 @@ export class View extends EventEmitter {
    * 基于注册组件初始化
    */
   private initComponent() {
-    this.components = this.strategyManage.getComponent();
+    this.strategyManage.getComponent().forEach(c => {
+      this.components.set(c.name, c);
+    });
   }
 
   /**
@@ -122,7 +125,7 @@ export class View extends EventEmitter {
     this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
   }
 
-  private systemChangeTheme = (e: MediaQueryListEvent) => {
+  private readonly systemChangeTheme = (e: MediaQueryListEvent) => {
     const theme = e.matches ? 'dark' : 'light';
     this.theme(theme);
   };
@@ -136,7 +139,7 @@ export class View extends EventEmitter {
     this.themeObject = isObject(theme)
       ? getTheme(theme.type, theme)
       : getTheme(theme);
-    this.emit(CHART_EVENTS.THEME_CHANGE)
+    this.emit(CHART_EVENTS.THEME_CHANGE);
     return this;
   }
 
@@ -167,6 +170,7 @@ export class View extends EventEmitter {
    */
   data(data: Data): View {
     set(this.options, 'data', data);
+    this.emit(CHART_EVENTS.DATA_CHANGE, data);
     return this;
   }
 
@@ -222,11 +226,12 @@ export class View extends EventEmitter {
    *   //...
    * });
    * ```
-   * @param field 坐标轴 x y
-   * @param axisOption 坐标轴配置
+   * @param field 图形类型
+   * @param shapeOption 图形配置
+   * @param name 指定某个数据
    */
-  shape(field: string, shapeOption: ShapeOption): View {
-    set(this.options, ['shape', field], shapeOption);
+  shape(field: string, shapeOption?: ShapeOption): View {
+    set(this.options, ['shape', field], { ...shapeOption, type: field });
     return this;
   }
 

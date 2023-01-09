@@ -76,7 +76,7 @@
     "clean": "rimraf .type-coverage dist lib '.*cache' '*.tsbuildinfo'",
     "dev": "start-storybook",
     "lint": "run-p lint:*",
-    "lint:es": "eslint . --cache -f friendly",
+    "lint:es": "eslint . --fix --cache -f friendly",
     "lint:style": "stylelint . --cache",
     "lint:tsc": "tsc --noEmit",
     "prepare": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0",
@@ -100,6 +100,8 @@
     }
   },
   "dependencies": {
+    "aphrodite": "^2.4.0",
+    "placement.js": "1.0.0-beta.2",
     "uplot": "^1.6.23"
   },
   "devDependencies": {
@@ -123,6 +125,7 @@
     "resolve-typescript-plugin": "^1.2.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
+    "storybook-dark-mode": "^2.0.5",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "type-coverage": "^2.22.0",
     "typed-query-selector": "^2.6.1",

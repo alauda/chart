@@ -1,3 +1,5 @@
+import { TooltipValue } from './component.js';
+
 import { Theme } from './index.js';
 
 export interface ChartOption {
@@ -30,6 +32,9 @@ export interface ViewOption {
 export interface Options {
   data?: Data;
   title?: TitleOption;
+  legend?: LegendOption;
+  tooltip?: TooltipOption;
+  shape?: Record<string, ShapeOption>;
 }
 
 export type Data = DataItem[];
@@ -37,6 +42,7 @@ export type Data = DataItem[];
 export interface DataItem {
   name: string;
   color?: string;
+  // type-coverage:ignore-next-line
   values: Array<{ x: any; y: number }>;
 }
 
@@ -47,8 +53,17 @@ export interface TitleOpt {
 }
 
 export type LegendOption = LegendOpt | boolean;
+
+export type LegendPosition =
+  | 'top'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom'
+  | 'bottom-left'
+  | 'bottom-right';
+
 export interface LegendOpt {
-  position: 'left' | 'right' | 'top' | 'bottom';
+  position: LegendPosition;
 }
 
 export type AxisOption = AxisOpt | boolean;
@@ -60,10 +75,14 @@ export interface AxisOpt {
 export type TooltipOption = TooltipOpt | boolean;
 export interface TooltipOpt {
   showTitle?: boolean;
+  titleFormatter?: string | ((title: string) => string);
+  valueFormatter?: string | ((value: TooltipValue) => string);
 }
 
 export interface ShapeOption {
-  width?: number;
+  type?: string;
+  name?: string; // 指定 data name
+  connectNulls?: boolean; // 是否链接空值
 }
 
 export interface AnnotationOption {

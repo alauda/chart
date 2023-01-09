@@ -6,7 +6,7 @@ import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
-  title: 'Line',
+  title: 'Point',
 } as Meta;
 
 const Template: Story = () => {
@@ -16,12 +16,12 @@ const Template: Story = () => {
       container: '.chart1',
       data: [
         {
-          name: 'line1',
-          values: generateData('2023-01-31 09:00:00', 20_000, 60),
+          name: 'point1',
+          values: generateData('2023-01-31 09:00:00', 10_000, 60),
         },
         {
-          name: 'line2',
-          values: generateData('2023-01-31 09:00:00', 20_000, 60),
+          name: 'point2',
+          values: generateData('2023-01-31 09:00:00', 10_000, 60),
         },
       ],
       options: {
@@ -38,7 +38,7 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    // chart.shape('line');
+    chart.shape('point');
     // chart.shape('bar', { name: 'line2' });
     chart.render();
   });
@@ -47,7 +47,7 @@ const Template: Story = () => {
   `;
 };
 
-export const line = Template.bind({});
+export const Point = Template.bind({});
 
 // 图表类型  line area bar
 // 大数据量

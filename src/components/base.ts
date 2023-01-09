@@ -9,7 +9,18 @@ export abstract class BaseComponent<O = unknown> {
 
   abstract render(): void;
 
-  constructor() {
+  abstract update(): void;
+
+  container: HTMLElement;
+
+  ctrl: View;
+
+  constructor(ctrl: View) {
+    this.ctrl = ctrl;
     this.render();
+  }
+
+  destroy() {
+    this.container?.remove();
   }
 }

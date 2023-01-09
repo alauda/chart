@@ -5,7 +5,6 @@ export const UPLOT_DEFAULT_OPTIONS = {
   },
   axes: [
     {
-     
       grid: {
         show: false,
       },
@@ -22,9 +21,15 @@ export const UPLOT_DEFAULT_OPTIONS = {
       },
     },
   ],
-  cursor: {
-    focus: {
-      prox: 10, // 鼠标移入点激活  像素激活距离
+  scales: {
+    x: {
+      time: true,
     },
+  },
+  cursor: {
+    y: false,
+    // focus: {
+    //   prox: 20, // 鼠标移入点激活  像素激活距离
+    // },
   },
 };

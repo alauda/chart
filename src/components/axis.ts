@@ -6,4 +6,8 @@ export class Axis extends BaseComponent {
   render() {
     // ..
   }
+
+  update() {
+    // ..
+  }
 }
