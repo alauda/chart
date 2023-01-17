@@ -19,14 +19,15 @@ const Template: Story = () => {
   });
 
   setTimeout(() => {
-    const total = 600;
-    const step = 600;
+    const total = 60;
+    const step = 60;
     const start = '2023-01-31 09:00:00';
-    const range1: [number, number] = [5, 10];
-    const range2: [number, number] = [4, -12];
+    const range1: [number, number] = [0, 11_111_170];
+    const range2: [number, number] = [0, 20];
     const timeData = generateTime(start, total, step);
     let yData1 = generateY(total, range1);
     let yData2 = generateY(total, range2);
+
     const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
     const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
 
@@ -56,7 +57,8 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    chart.shape('area');
+    chart.area();
+    // chart.axis('y', {autoSize: false})
     // chart.shape('bar', { name: 'line2' });
     chart.render();
 

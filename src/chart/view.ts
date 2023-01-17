@@ -1,6 +1,9 @@
 import { isBoolean, isObject, set } from 'lodash';
 
 import { BaseComponent } from '../components/base.js';
+import { Coordinate } from '../components/coordinate.js';
+import { Shape, ShapeCtor } from '../components/shape/index.js';
+import { getChartColor } from '../index.js';
 import { ViewStrategy } from '../strategy/abstract.js';
 import {
   UPlotViewStrategy,
@@ -11,10 +14,11 @@ import { getTheme } from '../theme/index.js';
 import {
   AnnotationOption,
   AxisOption,
+  CoordinateOption,
   Data,
   LegendOption,
   Options,
-  ShapeOption,
+  ShapeOptions,
   Size,
   Theme,
   ThemeOptions,
@@ -22,24 +26,32 @@ import {
   TooltipOption,
   ViewOption,
 } from '../types/index.js';
-import { CHART_EVENTS } from '../utils/constant.js';
+import { ShapeType } from '../utils/component.js';
+import { CHART_EVENTS, INTERACTION_TYPE } from '../utils/constant.js';
 
 import EventEmitter from './event-emitter.js';
 
 export class View extends EventEmitter {
-  /** 所有的组件 controllers。 */
+  /** 所有的组件  */
   components: Map<string, BaseComponent> = new Map();
+
+  /** 图形组件 */
+  shapeComponents: Map<string, Shape> = new Map();
 
   // 配置信息存储
   protected options: Options = {};
 
+  interactionType: INTERACTION_TYPE = INTERACTION_TYPE.TOOLTIP;
+
   // container
   container: HTMLElement;
+
+  coordinateInstance: Coordinate;
 
   /** 主题配置，存储当前主题配置。 */
   protected themeObject: ThemeOptions;
 
-  private strategyManage: ViewStrategyManager;
+  strategyManage: ViewStrategyManager;
 
   private strategy: ViewStrategy[];
 
@@ -72,20 +84,21 @@ export class View extends EventEmitter {
     if (size) {
       this.size = size;
     }
+    [...this.components.values()].forEach(c => c.render());
     this.strategy.forEach(item => {
       item.render();
     });
   }
 
-  interaction(name?: string) {
-    console.log(name);
-    // createInteraction..
+  interaction(name?: INTERACTION_TYPE) {
+    this.interactionType = name;
   }
 
   /**
    * 基于注册组件初始化
    */
   private initComponent() {
+    this.createCoordinate();
     this.strategyManage.getComponent().forEach(c => {
       this.components.set(c.name, c);
     });
@@ -169,6 +182,11 @@ export class View extends EventEmitter {
    * @returns View
    */
   data(data: Data): View {
+    data.forEach((d, index) => {
+      if (!d.color) {
+        d.color = getChartColor(index);
+      }
+    });
     set(this.options, 'data', data);
     this.emit(CHART_EVENTS.DATA_CHANGE, data);
     return this;
@@ -212,28 +230,56 @@ export class View extends EventEmitter {
     return this;
   }
 
+  /**
+   * 创建坐标系
+   * @private
+   */
+  private createCoordinate() {
+    this.coordinateInstance = new Coordinate();
+  }
+
+  /**
+   * 坐标系配置。
+   *
+   * ```ts
+   * // 直角坐标系，并进行转置变换
+   * chart.coordinate().transpose();
+   * ```
+   * @returns
+   */
+  coordinate(option?: CoordinateOption): Coordinate {
+    set(this.options, 'coordinate', option);
+    // 更新 coordinate 配置
+    // this.coordinateInstance.update(option);
+    return this.coordinateInstance;
+  }
+
+  getCoordinate() {
+    return this.coordinateInstance;
+  }
+
   tooltip(tooltipOption: TooltipOption): View {
     set(this.options, 'tooltip', tooltipOption);
     return this;
   }
 
-  /**
-   * 图形配置
-   *
-   * ```ts
-   * view.shape('line'); // line area point bar pie gauge
-   * view.shape('area', {
-   *   //...
-   * });
-   * ```
-   * @param field 图形类型
-   * @param shapeOption 图形配置
-   * @param name 指定某个数据
-   */
-  shape(field: string, shapeOption?: ShapeOption): View {
-    set(this.options, ['shape', field], { ...shapeOption, type: field });
-    return this;
-  }
+  // /**
+  //  * 图形配置
+  //  *
+  //  * ```ts
+  //  * view.shape('line'); // line area point bar pie gauge
+  //  * view.shape('area', {
+  //  *   //...
+  //  * });
+  //  * ```
+  //  * @param field 图形类型
+  //  * @param shapeOption 图形配置
+  //  * @param name 指定某个数据
+  //  */
+  // shape(field: string, shapeOption?: ShapeOption): View {
+  //   set(this.options, ['shape', field], { ...shapeOption, type: field });
+  //   return this;
+  // }
 
   /**
    * 辅助标记配置
@@ -250,4 +296,20 @@ export class View extends EventEmitter {
     // ...
     this.unbindThemeListener();
   }
+}
+
+/**
+ * 注册 geometry 组件
+ * @param name
+ * @param Ctor
+ * @returns Geometry
+ */
+export function registerShape(name: string, Ctor: ShapeCtor) {
+  const key = name.toLowerCase() as ShapeType;
+  // 语法糖，在 view API 上增加原型方法
+  View.prototype[key] = function (options?: ShapeOptions) {
+    const shape = new Ctor(this, options);
+    this.shapeComponents.set(key, shape);
+    return shape as any;
+  };
 }

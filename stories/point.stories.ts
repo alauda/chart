@@ -4,6 +4,7 @@ import { dealWithTime, generateData } from './utilt';
 
 import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
+import { INTERACTION_TYPE } from 'src/utils/constant';
 
 export default {
   title: 'Point',
@@ -17,11 +18,11 @@ const Template: Story = () => {
       data: [
         {
           name: 'point1',
-          values: generateData('2023-01-31 09:00:00', 10_000, 60),
+          values: generateData('2023-01-31 09:00:00', 60, 60),
         },
         {
           name: 'point2',
-          values: generateData('2023-01-31 09:00:00', 10_000, 60),
+          values: generateData('2023-01-31 09:00:00', 60, 60, [2, 5]),
         },
       ],
       options: {
@@ -38,7 +39,8 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    chart.shape('point');
+    chart.point().size('size');
+    chart.interaction(INTERACTION_TYPE.ELEMENT_ACTIVE);
     // chart.shape('bar', { name: 'line2' });
     chart.render();
   });

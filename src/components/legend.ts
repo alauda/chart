@@ -3,7 +3,7 @@ import { get, isBoolean } from 'lodash';
 
 import { LegendOption } from '../types/index.js';
 import { CHART_EVENTS, DIRECTION } from '../utils/constant.js';
-import { generateName, getChartColor } from '../utils/index.js';
+import { generateName } from '../utils/index.js';
 
 import { BaseComponent } from './base.js';
 import { Header } from './header.js';
@@ -135,9 +135,9 @@ export class Legend extends BaseComponent<LegendOption> {
 
   getLegend() {
     const data = this.ctrl.getData();
-    return data.map(({ name, color }, index) => ({
+    return data.map(({ name, color }) => ({
       name,
-      color: color || getChartColor(index),
+      color,
     }));
   }
 }

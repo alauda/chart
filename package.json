@@ -76,7 +76,7 @@
     "clean": "rimraf .type-coverage dist lib '.*cache' '*.tsbuildinfo'",
     "dev": "start-storybook",
     "lint": "run-p lint:*",
-    "lint:es": "eslint . --fix --cache -f friendly",
+    "lint:es": "eslint . --cache -f friendly",
     "lint:style": "stylelint . --cache",
     "lint:tsc": "tsc --noEmit",
     "prepare": "simple-git-hooks && yarn-deduplicate --strategy fewer || exit 0",
@@ -146,6 +146,9 @@
     "ignoreNonNullAssertion": true,
     "showRelativePath": true,
     "strict": true,
-    "update": true
+    "update": true,
+    "ignoreFiles": [
+      "src/components/uplot-lib/*.ts"
+    ]
   }
 }

@@ -31,6 +31,7 @@ export function generateData(
         x,
         y: v,
         xx: dealWithTime(new Date(x * 1000)),
+        size: Math.random() * (max + 1 - min) + min,
       };
     });
 }

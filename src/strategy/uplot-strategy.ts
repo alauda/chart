@@ -1,30 +1,40 @@
-import { merge } from 'lodash';
+import { merge, mergeWith } from 'lodash';
 import UPlot from 'uplot';
 
-import { Data, LegendItemActive, ShapeOption, Size } from '../types/index.js';
-import { CHART_EVENTS } from '../utils/constant.js';
-import { getChartColor } from '../utils/index.js';
+import { Axis } from '../components/axis.js';
+import { Data, LegendItemActive, Size } from '../types/index.js';
+import { CHART_EVENTS, INTERACTION_TYPE } from '../utils/constant.js';
+import { SHAPE_TYPES } from '../utils/index.js';
 
 import { ViewStrategy } from './abstract.js';
 import { UPLOT_DEFAULT_OPTIONS } from './config.js';
+import { Quadtree } from './quadtree.js';
 
+const SHAPES = SHAPE_TYPES;
 /**
  * 渲染策略
  * uPlot 渲染图表
  */
 export class UPlotViewStrategy extends ViewStrategy {
+  shapes = SHAPES;
+
+  qt: Quadtree;
+
   get name(): string {
     return 'uPlot';
   }
 
   get component(): string[] {
-    return ['axis', 'tooltip', 'line', 'area', 'bar', 'point'];
+    return ['axis', 'tooltip', ...SHAPES];
   }
 
   private uPlot: uPlot;
 
+  get isElementActive() {
+    return this.ctrl.interactionType === INTERACTION_TYPE.ELEMENT_ACTIVE;
+  }
+
   init() {
-    // ..
     this.getChartEvent();
   }
 
@@ -51,7 +61,7 @@ export class UPlotViewStrategy extends ViewStrategy {
         const data = this.getData();
         this.uPlot.setData(data);
         if (this.uPlot.series.length < data.length) {
-          this.getSeries(this.ctrl.getData()).forEach((s, index) => {
+          this.getSeries().forEach((s: uPlot.Series, index) => {
             if (index) {
               this.uPlot.addSeries(s, index);
             }
@@ -65,12 +75,12 @@ export class UPlotViewStrategy extends ViewStrategy {
 
   render(size?: Size) {
     const option = this.getOption();
-    const data = this.getData();
+    const data = option.data?.length ? option.data : this.getData();
     if (!this.uPlot) {
+      console.log('UPlot', option, option.data, this.getData());
       this.uPlot = new UPlot(option, data, this.ctrl.container);
     }
     this.changeSize(size || this.ctrl.size);
-    console.timeEnd('render');
   }
 
   /**
@@ -90,26 +100,54 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   private readonly getOption = (): uPlot.Options => {
     const { width, height } = this.ctrl.size;
-    const series = this.getSeries(this.ctrl.getData());
+    const series = this.getSeries();
     const theme = this.getThemeOption();
     const plugins = this.getPlugins();
-    return merge(
-      {
-        width,
-        height,
-        ...UPLOT_DEFAULT_OPTIONS,
-        series,
-        plugins,
-        fmtDate: () => UPlot.fmtDate('{HH}:{mm}'),
-        hooks: {
-          ready: [
-            () => {
-              this.ctrl.emit(CHART_EVENTS.U_PLOT_READY);
-            },
-          ],
-        },
+    const shapeOptions = this.getShapeChartOption();
+    const coordinate = this.ctrl.coordinateInstance.getOptions();
+    const axis = (this.ctrl.components.get('axis') as Axis).getOptions();
+
+    const source = {
+      width,
+      height,
+      ...UPLOT_DEFAULT_OPTIONS,
+      plugins,
+      fmtDate: () => UPlot.fmtDate('{HH}:{mm}'),
+      hooks: {
+        drawClear: [
+          (u: uPlot) => {
+            this.qt =
+              this.qt || new Quadtree(0, 0, u.bbox.width, u.bbox.height);
+            this.qt.clear();
+          },
+        ],
+        ready: [
+          () => {
+            this.ctrl.emit(CHART_EVENTS.U_PLOT_READY);
+          },
+        ],
       },
+      series,
+    };
+    return mergeWith(
+      source,
+      coordinate,
+      axis,
       theme,
+      shapeOptions,
+      (objValue: unknown, srcValue: unknown, key) => {
+        if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+          if (key === 'plugins') {
+            return objValue.concat(srcValue);
+          }
+          const objLonger = objValue.length > srcValue.length;
+          const source = objLonger ? objValue : srcValue;
+          const minSource = objLonger ? srcValue : objValue;
+          return source.map((value: unknown, index) =>
+            merge(value, minSource[index]),
+          );
+        }
+      },
     );
   };
 
@@ -118,7 +156,7 @@ export class UPlotViewStrategy extends ViewStrategy {
    * 原始数据转换为 uPlot 数据
    * @returns uPlot.AlignedData
    */
-  private getData(): uPlot.AlignedData {
+  getData(): uPlot.AlignedData {
     const data = this.ctrl.getData();
     return this.handleData(data);
   }
@@ -144,64 +182,30 @@ export class UPlotViewStrategy extends ViewStrategy {
    * @param data 源数据
    * @returns uPlot series
    */
-  getSeries(data: Data) {
-    const shape = this.ctrl.getOption().shape;
-    let defaultType = 'line';
-    let shapes: ShapeOption[];
-    if (shape) {
-      shapes = Object.values(shape);
-      defaultType = Object.keys(shape)[0] || 'line';
-    }
-    return [
-      {},
-      ...data.map(({ color, name }, index) => {
-        const c: string = color || getChartColor(index);
-        const type = shapes?.find(d => d.name === name)?.type || defaultType;
-        return {
-          stroke: c,
-          label: name,
-          points: {
-            show: false,
-          },
-          ...this.getSeriesPathType(type, c),
-        };
-      }),
-    ];
+  getSeries() {
+    const shapeSeries = this.shapes.reduce((prev, name) => {
+      const comp = this.ctrl.shapeComponents.get(name);
+      return comp ? [comp.getSeries(), ...prev] : prev;
+    }, []);
+
+    console.log('shapeComp', shapeSeries.flat());
+    return [{}, ...shapeSeries.flat()];
   }
 
-  getSeriesPathType(type: string, color: string) {
-    const defaultType = UPlot.paths.spline();
-    return (
-      {
-        line: {
-          paths: defaultType,
-        },
-        area: {
-          paths: defaultType,
-          alpha: 0.6,
-          width: 1.5,
-          // fill: color,
-          fill: (u: UPlot, seriesIdx: number) => {
-            const s = u.series[seriesIdx];
-            return this.scaleGradient(u, s.scale, 1, [
-              [0, color],
-              [100, color],
-            ]);
-          },
-        },
-        bar: {
-          paths: UPlot.paths.bars(),
-          fill: color,
-        },
-        point: {
-          paths: UPlot.paths.points(),
-        },
-      }[type] || {
-        paths: defaultType,
-      }
-    );
+  /**
+   * 获取 shape uPlot 配置
+   * @returns uPlot option
+   */
+  getShapeChartOption() {
+    return this.shapes.reduce((prev, name) => {
+      const comp = this.ctrl.shapeComponents.get(name);
+      return comp ? merge(prev, comp.getOptions()) : prev;
+    }, {});
   }
 
+  /**
+   * 获取主题 配置
+   */
   getThemeOption() {
     if (!this.ctrl.getTheme()) {
       return;
@@ -236,6 +240,7 @@ export class UPlotViewStrategy extends ViewStrategy {
     let bound: HTMLDivElement;
     let bLeft: number;
     let bTop: number;
+    let cacheData: { title: string | number; values: Data };
     return {
       hooks: {
         init: (u: UPlot) => {
@@ -243,11 +248,11 @@ export class UPlotViewStrategy extends ViewStrategy {
           bound = over;
           over.addEventListener('mouseenter', () => {
             if (u.series.some(d => d.scale === 'y' && d.show)) {
-              this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSEENTER);
+              this.showTooltip(INTERACTION_TYPE.TOOLTIP);
             }
           });
           over.addEventListener('mouseleave', () => {
-            this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSELEAVE);
+            this.hideTooltip(INTERACTION_TYPE.TOOLTIP);
           });
         },
         setSize: () => {
@@ -256,108 +261,64 @@ export class UPlotViewStrategy extends ViewStrategy {
           bTop = bbox.top;
         },
         setCursor: (u: uPlot) => {
-          const { left, top, idx } = u.cursor;
+          const { left, top, idx, idxs } = u.cursor;
           const x = u.data[0][idx];
           const anchor = { left: left + bLeft, top: top + bTop };
           const data = this.ctrl.getData();
 
           const ySeries = u.series.filter(d => d.scale === 'y');
+
           const values = data.reduce((prev, curr, index) => {
-            return ySeries[index]?.show
+            const allow = this.isElementActive ? idxs[index + 1] : true;
+            return ySeries[index]?.show && allow
               ? [
                   ...prev,
                   {
                     name: curr.name,
-                    color: curr.color || getChartColor(index),
+                    color: curr.color,
                     value: curr.values[idx || 0].y,
                   },
                 ]
               : prev;
           }, []);
+          if (!this.isElementActive) {
+            cacheData = {
+              title: x,
+              values,
+            };
+          }
+          if (idxs.some(Boolean)) {
+            cacheData = {
+              title: x,
+              values,
+            };
+            this.showTooltip(INTERACTION_TYPE.ELEMENT_ACTIVE);
+          } else {
+            this.hideTooltip(INTERACTION_TYPE.ELEMENT_ACTIVE);
+          }
 
-          this.ctrl.emit(CHART_EVENTS.U_PLOT_SET_CURSOR, {
-            bound,
-            anchor,
-            title: x,
-            values,
-          });
+          if (cacheData) {
+            this.ctrl.emit(CHART_EVENTS.U_PLOT_SET_CURSOR, {
+              bound,
+              anchor,
+              title: cacheData.title,
+              values: cacheData.values,
+            });
+          }
         },
       },
     };
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  scaleGradient(
-    u: UPlot,
-    scaleKey: string,
-    ori: number,
-    scaleStops: Array<[number, string]>,
-    discrete = false,
-  ) {
-    const can = document.createElement('canvas');
-    const ctx = can.getContext('2d');
-    const scale = u.scales[scaleKey];
-
-    // we want the stop below or at the scaleMax
-    // and the stop below or at the scaleMin, else the stop above scaleMin
-    let minStopIdx: number;
-    let maxStopIdx: number;
-
-    for (const [i, scaleStop] of scaleStops.entries()) {
-      const stopVal = scaleStop[0];
-
-      if (stopVal <= scale.min || minStopIdx == null) minStopIdx = i;
-
-      maxStopIdx = i;
-
-      if (stopVal >= scale.max) break;
+  private showTooltip(type: INTERACTION_TYPE) {
+    if (this.ctrl.interactionType === type) {
+      this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSEENTER);
     }
+  }
 
-    if (minStopIdx === maxStopIdx) return scaleStops[minStopIdx][1];
-
-    let minStopVal = scaleStops[minStopIdx][0];
-    let maxStopVal = scaleStops[maxStopIdx][0];
-
-    if (minStopVal === -Infinity) minStopVal = scale.min;
-
-    if (maxStopVal === Infinity) maxStopVal = scale.max;
-
-    const minStopPos = u.valToPos(minStopVal, scaleKey, true);
-    const maxStopPos = u.valToPos(maxStopVal, scaleKey, true);
-
-    const range = minStopPos - maxStopPos;
-
-    let x0: number, y0: number, x1: number, y1: number;
-
-    if (ori === 1) {
-      x0 = x1 = 0;
-      y0 = minStopPos;
-      y1 = maxStopPos;
-    } else {
-      y0 = y1 = 0;
-      x0 = minStopPos;
-      x1 = maxStopPos;
+  private hideTooltip(type: INTERACTION_TYPE) {
+    if (this.ctrl.interactionType === type) {
+      this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSELEAVE);
     }
-
-    const grd = ctx.createLinearGradient(x0, y0, x1, y1);
-    let prevColor: string;
-
-    for (let i = minStopIdx; i <= maxStopIdx; i++) {
-      const s = scaleStops[i];
-
-      const stopPos =
-        i === minStopIdx
-          ? minStopPos
-          : i === maxStopIdx
-          ? maxStopPos
-          : u.valToPos(s[0], scaleKey, true);
-      const pct = (minStopPos - stopPos) / range;
-
-      if (discrete && i > minStopIdx) grd.addColorStop(pct, prevColor);
-
-      grd.addColorStop(pct, (prevColor = s[1]));
-    }
-
-    return grd;
   }
 }

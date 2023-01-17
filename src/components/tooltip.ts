@@ -17,19 +17,21 @@ import { symbolStyle } from './styles.js';
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    display: 'none',
+    visibility: 'hidden',
     pointerEvents: 'none',
-    padding: '0 12px',
+    padding: '12px',
     opacity: 0.95,
     backgroundColor: '#fff',
     boxShadow: '0 2px 8px #00000029',
     margin: 8,
     color: '#646669',
     zIndex: 999,
+    // transition:
+    //   'top 0.3s cubic-bezier(0.23, 1, 0.32, 1) 0s',
     fontSize: 12,
   },
   'tooltip-title': {
-    margin: '12px 0',
+    marginBottom: 8,
   },
   'tooltip-list': {
     listStyle: 'none',
@@ -39,7 +41,6 @@ const styles = StyleSheet.create({
   'tooltip-list-item': {
     listStyleType: 'none',
     padding: 0,
-    margin: '8px 0',
     display: 'flex',
     alignItems: 'center',
   },
@@ -74,7 +75,6 @@ export class Tooltip extends BaseComponent<TooltipOption> {
       overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
       document.body.append(overlay);
       this.container = overlay;
-      // this.container.innerHTML = `asdasd`
       this.createItem();
       this.eventListener();
     }
@@ -150,10 +150,11 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     );
 
     this.ctrl.on(CHART_EVENTS.U_PLOT_OVER_MOUSEENTER, () => {
-      this.container.style.display = 'block';
+      this.container.style.visibility = 'visible';
     });
+
     this.ctrl.on(CHART_EVENTS.U_PLOT_OVER_MOUSELEAVE, () => {
-      this.container.style.display = 'none';
+      this.container.style.visibility = 'hidden';
     });
   }
 }

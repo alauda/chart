@@ -11,6 +11,10 @@ export const UPLOT_DEFAULT_OPTIONS = {
       ticks: {
         width: 1,
       },
+      // border: {
+      //   show: true,
+      //   width: 1,
+      // }
     },
     {
       grid: {
@@ -24,6 +28,9 @@ export const UPLOT_DEFAULT_OPTIONS = {
   scales: {
     x: {
       time: true,
+    },
+    y: {
+      distr: 1,
     },
   },
   cursor: {

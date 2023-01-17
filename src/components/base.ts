@@ -17,7 +17,7 @@ export abstract class BaseComponent<O = unknown> {
 
   constructor(ctrl: View) {
     this.ctrl = ctrl;
-    this.render();
+    // this.render();
   }
 
   destroy() {

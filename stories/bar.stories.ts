@@ -1,7 +1,5 @@
 import { Story, Meta } from '@storybook/html';
 
-import { dealWithTime, generateData } from './utilt';
-
 import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
@@ -14,24 +12,50 @@ const Template: Story = () => {
     const chart = new Chart({
       container: '.chart-bar',
       data: [
-        { name: 'bar1', values: generateData('2023-01-31 09:00:00', 20, 60) },
-        { name: 'bar2', values: generateData('2023-01-31 09:00:00', 20, 60) },
+        {
+          name: 'bar1',
+          values: [
+            { x: 'a', y: 2 },
+            { x: 'b', y: 4 },
+            { x: 'c', y: 1 },
+          ],
+        },
+        {
+          name: 'bar2',
+          values: [
+            { x: 'a', y: 4 },
+            { x: 'b', y: 2 },
+            { x: 'c', y: 1 },
+          ],
+        },
+        {
+          name: 'bar3',
+          values: [
+            { x: 'a', y: 1 },
+            { x: 'b', y: 1 },
+            { x: 'c', y: 1 },
+          ],
+        },
+        // { name: 'bar2', values: generateData('2023-01-31 09:00:00', 1, 60) },
+        // { name: 'bar3', values: generateData('2023-01-31 09:00:00', 1, 60) },
       ],
       options: {
         title: { text: 'bar chart' },
         // legend: {
         //   position: 'bottom-right',
         // }
-        tooltip: {
-          // showTitle: false
-          titleFormatter: title =>
-            `${dealWithTime(new Date(Number(title) * 1000))}`,
-        },
+        // tooltip: {
+        //   // showTitle: false
+        //   titleFormatter: title =>
+        //     `${dealWithTime(new Date(Number(title) * 1000))}`,
+        // },
       },
     });
     // console.log(chart);
     // chart.data(data);
-    chart.shape('bar');
+    // chart.bar().adjust({ marginRatio: 0.2 });
+    chart.bar().adjust({ type: 'stack' });
+    // chart.coordinate().transpose();
     // chart.shape('line', { name: 'bar2' });
     chart.render();
   });

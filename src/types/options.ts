@@ -1,3 +1,5 @@
+import uPlot from 'uplot';
+
 import { TooltipValue } from './component.js';
 
 import { Theme } from './index.js';
@@ -34,7 +36,7 @@ export interface Options {
   title?: TitleOption;
   legend?: LegendOption;
   tooltip?: TooltipOption;
-  shape?: Record<string, ShapeOption>;
+  axis?: Record<'x' | 'y', AxisOption>;
 }
 
 export type Data = DataItem[];
@@ -43,7 +45,7 @@ export interface DataItem {
   name: string;
   color?: string;
   // type-coverage:ignore-next-line
-  values: Array<{ x: any; y: number }>;
+  values: Array<{ x: any; y: number; size?: number }>;
 }
 
 export type TitleOption = TitleOpt | boolean;
@@ -66,8 +68,15 @@ export interface LegendOpt {
   position: LegendPosition;
 }
 
+export type CoordinateOption = CoordinateOpt | boolean;
+
+export interface CoordinateOpt {
+  transposed?: boolean;
+}
+
 export type AxisOption = AxisOpt | boolean;
 export interface AxisOpt {
+  autoSize?: boolean; // 默认 true
   min?: number;
   max?: number;
 }
@@ -80,10 +89,35 @@ export interface TooltipOpt {
 }
 
 export interface ShapeOption {
-  type?: string;
   name?: string; // 指定 data name
-  connectNulls?: boolean; // 是否链接空值
+  color?: string;
+  connectNulls?: boolean; // 是否链接空值 默认 false
+  points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
+  width?: number;
+  alpha?: number;
 }
+
+export interface LineShapeOption extends ShapeOption {
+  type?: string;
+}
+
+export interface AreaShapeOption extends ShapeOption {
+  type?: string;
+}
+
+export interface BarShapeOption extends ShapeOption {
+  type?: string;
+}
+
+export interface PointShapeOption extends ShapeOption {
+  type?: string;
+}
+
+export type ShapeOptions =
+  | LineShapeOption
+  | AreaShapeOption
+  | BarShapeOption
+  | PointShapeOption;
 
 export interface AnnotationOption {
   text?: string;

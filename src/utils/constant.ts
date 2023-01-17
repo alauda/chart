@@ -20,12 +20,6 @@ export const DEFAULT_COLORS = [
   '#b0b55c',
 ];
 
-export const DEFAULT_INTERACTIONS = [
-  'tooltip',
-  'legend-filter',
-  'legend-active',
-];
-
 export enum CHART_EVENTS {
   // theme
   THEME_CHANGE = 'theme:change',
@@ -66,3 +60,19 @@ export enum DIRECTION {
   // no direction information
   NONE = 'none',
 }
+
+export enum INTERACTION_TYPE {
+  TOOLTIP = 'tooltip',
+  ELEMENT_ACTIVE = 'element_active',
+
+  // legend
+  LEGEND_FILTER = 'legend-filter',
+  LEGEND_ACTIVE = 'legend-active',
+}
+
+export const DEFAULT_INTERACTIONS = [
+  INTERACTION_TYPE.TOOLTIP,
+  INTERACTION_TYPE.ELEMENT_ACTIVE,
+  INTERACTION_TYPE.LEGEND_FILTER,
+  INTERACTION_TYPE.LEGEND_ACTIVE,
+];
