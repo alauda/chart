@@ -3,12 +3,13 @@ import { get, isBoolean, isFunction, isString } from 'lodash';
 import placement from 'placement.js';
 
 import {
+  ChartEvent,
   TooltipItemActive,
   TooltipOpt,
   TooltipOption,
   TooltipValue,
 } from '../types/index.js';
-import { CHART_EVENTS, NOT_AVAILABLE } from '../utils/constant.js';
+import { NOT_AVAILABLE } from '../utils/constant.js';
 import { generateName, template } from '../utils/index.js';
 
 import { BaseComponent } from './base.js';
@@ -138,8 +139,9 @@ export class Tooltip extends BaseComponent<TooltipOption> {
    * 添加事件监听
    */
   private eventListener() {
+    // TODO: 是否纳管到 interaction
     this.ctrl.on(
-      CHART_EVENTS.U_PLOT_SET_CURSOR,
+      ChartEvent.U_PLOT_SET_CURSOR,
       ({ anchor, title, values }: TooltipItemActive) => {
         // @ts-ignore
         placement(this.container, anchor, 'right', 'start', {
@@ -148,13 +150,5 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         this.createItem(title, values);
       },
     );
-
-    this.ctrl.on(CHART_EVENTS.U_PLOT_OVER_MOUSEENTER, () => {
-      this.container.style.visibility = 'visible';
-    });
-
-    this.ctrl.on(CHART_EVENTS.U_PLOT_OVER_MOUSELEAVE, () => {
-      this.container.style.visibility = 'hidden';
-    });
   }
 }

@@ -101,6 +101,7 @@
   },
   "dependencies": {
     "aphrodite": "^2.4.0",
+    "on-change": "^4.0.2",
     "placement.js": "1.0.0-beta.2",
     "uplot": "^1.6.23"
   },
@@ -148,7 +149,8 @@
     "strict": true,
     "update": true,
     "ignoreFiles": [
-      "src/components/uplot-lib/*.ts"
+      "src/components/uplot-lib/*.ts",
+      "src/interaction/interaction.ts"
     ]
   }
 }

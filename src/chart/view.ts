@@ -4,6 +4,8 @@ import { BaseComponent } from '../components/base.js';
 import { Coordinate } from '../components/coordinate.js';
 import { Shape, ShapeCtor } from '../components/shape/index.js';
 import { getChartColor } from '../index.js';
+import { getInteraction } from '../interaction/index.js';
+import Interaction from '../interaction/interaction.js';
 import { ViewStrategy } from '../strategy/abstract.js';
 import {
   UPlotViewStrategy,
@@ -14,8 +16,10 @@ import { getTheme } from '../theme/index.js';
 import {
   AnnotationOption,
   AxisOption,
+  ChartEvent,
   CoordinateOption,
   Data,
+  InteractionSteps,
   LegendOption,
   Options,
   ShapeOptions,
@@ -27,7 +31,6 @@ import {
   ViewOption,
 } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
-import { CHART_EVENTS, INTERACTION_TYPE } from '../utils/constant.js';
 
 import EventEmitter from './event-emitter.js';
 
@@ -41,7 +44,7 @@ export class View extends EventEmitter {
   // 配置信息存储
   protected options: Options = {};
 
-  interactionType: INTERACTION_TYPE = INTERACTION_TYPE.TOOLTIP;
+  interactions: Map<string, Interaction> = new Map();
 
   // container
   container: HTMLElement;
@@ -61,14 +64,23 @@ export class View extends EventEmitter {
 
   size: Size = { width: 0, height: 0 };
 
+  defaultInteractions: string[];
+
+  // 判断是否是 element active  [point]
+  get isElementAction() {
+    return !!this.shapeComponents.get('point');
+  }
+
   constructor(props: ViewOption) {
     super();
-    const { width, height, ele, options, data, theme } = props;
+    const { width, height, ele, options, data, theme, defaultInteractions } =
+      props;
     this.container = ele;
     if (options) {
       this.options = options;
     }
     data && this.data(data);
+    this.defaultInteractions = defaultInteractions;
     this.size = { ...this.size, width, height };
     this.initTheme(theme);
     this.init();
@@ -80,6 +92,15 @@ export class View extends EventEmitter {
     // this.render();
   }
 
+  private initDefaultInteractions(interactions: string[]) {
+    for (const name of interactions) {
+      const interactionStep = getInteraction(name);
+      if (name) {
+        this.interaction(name, interactionStep);
+      }
+    }
+  }
+
   render(size?: Size) {
     if (size) {
       this.size = size;
@@ -88,10 +109,14 @@ export class View extends EventEmitter {
     this.strategy.forEach(item => {
       item.render();
     });
+    // TODO: 去除依赖 shape 判断 is point
+    this.initDefaultInteractions(this.defaultInteractions);
   }
 
-  interaction(name?: INTERACTION_TYPE) {
-    this.interactionType = name;
+  interaction(name: string, steps?: InteractionSteps) {
+    const interaction = new Interaction(this, steps);
+    interaction.init();
+    this.interactions.set(name, interaction);
   }
 
   /**
@@ -152,7 +177,7 @@ export class View extends EventEmitter {
     this.themeObject = isObject(theme)
       ? getTheme(theme.type, theme)
       : getTheme(theme);
-    this.emit(CHART_EVENTS.THEME_CHANGE);
+    this.emit(ChartEvent.THEME_CHANGE);
     return this;
   }
 
@@ -188,7 +213,7 @@ export class View extends EventEmitter {
       }
     });
     set(this.options, 'data', data);
-    this.emit(CHART_EVENTS.DATA_CHANGE, data);
+    this.emit(ChartEvent.DATA_CHANGE, data);
     return this;
   }
 

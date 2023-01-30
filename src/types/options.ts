@@ -1,5 +1,8 @@
 import uPlot from 'uplot';
 
+import { AdjustOption } from '../components/shape/bar.js';
+import { SizeCallback } from '../components/shape/point.js';
+
 import { TooltipValue } from './component.js';
 
 import { Theme } from './index.js';
@@ -27,6 +30,7 @@ export interface ViewOption {
   padding?: number[];
   data?: Data;
   options?: Options;
+  defaultInteractions: string[];
   /** 主题 */
   theme?: Theme; // default system
 }
@@ -37,6 +41,10 @@ export interface Options {
   legend?: LegendOption;
   tooltip?: TooltipOption;
   axis?: Record<'x' | 'y', AxisOption>;
+  line?: LineShapeOption;
+  area?: AreaShapeOption;
+  bar?: BarShapeOption;
+  point?: PointShapeOption;
 }
 
 export type Data = DataItem[];
@@ -95,22 +103,25 @@ export interface ShapeOption {
   points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
   width?: number;
   alpha?: number;
+  map?: string;
 }
 
 export interface LineShapeOption extends ShapeOption {
-  type?: string;
+  step?: 'start' | 'end';
 }
 
 export interface AreaShapeOption extends ShapeOption {
-  type?: string;
+  map?: string;
 }
 
 export interface BarShapeOption extends ShapeOption {
-  type?: string;
+  adjustOpt?: AdjustOption;
 }
 
 export interface PointShapeOption extends ShapeOption {
-  type?: string;
+  pointSize?: number;
+  sizeField?: string;
+  sizeCallback?: SizeCallback;
 }
 
 export type ShapeOptions =

@@ -8,7 +8,13 @@ import Line from './components/shape/line.js';
 import Point from './components/shape/point.js';
 import { Title } from './components/title.js';
 import { Tooltip } from './components/tooltip.js';
+import { ElementAction } from './interaction/action/element.js';
+import { registerAction } from './interaction/action/index.js';
+import { LegendToggle } from './interaction/action/legend.js';
+import { TooltipAction } from './interaction/action/tooltip.js';
+import { registerInteraction } from './interaction/index.js';
 import { Dark, registerTheme } from './theme/index.js';
+import { ActionType, ChartEvent } from './types/index.js';
 import {
   AreaShapeOption,
   BarShapeOption,
@@ -50,6 +56,7 @@ declare module './chart/view.js' {
   }
 }
 
+// register shape
 registerShape('line', Line);
 
 registerShape('area', Area);
@@ -57,3 +64,38 @@ registerShape('area', Area);
 registerShape('point', Point);
 
 registerShape('Bar', Bar);
+
+// register interaction action
+registerAction('tooltip', TooltipAction);
+
+registerAction('element-active', ElementAction);
+
+registerAction('legend', LegendToggle);
+
+// register interaction
+registerInteraction('tooltip', {
+  start: [
+    { trigger: ChartEvent.PLOT_MOUSEMOVE, action: ActionType.TOOLTIP_SHOW },
+  ],
+  end: [
+    { trigger: ChartEvent.PLOT_MOUSELEAVE, action: ActionType.TOOLTIP_HIDE },
+  ],
+});
+
+registerInteraction('legend-active', {
+  start: [
+    { trigger: ChartEvent.LEGEND_ITEM_CLICK, action: ActionType.LEGEND_TOGGLE },
+  ],
+  // end: [
+  //   { trigger: ChartEvent.LEGEND_ITEM_RESEAT, action: ActionType.TOOLTIP_HIDE },
+  // ],
+});
+
+// registerInteraction('element-active', {
+//   start: [
+//     { trigger: ChartEvent.ELEMENT_MOUSEMOVE, action: ActionType.ELEMENT_ACTIVE },
+//   ],
+//   end: [
+//     { trigger: ChartEvent.ELEMENT_MOUSELEAVE, action: ActionType.ELEMENT_RESET },
+//   ],
+// });

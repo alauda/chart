@@ -1,7 +1,7 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
 
 import { View } from '../chart/view.js';
-import { DIRECTION } from '../utils/constant.js';
+import { DIRECTION } from '../types/index.js';
 import { generateName } from '../utils/index.js';
 
 const styles = StyleSheet.create({

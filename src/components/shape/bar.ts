@@ -5,9 +5,8 @@ import { seriesBarsPlugin, stack } from '../uplot-lib/index.js';
 
 import { Shape } from './index.js';
 
-type AdjustType = 'stack' | 'group';
-
-interface AdjustOption {
+export type AdjustType = 'stack' | 'group';
+export interface AdjustOption {
   type?: AdjustType; // 默认 group
   marginRatio?: number; // type group 下有效 0-1 范围 默认 0.1
 }

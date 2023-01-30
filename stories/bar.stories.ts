@@ -53,8 +53,8 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    // chart.bar().adjust({ marginRatio: 0.2 });
-    chart.bar().adjust({ type: 'stack' });
+    chart.bar().adjust({ marginRatio: 0.2 });
+    // chart.bar().adjust({ type: 'stack' });
     // chart.coordinate().transpose();
     // chart.shape('line', { name: 'bar2' });
     chart.render();

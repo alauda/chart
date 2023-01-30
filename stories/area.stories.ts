@@ -36,6 +36,7 @@ const Template: Story = () => {
       data: [
         {
           name: 'area1',
+          // color: '#999',
           values: d1,
         },
         {

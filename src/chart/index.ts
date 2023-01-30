@@ -1,4 +1,5 @@
 import { ChartOption, Size } from '../types/index.js';
+import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
 // import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
 import { getChartSize, getElement, resizeObserver } from '../utils/index.js';
 
@@ -17,31 +18,26 @@ export class Chart extends View {
       width,
       height,
       padding,
-      // defaultInteractions = DEFAULT_INTERACTIONS,
+      defaultInteractions = DEFAULT_INTERACTIONS,
       options,
       data,
     } = props;
     const ele: HTMLElement = getElement(container);
     const size = getChartSize(ele, width, height);
-    super({
+    const opts = {
       ele,
       ...size,
       padding,
       data,
       options,
-    });
+      defaultInteractions,
+    };
+    super(opts);
     this.ele = ele;
     this.width = size.width;
     this.height = size.height;
-    // this.initDefaultInteractions(defaultInteractions);
     this.bindAutoFit();
   }
-
-  // private initDefaultInteractions(interactions: string[]) {
-  //   for (const interaction of interactions) {
-  //     this.interaction(interaction);
-  //   }
-  // }
 
   private bindAutoFit() {
     this.sizeObserver = resizeObserver(this.ele, this.changeSize);

@@ -4,7 +4,6 @@ import { dealWithTime, generateData } from './utilt';
 
 import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
-import { INTERACTION_TYPE } from 'src/utils/constant';
 
 export default {
   title: 'Point',
@@ -40,7 +39,6 @@ const Template: Story = () => {
     // console.log(chart);
     // chart.data(data);
     chart.point().size('size');
-    chart.interaction(INTERACTION_TYPE.ELEMENT_ACTIVE);
     // chart.shape('bar', { name: 'line2' });
     chart.render();
   });

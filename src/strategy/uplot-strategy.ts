@@ -2,8 +2,7 @@ import { merge, mergeWith } from 'lodash';
 import UPlot from 'uplot';
 
 import { Axis } from '../components/axis.js';
-import { Data, LegendItemActive, Size } from '../types/index.js';
-import { CHART_EVENTS, INTERACTION_TYPE } from '../utils/constant.js';
+import { ChartEvent, Data, Size } from '../types/index.js';
 import { SHAPE_TYPES } from '../utils/index.js';
 
 import { ViewStrategy } from './abstract.js';
@@ -30,9 +29,11 @@ export class UPlotViewStrategy extends ViewStrategy {
 
   private uPlot: uPlot;
 
-  get isElementActive() {
-    return this.ctrl.interactionType === INTERACTION_TYPE.ELEMENT_ACTIVE;
+  get isElementAction() {
+    return this.ctrl.isElementAction;
   }
+
+  private recordActive = false;
 
   init() {
     this.getChartEvent();
@@ -43,20 +44,20 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   getChartEvent() {
     // 监听 主题改变
-    this.ctrl.on(CHART_EVENTS.THEME_CHANGE, () => {
+    this.ctrl.on(ChartEvent.THEME_CHANGE, () => {
       if (this.uPlot) {
         this.uPlot.redraw();
       }
     });
 
-    // 监听 legend item click
-    this.ctrl.on(CHART_EVENTS.LEGEND_ITEM_CLICK, (data: LegendItemActive) => {
-      if (this.uPlot) {
-        this.uPlot.setSeries(data.index + 1, { show: !data.isActive }, true);
-      }
-    });
+    // // 监听 legend item click
+    // this.ctrl.on(ChartEvent.LEGEND_ITEM_CLICK, (data: LegendItemActive) => {
+    //   if (this.uPlot) {
+    //     this.uPlot.setSeries(data.index + 1, { show: !data.isActive }, true);
+    //   }
+    // });
 
-    this.ctrl.on(CHART_EVENTS.DATA_CHANGE, () => {
+    this.ctrl.on(ChartEvent.DATA_CHANGE, () => {
       if (this.uPlot) {
         const data = this.getData();
         this.uPlot.setData(data);
@@ -77,7 +78,6 @@ export class UPlotViewStrategy extends ViewStrategy {
     const option = this.getOption();
     const data = option.data?.length ? option.data : this.getData();
     if (!this.uPlot) {
-      console.log('UPlot', option, option.data, this.getData());
       this.uPlot = new UPlot(option, data, this.ctrl.container);
     }
     this.changeSize(size || this.ctrl.size);
@@ -123,7 +123,7 @@ export class UPlotViewStrategy extends ViewStrategy {
         ],
         ready: [
           () => {
-            this.ctrl.emit(CHART_EVENTS.U_PLOT_READY);
+            this.ctrl.emit(ChartEvent.U_PLOT_READY);
           },
         ],
       },
@@ -188,7 +188,7 @@ export class UPlotViewStrategy extends ViewStrategy {
       return comp ? [comp.getSeries(), ...prev] : prev;
     }, []);
 
-    console.log('shapeComp', shapeSeries.flat());
+    // console.log('shapeComp', shapeSeries.flat());
     return [{}, ...shapeSeries.flat()];
   }
 
@@ -248,11 +248,11 @@ export class UPlotViewStrategy extends ViewStrategy {
           bound = over;
           over.addEventListener('mouseenter', () => {
             if (u.series.some(d => d.scale === 'y' && d.show)) {
-              this.showTooltip(INTERACTION_TYPE.TOOLTIP);
+              this.ctrl.emit(ChartEvent.PLOT_MOUSEMOVE);
             }
           });
           over.addEventListener('mouseleave', () => {
-            this.hideTooltip(INTERACTION_TYPE.TOOLTIP);
+            this.ctrl.emit(ChartEvent.PLOT_MOUSELEAVE);
           });
         },
         setSize: () => {
@@ -269,7 +269,7 @@ export class UPlotViewStrategy extends ViewStrategy {
           const ySeries = u.series.filter(d => d.scale === 'y');
 
           const values = data.reduce((prev, curr, index) => {
-            const allow = this.isElementActive ? idxs[index + 1] : true;
+            const allow = this.isElementAction ? idxs[index + 1] : true;
             return ySeries[index]?.show && allow
               ? [
                   ...prev,
@@ -281,7 +281,7 @@ export class UPlotViewStrategy extends ViewStrategy {
                 ]
               : prev;
           }, []);
-          if (!this.isElementActive) {
+          if (!this.isElementAction) {
             cacheData = {
               title: x,
               values,
@@ -292,13 +292,19 @@ export class UPlotViewStrategy extends ViewStrategy {
               title: x,
               values,
             };
-            this.showTooltip(INTERACTION_TYPE.ELEMENT_ACTIVE);
+            if (!this.recordActive) {
+              this.recordActive = true;
+              this.ctrl.emit(ChartEvent.ELEMENT_MOUSEMOVE);
+            }
           } else {
-            this.hideTooltip(INTERACTION_TYPE.ELEMENT_ACTIVE);
+            if (this.recordActive) {
+              this.ctrl.emit(ChartEvent.ELEMENT_MOUSELEAVE);
+              this.recordActive = false;
+            }
           }
 
           if (cacheData) {
-            this.ctrl.emit(CHART_EVENTS.U_PLOT_SET_CURSOR, {
+            this.ctrl.emit(ChartEvent.U_PLOT_SET_CURSOR, {
               bound,
               anchor,
               title: cacheData.title,
@@ -308,17 +314,5 @@ export class UPlotViewStrategy extends ViewStrategy {
         },
       },
     };
-  }
-
-  private showTooltip(type: INTERACTION_TYPE) {
-    if (this.ctrl.interactionType === type) {
-      this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSEENTER);
-    }
-  }
-
-  private hideTooltip(type: INTERACTION_TYPE) {
-    if (this.ctrl.interactionType === type) {
-      this.ctrl.emit(CHART_EVENTS.U_PLOT_OVER_MOUSELEAVE);
-    }
   }
 }

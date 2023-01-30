@@ -1,6 +1,6 @@
-import { InteractionCtor } from './interaction.js';
+import { InteractionSteps } from '../types/index.js';
 
-const INTERACTIONS: Map<string, InteractionCtor> = new Map();
+const INTERACTIONS: Map<string, InteractionSteps> = new Map();
 
 /**
  * 全局注册组件。
@@ -10,7 +10,7 @@ const INTERACTIONS: Map<string, InteractionCtor> = new Map();
  */
 export function registerInteraction(
   name: string,
-  interaction: InteractionCtor,
+  interaction: InteractionSteps,
 ) {
   INTERACTIONS.set(name, interaction);
 }
@@ -20,6 +20,6 @@ export function registerInteraction(
  * @param name 交互名称
  * @returns 返回交互类
  */
-export function getInteraction(name: string): InteractionCtor {
+export function getInteraction(name: string): InteractionSteps {
   return INTERACTIONS.get(name);
 }

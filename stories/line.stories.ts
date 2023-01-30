@@ -380,7 +380,7 @@ const data = [
 const Template: Story = () => {
   setTimeout(() => {
     console.time('render');
-    const chart = new Chart({
+    const opts = {
       container: '.chart1',
       data: [
         {
@@ -399,11 +399,12 @@ const Template: Story = () => {
         // }
         tooltip: {
           // showTitle: false
-          titleFormatter: title =>
+          titleFormatter: (title: string) =>
             `${dealWithTime(new Date(Number(title) * 1000))}`,
         },
       },
-    });
+    };
+    const chart = new Chart(opts);
     chart.line();
     // console.log(chart);
     // chart.data(data);

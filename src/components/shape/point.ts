@@ -5,7 +5,6 @@ import { UPLOT_DEFAULT_OPTIONS } from '../../strategy/config.js';
 import { UPlotViewStrategy } from '../../strategy/index.js';
 import { pointWithin, Quadtree } from '../../strategy/quadtree.js';
 import { Nilable } from '../../types/index.js';
-import { INTERACTION_TYPE } from '../../utils/constant.js';
 import { convertRgba, ShapeType } from '../../utils/index.js';
 
 import { Shape } from './index.js';
@@ -43,10 +42,6 @@ export default class Point extends Shape<Point> {
 
   private get qt() {
     return this.strategy.qt;
-  }
-
-  private get isElementActive() {
-    return this.ctrl.interactionType === INTERACTION_TYPE.ELEMENT_ACTIVE;
   }
 
   map(name: string) {
@@ -149,7 +144,7 @@ export default class Point extends Shape<Point> {
 
   private readonly getCursorOption = (): uPlot.Cursor => {
     return {
-      x: !this.isElementActive,
+      x: false,
       dataIdx: (u: uPlot, seriesIdx: number) => {
         if (seriesIdx === 1) {
           this.hRect = null;
@@ -173,10 +168,8 @@ export default class Point extends Shape<Point> {
                 this.hRect = o;
               }
             }
-            // TODO: 鼠标移出 point 触发 hide tip
           });
         }
-
         return this.hRect && seriesIdx === this.hRect.sidx
           ? this.hRect.didx
           : null;

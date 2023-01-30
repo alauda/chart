@@ -1,8 +1,7 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
 import { get, isBoolean } from 'lodash';
 
-import { LegendOption } from '../types/index.js';
-import { CHART_EVENTS, DIRECTION } from '../utils/constant.js';
+import { ChartEvent, DIRECTION, LegendOption } from '../types/index.js';
 import { generateName } from '../utils/index.js';
 
 import { BaseComponent } from './base.js';
@@ -75,7 +74,7 @@ export class Legend extends BaseComponent<LegendOption> {
         dom.append(this.container);
         this.createItem();
       } else {
-        this.ctrl.on(CHART_EVENTS.U_PLOT_READY, () => {
+        this.ctrl.on(ChartEvent.U_PLOT_READY, () => {
           dom.append(this.container);
           this.container.className = `${generateName('legend')} ${css(
             styles.legend,
@@ -106,7 +105,7 @@ export class Legend extends BaseComponent<LegendOption> {
         li.addEventListener('click', () => {
           const isActive = li.style.opacity === '1' || !li.style.opacity;
           li.style.opacity = isActive ? '0.5' : '1';
-          this.ctrl.emit(CHART_EVENTS.LEGEND_ITEM_CLICK, {
+          this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, {
             index: Number(index),
             data: value,
             isActive,
