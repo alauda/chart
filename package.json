@@ -1,14 +1,8 @@
 {
-  "name": "@alauda/chart",
-  "version": "0.1.2",
+  "name": "zz-chart",
+  "version": "0.1.0-beta.60",
   "type": "module",
-  "description": "Alauda Chart components by Alauda Frontend Team",
-  "repository": "git+https://github.com/alauda/alauda-chart.git",
   "author": "Alauda",
-  "contributors": [
-    "zChanges",
-    "JounQin (https://www.1stG.me) <admin@1stg.me>"
-  ],
   "donate": {
     "recipients": [
       {
@@ -102,7 +96,7 @@
   "dependencies": {
     "aphrodite": "^2.4.0",
     "on-change": "^4.0.2",
-    "placement.js": "1.0.0-beta.2",
+    "placement.js": "^1.0.0-beta.5",
     "uplot": "^1.6.23"
   },
   "devDependencies": {

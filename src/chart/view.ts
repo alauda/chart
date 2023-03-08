@@ -1,11 +1,14 @@
-import { isBoolean, isObject, set } from 'lodash';
+import { isBoolean, isObject, merge, set } from 'lodash';
+import { Annotation } from '../components/annotation.js';
 
 import { BaseComponent } from '../components/base.js';
 import { Coordinate } from '../components/coordinate.js';
+import { Legend } from '../components/legend.js';
+import { Scale } from '../components/scale.js';
 import { Shape, ShapeCtor } from '../components/shape/index.js';
-import { getChartColor } from '../index.js';
 import { getInteraction } from '../interaction/index.js';
 import Interaction from '../interaction/interaction.js';
+import { reactive, Reactive } from '../reactivity/index.js';
 import { ViewStrategy } from '../strategy/abstract.js';
 import {
   UPlotViewStrategy,
@@ -14,7 +17,6 @@ import {
 } from '../strategy/index.js';
 import { getTheme } from '../theme/index.js';
 import {
-  AnnotationOption,
   AxisOption,
   ChartEvent,
   CoordinateOption,
@@ -22,6 +24,7 @@ import {
   InteractionSteps,
   LegendOption,
   Options,
+  ScaleOption,
   ShapeOptions,
   Size,
   Theme,
@@ -31,6 +34,7 @@ import {
   ViewOption,
 } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
+import { getChartColor } from '../utils/index.js';
 
 import EventEmitter from './event-emitter.js';
 
@@ -44,10 +48,14 @@ export class View extends EventEmitter {
   // 配置信息存储
   protected options: Options = {};
 
+  readonly reactivity: Reactive;
+
   interactions: Map<string, Interaction> = new Map();
 
   // container
   container: HTMLElement;
+
+  chartContainer: HTMLElement;
 
   coordinateInstance: Coordinate;
 
@@ -71,13 +79,29 @@ export class View extends EventEmitter {
     return !!this.shapeComponents.get('point');
   }
 
+  get hideTooltip () {
+    return this.options.tooltip === false
+  }
+
   constructor(props: ViewOption) {
     super();
-    const { width, height, ele, options, data, theme, defaultInteractions } =
-      props;
+    const {
+      width,
+      height,
+      chartEle,
+      ele,
+      options,
+      data,
+      theme,
+      chartOption,
+      padding,
+      defaultInteractions,
+    } = props;
+    this.reactivity = reactive(chartOption, this);
+    this.chartContainer = chartEle;
     this.container = ele;
     if (options) {
-      this.options = options;
+      this.options = { ...options, padding };
     }
     data && this.data(data);
     this.defaultInteractions = defaultInteractions;
@@ -92,13 +116,8 @@ export class View extends EventEmitter {
     // this.render();
   }
 
-  private initDefaultInteractions(interactions: string[]) {
-    for (const name of interactions) {
-      const interactionStep = getInteraction(name);
-      if (name) {
-        this.interaction(name, interactionStep);
-      }
-    }
+  reactive() {
+    return this.reactivity.reactiveObject;
   }
 
   render(size?: Size) {
@@ -114,9 +133,24 @@ export class View extends EventEmitter {
   }
 
   interaction(name: string, steps?: InteractionSteps) {
-    const interaction = new Interaction(this, steps);
-    interaction.init();
-    this.interactions.set(name, interaction);
+    const interactionStep = getInteraction(name);
+    if (steps || interactionStep) {
+      const step =
+        steps && interactionStep
+          ? merge(interactionStep, steps)
+          : steps || interactionStep;
+      const interaction = new Interaction(this, step);
+      interaction.init();
+      this.interactions.set(name, interaction);
+    }
+  }
+
+  private initDefaultInteractions(interactions: string[]) {
+    for (const name of interactions) {
+      if (name) {
+        this.interaction(name);
+      }
+    }
   }
 
   /**
@@ -227,9 +261,10 @@ export class View extends EventEmitter {
     return this;
   }
 
-  legend(legendOption: boolean | LegendOption): View {
+  legend(legendOption: boolean | LegendOption): Legend {
     set(this.options, 'legend', legendOption);
-    return this;
+    const legend = this.components.get('legend') as Legend;
+    return legend;
   }
 
   /**
@@ -256,11 +291,32 @@ export class View extends EventEmitter {
   }
 
   /**
+   * 对x y 度量进行配置。
+   * ```
+   * @param field 度量 x y
+   * @param scaleOption 度量配置
+   */
+  scale(field: string, axisOption: ScaleOption): Scale {
+    if (isBoolean(field)) {
+      set(this.options, ['scale'], field);
+    } else {
+      set(this.options, ['scale', field], axisOption);
+    }
+    const scale = this.components.get('scale') as Scale;
+    return scale;
+  }
+
+  setScale(field: 'x' | 'y', limits: { min?: number; max?: number }) {
+    const scale = this.components.get('scale') as Scale;
+    scale.setScale(field, limits);
+  }
+
+  /**
    * 创建坐标系
    * @private
    */
   private createCoordinate() {
-    this.coordinateInstance = new Coordinate();
+    this.coordinateInstance = new Coordinate(this);
   }
 
   /**
@@ -309,9 +365,19 @@ export class View extends EventEmitter {
   /**
    * 辅助标记配置
    */
-  annotation(annotationOption: AnnotationOption) {
-    set(this.options, 'annotation', annotationOption);
+  annotation(): Annotation {
+    return this.components.get('annotation') as Annotation;
+  }
+
+  // 命令式设置 option
+  setOption(name: string | string[], option: unknown) {
+    set(this.options, name, option);
+    // console.log(this.options)
     return this;
+  }
+
+  redraw() {
+    this.emit(ChartEvent.HOOKS_REDRAW);
   }
 
   /**
@@ -319,6 +385,10 @@ export class View extends EventEmitter {
    */
   destroy() {
     // ...
+    this.chartContainer.innerHTML = '';
+    this.reactivity.unsubscribe();
+    [...this.components.values()].forEach(c => c.destroy());
+    this.strategyManage.getStrategy('uPlot')?.destroy();
     this.unbindThemeListener();
   }
 }

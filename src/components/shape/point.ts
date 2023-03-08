@@ -91,7 +91,7 @@ export default class Point extends Shape<Point> {
                 const chartData = this.ctrl.getData();
                 const data = chartData[seriesIdx - 1].values;
                 return data.map(d => {
-                  const field: number = get(d, this.sizeField) || get(d, 'x');
+                  const field: number = get(d, this.sizeField) || this.pointSize;
                   const [min, max] = this.sizeRange;
                   let value = field;
                   if (field < min) {

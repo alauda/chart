@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import { UPlotViewStrategy } from '../../strategy/index.js';
 import { getSeriesPathType } from '../../strategy/utils.js';
 import { ShapeType } from '../../utils/index.js';
@@ -72,6 +73,7 @@ export default class Bar extends Shape<Bar> {
       ...stackOpt,
       plugins: [
         seriesBarsPlugin({
+          time: !!get(this.ctrl.getOption()?.scale?.x, 'time'),
           ori: this.transposed ? 1 : 0,
           dir: this.transposed ? -1 : 1,
           stacked: this.isStack,

@@ -37,6 +37,7 @@ interface Point {
 }
 
 export interface ThemeOptions {
+  colorVar: Record<string, string>
   backgroundColor?: string;
 
   // 标题

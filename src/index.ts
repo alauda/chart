@@ -1,13 +1,16 @@
 import { registerShape } from './chart/view.js';
+import { Annotation } from './components/annotation.js';
 import { Axis } from './components/axis.js';
 import { registerComponent } from './components/index.js';
 import { Legend } from './components/legend.js';
+import { Scale } from './components/scale.js';
 import Area from './components/shape/area.js';
 import Bar from './components/shape/bar.js';
 import Line from './components/shape/line.js';
 import Point from './components/shape/point.js';
 import { Title } from './components/title.js';
 import { Tooltip } from './components/tooltip.js';
+import { BrushXAction } from './interaction/action/brush-x.js';
 import { ElementAction } from './interaction/action/element.js';
 import { registerAction } from './interaction/action/index.js';
 import { LegendToggle } from './interaction/action/legend.js';
@@ -34,6 +37,11 @@ registerComponent('legend', Legend);
 registerComponent('tooltip', Tooltip);
 
 registerComponent('axis', Axis);
+
+registerComponent('scale', Scale);
+
+registerComponent('annotation', Annotation);
+
 
 // 注册黑暗主题
 registerTheme('dark', Dark());
@@ -72,6 +80,9 @@ registerAction('element-active', ElementAction);
 
 registerAction('legend', LegendToggle);
 
+registerAction('brush-x', BrushXAction);
+
+
 // register interaction
 registerInteraction('tooltip', {
   start: [
@@ -91,6 +102,16 @@ registerInteraction('legend-active', {
   // ],
 });
 
+
+registerInteraction('brush-x', {
+  start: [
+    { trigger: ChartEvent.PLOT_MOUSEDOWN, action: ActionType.BRUSH_X_START },
+  ],
+  end: [
+    { trigger: ChartEvent.PLOT_MOUSEUP, action: ActionType.BRUSH_X_END },
+  ],
+});
+
 // registerInteraction('element-active', {
 //   start: [
 //     { trigger: ChartEvent.ELEMENT_MOUSEMOVE, action: ActionType.ELEMENT_ACTIVE },
@@ -99,3 +120,5 @@ registerInteraction('legend-active', {
 //     { trigger: ChartEvent.ELEMENT_MOUSELEAVE, action: ActionType.ELEMENT_RESET },
 //   ],
 // });
+
+export * from './components/index.js';

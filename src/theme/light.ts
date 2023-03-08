@@ -64,6 +64,7 @@ const SHAPE = {
  */
 export const Light = (options?: ThemeOptions): ThemeOptions => {
   const defaultOptions: Theme = {
+    colorVar: COLORS,
     legend: LEGEND,
     title: TITLE,
     xAxis: AXIS,

@@ -2,6 +2,8 @@ export enum ChartEvent {
   // theme
   THEME_CHANGE = 'theme:change',
 
+  HOOKS_REDRAW = 'hooks:redraw',
+
   // uPlot hooks
   U_PLOT_READY = 'uPlot:ready',
   U_PLOT_SET_CURSOR = 'uPlot:setCursor',
@@ -9,6 +11,10 @@ export enum ChartEvent {
   // plot
   PLOT_MOUSEMOVE = 'plot:mousemove',
   PLOT_MOUSELEAVE = 'plot:mouseleave',
+  PLOT_CLICK = 'plot:click',
+  PLOT_MOUSEDOWN = 'plot:mousedown',
+  PLOT_MOUSEUP = 'plot:mouseup',
+
 
   // element
   ELEMENT_MOUSEMOVE = 'element:mousemove',

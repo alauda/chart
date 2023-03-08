@@ -36,6 +36,11 @@ export interface InteractionStep {
    */
   action: string | ActionType;
 
+  /**
+   * 回调函数，action 执行后执行
+   */
+  callback?: (context: unknown) => void;
+
   // TODO: throttle debounce once
 }
 // TODO: 同时支持 string, string[], ()=>{} 三种方法是
@@ -55,4 +60,8 @@ export enum ActionType {
 
   // legend
   LEGEND_TOGGLE = 'legend:toggle',
+
+  // brush
+  BRUSH_X_START = 'brush-x:start',
+  BRUSH_X_END = 'brush-x:end',
 }

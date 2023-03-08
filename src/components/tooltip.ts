@@ -1,5 +1,12 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get, isBoolean, isFunction, isString } from 'lodash';
+import {
+  get,
+  isArray,
+  isBoolean,
+  isElement,
+  isFunction,
+  isString,
+} from 'lodash';
 import placement from 'placement.js';
 
 import {
@@ -27,6 +34,7 @@ const styles = StyleSheet.create({
     margin: 8,
     color: '#646669',
     zIndex: 999,
+    transition: 'transform 0.1s ease-out 0s',
     // transition:
     //   'top 0.3s cubic-bezier(0.23, 1, 0.32, 1) 0s',
     fontSize: 12,
@@ -41,12 +49,18 @@ const styles = StyleSheet.create({
   },
   'tooltip-list-item': {
     listStyleType: 'none',
-    padding: 0,
+    padding: '2px 8px',
     display: 'flex',
     alignItems: 'center',
   },
   'tooltip-marker': {
     marginRight: 4,
+  },
+  'tooltip-name': {
+    maxWidth: '197px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   'tooltip-value': {
     marginLeft: 30,
@@ -67,15 +81,18 @@ export class Tooltip extends BaseComponent<TooltipOption> {
   }
 
   update() {
-    // ..
+    this.option = get(this.ctrl.getOption(), this.name);
+    this.createItem();
   }
 
   create() {
     if (!isBoolean(this.option)) {
-      const overlay = document.createElement('div');
-      overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
-      document.body.append(overlay);
-      this.container = overlay;
+      if (!this.container) {
+        const overlay = document.createElement('div');
+        overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
+        document.body.append(overlay);
+        this.container = overlay;
+      }
       this.createItem();
       this.eventListener();
     }
@@ -88,15 +105,19 @@ export class Tooltip extends BaseComponent<TooltipOption> {
    */
   private createItem(title?: string, values?: TooltipValue[]) {
     const itemTpl = this.getTooltipItem(values);
+    const isEl = isElement(itemTpl);
+    const list = `<ul class="${css(styles['tooltip-list'])}">${itemTpl}</ul>`;
     this.container.innerHTML = `
-      ${this.getTooltipTitle(title)}
-      <ul class="${css(styles['tooltip-list'])}">
-        ${itemTpl}
-      </ul>
+      ${this.getTooltipTitle(title, values)}
+      ${isEl ? '' : list}
     `;
+    if (isEl) {
+      this.container.remove();
+      this.container.append(itemTpl);
+    }
   }
 
-  private getTooltipTitle(title?: string) {
+  private getTooltipTitle(title: string, values: TooltipValue[]) {
     const { showTitle, titleFormatter } = this.option as TooltipOpt;
     if (String(showTitle) === 'false') {
       return '';
@@ -106,27 +127,49 @@ export class Tooltip extends BaseComponent<TooltipOption> {
       tpl = template(titleFormatter, { title });
     }
     if (isFunction(titleFormatter)) {
-      tpl = titleFormatter(title);
+      tpl = titleFormatter(title, values);
     }
     return `<div class="${css(styles['tooltip-title'])}">${tpl}</div>`;
   }
 
-  private getTooltipItem(values?: TooltipValue[]) {
-    const { valueFormatter } = this.option as TooltipOpt;
-    return values
+  private getTooltipItem(values?: TooltipValue[]): string | Element {
+    if (!values || !values?.length) {
+      return '';
+    }
+    const { nameFormatter, valueFormatter, itemFormatter, sort } = this
+      .option as TooltipOpt;
+    let items = sort ? values.sort(sort) : values;
+    if (itemFormatter) {
+      const itemValue = itemFormatter(items);
+      if (isString(itemValue)) {
+        return itemValue;
+      }
+      if (isElement(itemValue)) {
+        return (itemValue as HTMLElement).innerHTML;
+      }
+      if (isArray(itemValue)) {
+        items = itemValue;
+      }
+    }
+    return items
       ?.map(item => {
-        let value = String(item.value);
-        if (isString(valueFormatter)) {
-          value = template(valueFormatter, { value: item.value });
-        }
-        if (isFunction(valueFormatter)) {
-          value = valueFormatter(item);
-        }
-        return `<li class="${css(styles['tooltip-list-item'])}">
+        const value = this.handleTemplateString(item.value, valueFormatter);
+        const name = this.handleTemplateString(
+          String(item.name),
+          nameFormatter,
+        );
+
+        return `<li class="${css(
+          styles['tooltip-list-item'],
+        )}" style="background: ${
+          item.activated ? this.ctrl.getTheme().colorVar['b-6'] : 'unset'
+        }">
             <span class="${css(symbolStyle.symbol)} ${css(
           symbolStyle.line,
         )}" style="background: ${item.color};"></span>
-            <span class="tooltip-name">${item.name || NOT_AVAILABLE}</span>
+            <span class="tooltip-name ${css(styles['tooltip-name'])}">${
+          name || NOT_AVAILABLE
+        }</span>
             <span class="${css(styles['tooltip-value'])}">${
           value || NOT_AVAILABLE
         }</span>
@@ -134,6 +177,27 @@ export class Tooltip extends BaseComponent<TooltipOption> {
       })
       .join('');
   }
+
+  handleTemplateString(text: string | number, formatter: string | Function) {
+    let value = text;
+    if (isString(formatter)) {
+      value = template(formatter, { value: text });
+    }
+    if (isFunction(formatter)) {
+      value = formatter(value);
+    }
+    return value;
+  }
+
+  public showTooltip = () => {
+    this.container.style.visibility = 'visible';
+  };
+
+  public hideTooltip = () => {
+    if (this.container) {
+      this.container.style.visibility = 'hidden';
+    }
+  };
 
   /**
    * 添加事件监听
@@ -143,9 +207,10 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     this.ctrl.on(
       ChartEvent.U_PLOT_SET_CURSOR,
       ({ anchor, title, values }: TooltipItemActive) => {
+        // console.log(anchor)
         // @ts-ignore
-        placement(this.container, anchor, 'right', 'start', {
-          bound: document.querySelector('body'),
+        placement(anchor, this.container, {
+          placement: 'right',
         });
         this.createItem(title, values);
       },

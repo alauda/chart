@@ -41,7 +41,7 @@ const COLORS = {
   'n-8': '#434652',
   'n-9': '#181b27',
   'n-10': '#242733',
-};
+} as const;
 
 const LEGEND = {};
 
@@ -64,6 +64,7 @@ const SHAPE = {
  */
 export const Dark = (options?: ThemeOptions): ThemeOptions => {
   const defaultOptions: Theme = {
+    colorVar: COLORS,
     type: 'dark',
     legend: LEGEND,
     title: TITLE,

@@ -11,7 +11,6 @@ const LOADED_COMPONENTS: Map<string, ComponentCtor> = new Map();
 export function registerComponent(name: string, plugin: ComponentCtor) {
   LOADED_COMPONENTS.set(name, plugin);
 }
-
 /**
  * 删除全局组件。
  * @param name 组件名
@@ -37,3 +36,10 @@ export function getComponentNames(): string[] {
 export function getComponent(name: string): ComponentCtor {
   return LOADED_COMPONENTS.get(name);
 }
+
+export * from './title.js'
+export * from './legend.js'
+export * from './axis.js'
+export * from './coordinate.js'
+export * from './tooltip.js'
+

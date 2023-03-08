@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import uPlot from 'uplot';
 
-import { LegendItemActive } from '../../index.js';
+// import { LegendItemActive } from '../../index.js';
 
 import { Action } from './action.js';
 
@@ -25,9 +25,12 @@ export class LegendToggle extends Action {
   /**
    * 切换 legend
    */
-  toggle(value: LegendItemActive) {
-    if (this.uPlot) {
-      this.uPlot?.setSeries(value.index + 1, { show: !value.isActive }, true);
-    }
+  // toggle(value: LegendItemActive) {
+  //   if (this.uPlot) {
+  //     this.uPlot?.setSeries(value.index + 1, { show: !value.isActive }, true);
+  //   }
+  // }
+  toggle() {
+    // TODO
   }
 }

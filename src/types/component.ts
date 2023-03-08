@@ -22,4 +22,5 @@ export interface TooltipValue {
   name: string;
   color: string;
   value: number;
+  activated?: boolean;
 }

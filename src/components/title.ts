@@ -1,10 +1,17 @@
+import { StyleSheet, css } from 'aphrodite/no-important.js';
 import { get } from 'lodash';
 
 import { TitleOption } from '../types/index.js';
-import { template } from '../utils/index.js';
+import { generateName, template } from '../utils/index.js';
 
 import { BaseComponent } from './base.js';
 import { Header } from './header.js';
+
+const styles = StyleSheet.create({
+  title: {
+    wordBreak: 'break-all',
+  },
+});
 
 export class Title extends BaseComponent<TitleOption> {
   get name(): string {
@@ -16,27 +23,31 @@ export class Title extends BaseComponent<TitleOption> {
   render() {
     const opt = this.ctrl.getOption();
     this.option = get(opt, this.name);
-    this.createTitle();
+    if (!this.headerContainer) {
+      this.createTitle();
+    } else {
+      this.update();
+    }
   }
 
   createTitle() {
     if (typeof this.option === 'object') {
-      const { text, formatter } = this.option;
       this.container = document.createElement('div');
+      this.container.style.wordBreak = 'break-all'
       this.container.style.flex = '1';
-      // title.className = 'ac-title';
-      const value =
-        typeof formatter === 'function'
-          ? formatter(text)
-          : template(formatter, { text });
-      this.container.innerHTML = value || text;
+      this.container.className = `${generateName('title')} ${css(
+        styles.title,
+      )}`;
+      this.update()
       const header = new Header(this.ctrl);
       header.container.append(this.container);
+      this.headerContainer = header.container;
     }
   }
 
   update() {
-    if (this.container) {
+    this.option = get(this.ctrl.getOption(), this.name);
+    if (this.container && !get(this.option, 'custom')) {
       this.container.innerHTML = this.getTitleValue();
     }
   }
@@ -47,9 +58,11 @@ export class Title extends BaseComponent<TitleOption> {
   private getTitleValue(): string {
     if (typeof this.option === 'object') {
       const { text, formatter } = this.option;
-      return typeof formatter === 'function'
-        ? formatter(text)
-        : template(formatter, { text });
+      return (
+        (typeof formatter === 'function'
+          ? formatter(text)
+          : template(formatter, { text })) || text
+      );
     }
     return '';
   }

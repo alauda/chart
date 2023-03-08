@@ -2,7 +2,7 @@ import { StyleSheet, css } from 'aphrodite/no-important.js';
 
 import { View } from '../chart/view.js';
 import { DIRECTION } from '../types/index.js';
-import { generateName } from '../utils/index.js';
+import { generateName, resizeObserver } from '../utils/index.js';
 
 const styles = StyleSheet.create({
   top: {
@@ -29,6 +29,8 @@ export class Header {
 
   container: HTMLElement;
 
+  private sizeObserver: ResizeObserver;
+
   constructor(
     ctrl: View,
     position: 'top' | 'top-left' | 'top-right' = DIRECTION.TOP_RIGHT,
@@ -36,6 +38,9 @@ export class Header {
     this.ctrl = ctrl;
     this.position = position;
     this.render();
+    this.sizeObserver = resizeObserver(this.container, () => {
+      this.ctrl.render();
+    });
   }
 
   render(): void {
@@ -44,16 +49,23 @@ export class Header {
 
   create() {
     const headerName = generateName('header');
-    const header: HTMLElement = this.ctrl.container.querySelector(
+    const header: HTMLElement = this.ctrl.chartContainer.querySelector(
       `.${headerName}`,
     );
     if (!this.container) {
       this.container = header || document.createElement('div');
+      header.style.wordBreak = 'break-all;';
       this.container.style.display = 'flex';
-      this.ctrl.container.append(this.container);
+      if (!header) {
+        this.ctrl.chartContainer.append(this.container);
+      }
     }
     this.container.className = `${generateName('header')} ${css(
       styles[this.position],
     )}`;
+  }
+
+  destroy() {
+    this.sizeObserver.disconnect();
   }
 }

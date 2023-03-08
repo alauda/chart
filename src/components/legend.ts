@@ -1,5 +1,5 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get, isBoolean } from 'lodash';
+import { get, isBoolean, isObject } from 'lodash';
 
 import { ChartEvent, DIRECTION, LegendOption } from '../types/index.js';
 import { generateName } from '../utils/index.js';
@@ -10,6 +10,11 @@ import { symbolStyle } from './styles.js';
 
 type PositionTop = 'top' | 'top-left' | 'top-right';
 type PositionBottom = 'bottom' | 'bottom-left' | 'bottom-right';
+
+export interface LegendItem {
+  name: string;
+  color: string;
+}
 
 const styles = StyleSheet.create({
   ul: {
@@ -26,6 +31,13 @@ const styles = StyleSheet.create({
     ':not(:last-child)': {
       marginRight: 12,
     },
+  },
+  name: {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    display: 'block',
+    maxWidth: '120px',
+    textOverflow: 'ellipsis',
   },
   legend: {
     display: 'flex',
@@ -47,19 +59,28 @@ export class Legend extends BaseComponent<LegendOption> {
     return 'legend';
   }
 
+  inactivatedSet = new Set<string>();
+
   render() {
     const opt = this.ctrl.getOption();
     this.option = get(opt, this.name, {});
-    this.create();
+    if (!this.container) {
+      this.create();
+    } else {
+      this.update();
+    }
   }
 
   update() {
+    this.option = get(this.ctrl.getOption(), this.name);
     this.createItem();
   }
 
   create() {
-    if (!isBoolean(this.option)) {
-      const { position } = this.option;
+    if (isObject(this.option) || this.option === true) {
+      const { position } = isBoolean(this.option)
+        ? { position: DIRECTION.TOP_RIGHT }
+        : this.option;
       let dom: HTMLElement = this.ctrl.container;
       this.container = document.createElement('div');
       this.container.className = generateName('legend');
@@ -86,7 +107,10 @@ export class Legend extends BaseComponent<LegendOption> {
   }
 
   createItem() {
-    if (!isBoolean(this.option)) {
+    if (
+      (isObject(this.option) || this.option === true) &&
+      !get(this.option, 'custom')
+    ) {
       this.container.innerHTML = '';
       const ul = document.createElement('ul');
       ul.className = css(styles.ul);
@@ -100,12 +124,13 @@ export class Legend extends BaseComponent<LegendOption> {
         <span class="${css(symbolStyle.symbol)} ${css(
           symbolStyle.line,
         )}" style="background: ${value.color};"></span> 
-        <span>${value.name}</span>`;
+        <span class="${css(styles.name)}">${value.name}</span>`;
         ul.append(li);
+        // TODO: 挪到 interaction 管理
         li.addEventListener('click', () => {
           const isActive = li.style.opacity === '1' || !li.style.opacity;
           li.style.opacity = isActive ? '0.5' : '1';
-          this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, {
+          this.legendItemClick({
             index: Number(index),
             data: value,
             isActive,
@@ -132,11 +157,27 @@ export class Legend extends BaseComponent<LegendOption> {
     }
   }
 
-  getLegend() {
+  legendItemClick(props: {
+    index: number;
+    data: { name: string; color?: string };
+    isActive: boolean;
+  }) {
+    const currentStatus = !props.isActive;
+    if (currentStatus) {
+      this.inactivatedSet.delete(props.data.name);
+    } else {
+      this.inactivatedSet.add(props.data.name);
+    }
+    this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, props);
+  }
+
+  getLegend(): LegendItem[] {
     const data = this.ctrl.getData();
-    return data.map(({ name, color }) => ({
-      name,
-      color,
-    }));
+    return data
+      .map(({ name, color }) => ({
+        name,
+        color,
+      }))
+      .filter(d => d.name);
   }
 }

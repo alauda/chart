@@ -13570,10 +13570,10 @@ pkg-dir@^5.0.0:
   dependencies:
     find-up "^5.0.0"
 
-placement.js@1.0.0-beta.2:
-  version "1.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/placement.js/-/placement.js-1.0.0-beta.2.tgz#d72ca65bd38e89332149a60950614a2ce75d353e"
-  integrity sha512-yPWaVzZRt3q3vgBNPOljssoHS0UnfOQnn2zpT6M7HGWhryeVwKR+3shqI41XYbw7NwVqQXAvfBH0yZ1e8nRgAA==
+placement.js@^1.0.0-beta.5:
+  version "1.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/placement.js/-/placement.js-1.0.0-beta.5.tgz#2aac6bd8e670729bbf26ad47f2f9656b19e037d5"
+  integrity sha512-QD5hLPVKnT6Q1U34xxuRG9BhlBVaD0uF91JOzjvDnHAQfO/qjO4jmSTyjpR+K4se6Dn3Oo23IWeFX+QFFa9xNg==
 
 pluralize@^8.0.0:
   version "8.0.0"

@@ -1,3 +1,4 @@
+import { Tooltip } from '../../components/index.js';
 import { Action } from './action.js';
 
 /**
@@ -10,20 +11,20 @@ export class TooltipAction extends Action {
   }
 
   get component() {
-    return this.view.components.get('tooltip');
+    return this.view.components.get('tooltip') as Tooltip;
   }
 
   /**
    * 显示 Tooltip
    */
   show() {
-    this.component.container.style.visibility = 'visible';
+    // this.component.showTooltip()
   }
 
   /**
    * 隐藏 Tooltip
    */
   hide() {
-    this.component.container.style.visibility = 'hidden';
+    // this.component.hideTooltip();
   }
 }

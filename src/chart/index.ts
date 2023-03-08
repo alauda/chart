@@ -1,11 +1,17 @@
 import { ChartOption, Size } from '../types/index.js';
 import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
 // import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
-import { getChartSize, getElement, resizeObserver } from '../utils/index.js';
+import {
+  generateName,
+  getChartSize,
+  getElement,
+  resizeObserver,
+} from '../utils/index.js';
 
 import { View } from './view.js';
 
 export class Chart extends View {
+  chartEle: HTMLElement;
   ele: HTMLElement;
   width: number;
   height: number;
@@ -16,23 +22,44 @@ export class Chart extends View {
     const {
       container,
       width,
+      autoFit = true,
       height,
       padding,
       defaultInteractions = DEFAULT_INTERACTIONS,
       options,
       data,
     } = props;
-    const ele: HTMLElement = getElement(container);
+    const chartEle: HTMLElement = getElement(container);
+    const header = document.createElement('div');
+    header.className = generateName('header');
+    chartEle.append(header);
+    const ele = document.createElement('div');
+    chartEle.append(ele);
+
+    if (autoFit) {
+      chartEle.style.width = '100%';
+      chartEle.style.height = '100%';
+      chartEle.style.display = 'flex';
+      chartEle.style.flexDirection = 'column';
+      chartEle.style.justifyContent = 'space-between';
+
+      ele.style.flex = '1';
+      // ele.style.width = '100%';
+      // ele.style.height = '100%';
+    }
     const size = getChartSize(ele, width, height);
     const opts = {
+      chartEle,
       ele,
       ...size,
       padding,
       data,
       options,
       defaultInteractions,
+      chartOption: props,
     };
     super(opts);
+    this.chartEle = chartEle;
     this.ele = ele;
     this.width = size.width;
     this.height = size.height;
@@ -40,7 +67,7 @@ export class Chart extends View {
   }
 
   private bindAutoFit() {
-    this.sizeObserver = resizeObserver(this.ele, this.changeSize);
+    this.sizeObserver = resizeObserver(this.chartEle, this.changeSize);
   }
 
   private unbindAutoFit() {
@@ -57,10 +84,11 @@ export class Chart extends View {
     if (this.width === width && this.height === height) {
       return;
     }
-    this.width = width;
-    this.height = height;
+    const size = getChartSize(this.ele, width, height);
+    this.width = size.width;
+    this.height = size.height;
     // 重新渲染
-    this.render({ width, height });
+    this.render(size);
     return this;
   };
 

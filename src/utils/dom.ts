@@ -3,10 +3,18 @@ import { debounce } from 'lodash';
 
 import { Size } from '../index.js';
 
-function getElementSize(ele: Element | HTMLElement) {
+export function getElementSize(ele: Element | HTMLElement): Size {
+  const style = getComputedStyle(ele);
+
   return {
-    width: ele.clientWidth,
-    height: ele.clientHeight,
+    width:
+      (ele.clientWidth || parseInt(style.width, 10)) -
+      parseInt(style.paddingLeft, 10) -
+      parseInt(style.paddingRight, 10),
+    height:
+      (ele.clientHeight || parseInt(style.height, 10)) -
+      parseInt(style.paddingTop, 10) -
+      parseInt(style.paddingBottom, 10),
   };
 }
 

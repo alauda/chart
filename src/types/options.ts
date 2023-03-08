@@ -1,4 +1,4 @@
-import uPlot from 'uplot';
+import uPlot, { Padding } from 'uplot';
 
 import { AdjustOption } from '../components/shape/bar.js';
 import { SizeCallback } from '../components/shape/point.js';
@@ -10,11 +10,12 @@ import { Theme } from './index.js';
 export interface ChartOption {
   container: string | HTMLElement;
   data?: Data;
+  autoFit?: boolean; // true
   // 图表宽高度 不设置默认根据父容器高度自适应
   width?: number;
   height?: number;
-  // 图表内边距 上 右 下 左
-  padding?: number[];
+  // 图表内边距 上 右 下 左  不包含 header
+  padding?: Padding; // [16,0,0,0]
   // 默认交互 ['tooltip', 'legend-filter', 'legend-active']
   defaultInteractions?: string[];
   // 图表组件等相关的配置。同时支持配置式 和 声明式
@@ -25,9 +26,11 @@ export interface ChartOption {
 
 export interface ViewOption {
   readonly ele: HTMLElement;
+  readonly chartEle: HTMLElement;
+  readonly chartOption: ChartOption;
   width?: number;
   height?: number;
-  padding?: number[];
+  padding?: Padding;
   data?: Data;
   options?: Options;
   defaultInteractions: string[];
@@ -36,11 +39,21 @@ export interface ViewOption {
 }
 
 export interface Options {
+  padding?: Padding;
   data?: Data;
   title?: TitleOption;
   legend?: LegendOption;
   tooltip?: TooltipOption;
-  axis?: Record<'x' | 'y', AxisOption>;
+  annotation?: AnnotationOption;
+  scale?: {
+    x?: ScaleOption;
+    y?: ScaleOption;
+  };
+  axis?: {
+    x?: AxisOption;
+    y?: AxisOption;
+  };
+  coordinate?: CoordinateOption
   line?: LineShapeOption;
   area?: AreaShapeOption;
   bar?: BarShapeOption;
@@ -56,8 +69,9 @@ export interface DataItem {
   values: Array<{ x: any; y: number; size?: number }>;
 }
 
-export type TitleOption = TitleOpt | boolean;
+export type TitleOption = TitleOpt | false;
 export interface TitleOpt {
+  custom?: boolean;
   text?: string;
   formatter?: string | ((text: string) => string);
 }
@@ -73,7 +87,14 @@ export type LegendPosition =
   | 'bottom-right';
 
 export interface LegendOpt {
-  position: LegendPosition;
+  custom?: boolean;
+  position?: LegendPosition;
+}
+
+export interface ScaleOption {
+  time?: boolean; // true
+  min?: number;
+  max?: number;
 }
 
 export type CoordinateOption = CoordinateOpt | boolean;
@@ -85,15 +106,17 @@ export interface CoordinateOpt {
 export type AxisOption = AxisOpt | boolean;
 export interface AxisOpt {
   autoSize?: boolean; // 默认 true
-  min?: number;
-  max?: number;
+  formatter?: string | ((value: string | number) => string);
 }
 
 export type TooltipOption = TooltipOpt | boolean;
 export interface TooltipOpt {
   showTitle?: boolean;
-  titleFormatter?: string | ((title: string) => string);
+  titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
+  nameFormatter?: string | ((name: string) => string);
   valueFormatter?: string | ((value: TooltipValue) => string);
+  itemFormatter?: (value: TooltipValue[]) => string | TooltipValue[] | Element;
+  sort?: (a: TooltipValue, b: TooltipValue) => number;
 }
 
 export interface ShapeOption {
@@ -131,5 +154,24 @@ export type ShapeOptions =
   | PointShapeOption;
 
 export interface AnnotationOption {
-  text?: string;
+  lineX?: AnnotationLineOption;
+  lineY?: AnnotationLineOption;
+}
+
+export interface AnnotationLineOption {
+  data: string | number;
+  text?: {
+    position?: 'left' | 'right' | string; //
+    content: unknown;
+    style?: object;
+    border?: {
+      style?: string;
+      padding?: [number, number];
+    };
+  };
+  style?: {
+    stroke?: string;
+    width?: number;
+    lineDash?: [number, number];
+  };
 }

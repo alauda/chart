@@ -14,6 +14,7 @@ const Template: Story = () => {
     console.time('render');
     const chart = new Chart({
       container: '.chart1',
+      height: 200,
       data: [
         {
           name: 'point1',
@@ -38,12 +39,14 @@ const Template: Story = () => {
     });
     // console.log(chart);
     // chart.data(data);
-    chart.point().size('size');
+    chart.point();
     // chart.shape('bar', { name: 'line2' });
     chart.render();
   });
   return `
-    <div class="chart1" style="width: 100%; height: 200px; "></div>
+    <div style="width: 100%; height: 200px; ">
+      <div class="chart1" style="width: 100%; "></div>
+    </div>
   `;
 };
 

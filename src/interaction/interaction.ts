@@ -93,6 +93,7 @@ export default class Interaction {
         // 生成执行的方法，执行对应 action 的名称
         const actionCallback = (context: any) => {
           executeAction(step.actionObject, context);
+          step.callback?.(context) // 执行callback
         };
         callbackCaches.set(stepName, actionCallback);
       }

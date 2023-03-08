@@ -1,9 +1,8 @@
 import UPlot from 'uplot';
 
 import { StepType } from '../components/shape/line.js';
-import { convertRgba } from '../index.js';
 import { ShapeType } from '../utils/component.js';
-
+import { convertRgba } from '../utils/index.js';
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function scaleGradient(
   u: UPlot,
@@ -83,9 +82,11 @@ export function getSeriesPathType(
   stepType?: StepType,
 ) {
   const defaultType = UPlot.paths.spline();
+  const stroke = convertRgba(color, 1);
   return (
     {
       [ShapeType.Line]: {
+        stroke,
         paths: stepType
           ? UPlot.paths.stepped({
               align: stepType === 'start' ? 1 : -1,
@@ -94,12 +95,14 @@ export function getSeriesPathType(
       },
       [ShapeType.Area]: {
         paths: defaultType,
+        stroke,
         fill: (u: UPlot, seriesIdx: number) => {
           const s = u.series[seriesIdx];
           const sc = u.scales[s.scale];
           return scaleGradient(u, s.scale, 1, [
             [sc.min, convertRgba(color, 0)],
-            [sc.max * 2, color],
+            [sc.max / 2, convertRgba(color, 0.1)],
+            [sc.max * 2, stroke],
           ]);
         },
       },
@@ -108,10 +111,74 @@ export function getSeriesPathType(
         fill: color,
       },
       [ShapeType.Point]: {
+        stroke,
         paths: UPlot.paths.points(),
       },
     }[type] || {
       paths: defaultType,
     }
   );
+}
+
+/** -------------------------------------------------------- */
+let _context: CanvasRenderingContext2D;
+const cache = new Map<string, TextMetrics>();
+const cacheLimit = 500;
+let ctxFontStyle = '';
+export const UPLOT_AXIS_FONT_SIZE = 12;
+
+// 计算最小网格和刻度间距
+export function axesSpace(self: uPlot, axisIdx: number, scaleMin: number) {
+  const axis = self.axes[axisIdx];
+  const scale = self.scales[axis.scale!];
+
+  // for axis left & right
+  if (axis.side !== 2 || !scale) {
+    return 30;
+  }
+  const defaultSpacing = 40;
+  if (scale.time) {
+    const width =
+      measureText(String(scaleMin), UPLOT_AXIS_FONT_SIZE).width + 18;
+    return width;
+  }
+  return defaultSpacing;
+}
+
+/**
+ * @internal
+ */
+export function getCanvasContext() {
+  if (!_context) {
+    _context = document.createElement('canvas').getContext('2d')!;
+  }
+  return _context;
+}
+/**
+ * @beta
+ */
+export function measureText(text: string, fontSize: number = 12): TextMetrics {
+  const fontStyle = `${fontSize}px 'Roboto'`;
+  const cacheKey = text + fontStyle;
+  const fromCache = cache.get(cacheKey);
+
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const context = getCanvasContext();
+
+  if (ctxFontStyle !== fontStyle) {
+    context.font = ctxFontStyle = fontStyle;
+  }
+
+  const metrics = context.measureText(text);
+
+  if (cache.size === cacheLimit) {
+    cache.clear();
+  }
+
+  cache.set(cacheKey, metrics);
+
+  return metrics;
 }

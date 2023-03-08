@@ -1,8 +1,9 @@
-import uPlot from 'uplot';
+import uPlot, { Axis } from 'uplot';
 
 import { pointWithin, Quadtree } from '../../strategy/quadtree.js';
 
 interface SeriesBarsPluginProps {
+  time: boolean;
   radius?: number;
   marginRatio?: number;
   ori: number;
@@ -67,6 +68,7 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
   // let font: string;
 
   const {
+    time,
     ignore = [],
     radius: _radius,
     ori: _ori,
@@ -306,7 +308,6 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
         range,
         ori: ori === 0 ? 1 : 0,
       };
-
       // hovered
       let hRect: Quadtree;
 
@@ -392,16 +393,22 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
       if (ori === 1) {
         opts.padding = [0, null, 0, null];
       }
-
+      const { xSplits } = getBarConfig({
+        dir,
+        ori,
+        xSpacing: dir === 1 ? 100 : -100,
+      });
+      const values = time === false ? {values: (u: uPlot) => u.data[0]} : {}
       uPlot.assign(axes[0], {
-        splits: (u: any, _axisIdx: number) => {
-          const _dir = dir * (ori === 0 ? 1 : -1);
-          // TODO？？？？
-          const splits = u._data[0].slice();
-          return _dir === 1 ? splits : splits.reverse();
-        },
+        // splits: (u: any, _axisIdx: number) => {
+        //   const _dir = dir * (ori === 0 ? 1 : -1);
+        //   // TODO？？？？
+        //   const splits = u._data[0].slice();
+        //   return _dir === 1 ? splits : splits.reverse();
+        // },
+        splits: xSplits,
         // 设置 x 坐标展示
-        values: (u: uPlot) => u.data[0],
+        ...values,
         gap: 15,
         size: ori === 0 ? 40 : 150,
         labelSize: 20,
@@ -426,6 +433,53 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
       });
     },
   };
+}
+
+/**
+ * @internal
+ */
+export function getBarConfig(opts: {
+  ori: number;
+  dir: number;
+  xSpacing: number;
+}) {
+  const { ori = 0, dir = 1, xSpacing = 0 } = opts;
+  const isXHorizontal = ori === 0;
+  const xSplits: Axis.Splits = (u: uPlot) => {
+    const dim = isXHorizontal ? u.bbox.width : u.bbox.height;
+    const _dir = dir * (isXHorizontal ? 1 : -1);
+
+    let dataLen = u.data[0].length;
+    let lastIdx = dataLen - 1;
+
+    let skipMod = 0;
+
+    if (xSpacing !== 0) {
+      let cssDim = dim / devicePixelRatio;
+      // let maxTicks = Math.abs(Math.floor(cssDim / xSpacing));
+      let maxTicks = Math.abs(
+        Math.floor(cssDim / (isXHorizontal ? xSpacing : xSpacing / 3)),
+      );
+
+      skipMod = dataLen < maxTicks ? 0 : Math.ceil(dataLen / maxTicks);
+    }
+
+    let splits: number[] = [];
+
+    // for distr: 2 scales, the splits array should contain indices into data[0] rather than values
+    u.data[0].forEach((_v, i) => {
+      let shouldSkip =
+        skipMod !== 0 && (xSpacing > 0 ? i : lastIdx - i) % skipMod > 0;
+
+      if (!shouldSkip) {
+        splits.push(i);
+      }
+    });
+
+    return _dir === 1 ? splits : splits.reverse();
+  };
+
+  return { xSplits };
 }
 
 export function stack(
