@@ -36,8 +36,14 @@ interface Point {
   size?: number; // 直径
 }
 
+interface Tooltip {
+  background?: string;
+  color?: string;
+  activeBg?: string;
+}
+
 export interface ThemeOptions {
-  colorVar: Record<string, string>
+  colorVar: Record<string, string>;
   backgroundColor?: string;
 
   // 标题
@@ -52,6 +58,9 @@ export interface ThemeOptions {
 
   // 图形
   shape?: Shape;
+
+  // tooltip
+  tooltip?: Tooltip;
 }
 
 export type LightTheme = {

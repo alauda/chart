@@ -59,6 +59,12 @@ const SHAPE = {
   },
 };
 
+const TOOLTIP = {
+  background: COLORS['n-10'],
+  color: COLORS['n-2'],
+  activeBg: COLORS['b-6'],
+}
+
 /**
  * Light theme.
  */
@@ -70,6 +76,7 @@ export const Light = (options?: ThemeOptions): ThemeOptions => {
     xAxis: AXIS,
     yAxis: AXIS,
     shape: SHAPE,
+    tooltip: TOOLTIP,
   };
   return { ...defaultOptions, ...options };
 };

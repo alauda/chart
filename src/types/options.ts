@@ -53,7 +53,7 @@ export interface Options {
     x?: AxisOption;
     y?: AxisOption;
   };
-  coordinate?: CoordinateOption
+  coordinate?: CoordinateOption;
   line?: LineShapeOption;
   area?: AreaShapeOption;
   bar?: BarShapeOption;
@@ -112,6 +112,7 @@ export interface AxisOpt {
 export type TooltipOption = TooltipOpt | boolean;
 export interface TooltipOpt {
   showTitle?: boolean;
+  popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
   titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
   nameFormatter?: string | ((name: string) => string);
   valueFormatter?: string | ((value: TooltipValue) => string);

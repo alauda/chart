@@ -14,7 +14,7 @@ export const AXES_X_VALUES = [
 ];
 const DEFAULT_FONT = '12px "Roboto", "Helvetica", "Arial", sans-serif';
 export const UPLOT_DEFAULT_OPTIONS = {
-  padding: [16, 0, 0, 0],
+  padding: [16, 8, 0, 0],
   legend: {
     show: false,
     live: false, // 关闭当前值

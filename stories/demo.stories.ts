@@ -4,7 +4,7 @@ import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
 import { dealWithTime, generateTime, generateY,  } from './utilt';
 
-import { Chart, ChartEvent, } from '@alauda/chart';
+import { ActionType, Chart, ChartEvent, } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
@@ -22,7 +22,7 @@ const Template: Story = () => {
     const destroy = document.querySelector('#destroy');
     const init = document.querySelector('#init');
     const change = document.querySelector('#change');
-    // const text = document.querySelector('.text');
+    const update = document.querySelector('#update');
     const total = 60;
     const step = 720;
     const start = '2023-01-31 09:00:00';
@@ -57,12 +57,9 @@ const Template: Story = () => {
           //   position: 'bottom-right',
           // }
           axis: {
-            // x: {
-            //   formatter: (value: string) => {
-            //     console.log(value)
-            //     return `${value}%1`
-            //   },
-            // },
+            x: {
+            
+            },
             // y: {
             //   autoSize: true,
             //   formatter: `{value}%1`,
@@ -95,7 +92,7 @@ const Template: Story = () => {
         },
       };
     }
-
+    initChart();
     function initChart() {
       chart = new Chart(getOp('.chart-area', data));
       chart.line();
@@ -130,12 +127,27 @@ const Template: Story = () => {
       ];
       chart.data(data);
     });
+
+    update.addEventListener('click', () => {
+      chart.interaction('brush-x', {
+        end: [
+          {
+            trigger: ChartEvent.PLOT_MOUSEUP,
+            action: ActionType.BRUSH_X_END,
+            callback: e => {
+              console.log('brush-x', e);
+            },
+          },
+        ],
+      });
+    })
   });
 
   return `
   <button id="destroy" type="close">destroy</button>
   <button id="init">initChart</button>
   <button id="change">change data</button>
+  <button id="update">update</button>
   <span class="text">close</span>
   <div style="width: 100%; height: 200px; display: flex;">
   <div  style="width:100%;height:100%;padding: 20px 16px ;  box-sizing: border-box; flex: 2;">

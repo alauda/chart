@@ -1,10 +1,11 @@
-import { cloneDeep, merge, mergeWith, omit } from 'lodash';
+import { cloneDeep, merge, mergeWith, omit, isFunction } from 'lodash';
 import UPlot from 'uplot';
 import { Annotation } from '../components/annotation.js';
 
 import { Axis } from '../components/axis.js';
 import { Tooltip } from '../components/index.js';
 import { Scale } from '../components/scale.js';
+import { autoPadRight } from '../components/uplot-lib/axis.js';
 import { ChartEvent, Data, LegendItemActive, Size } from '../types/index.js';
 import { generateName, SHAPE_TYPES } from '../utils/index.js';
 
@@ -155,11 +156,14 @@ export class UPlotViewStrategy extends ViewStrategy {
       this.ctrl.components.get('annotation') as Annotation
     ).getOptions();
     const interaction = this.getInteractionOption();
+    const [dt, dr, db, dl] =
+      ctrlOption.padding || UPLOT_DEFAULT_OPTIONS.padding;
+    const paddingRight = isFunction(dr) ? dr : autoPadRight(dr);
     const source = {
       width,
       height: height + 90,
       ...cloneDeep(UPLOT_DEFAULT_OPTIONS),
-      ...(ctrlOption.padding ? { padding: ctrlOption.padding } : {}),
+      padding: [dt, paddingRight, db, dl],
       plugins,
       // fmtDate: () => UPlot.fmtDate('{HH}:{mm}'),
       hooks: {
@@ -273,8 +277,22 @@ export class UPlotViewStrategy extends ViewStrategy {
   getInteractionOption() {
     return {
       cursor: {
+        bind: {
+          // 始终开启 drag x 根据 interaction brush x 是否开启触发 handle
+          mousedown: (
+            _u: uPlot,
+            _t: HTMLElement,
+            handler: (e: MouseEvent) => null,
+          ) => {
+            return (e: MouseEvent) => {
+              if (this.ctrl.interactions.get('brush-x')) {
+                handler(e);
+              }
+            };
+          },
+        },
         drag: {
-          x: !!this.ctrl.interactions.get('brush-x'),
+          x: true,
         },
       },
     };
@@ -294,6 +312,9 @@ export class UPlotViewStrategy extends ViewStrategy {
           ticks: {
             stroke: () => this.ctrl.getTheme().xAxis.tickStroke,
           },
+          border: {
+            stroke: () => this.ctrl.getTheme().xAxis.tickStroke,
+          },
         },
         {
           stroke: () => this.ctrl.getTheme().yAxis.stroke,
@@ -302,6 +323,9 @@ export class UPlotViewStrategy extends ViewStrategy {
           },
           ticks: {
             stroke: () => this.ctrl.getTheme().yAxis.tickStroke,
+          },
+          border: {
+            stroke: () => this.ctrl.getTheme().xAxis.tickStroke,
           },
         },
       ],

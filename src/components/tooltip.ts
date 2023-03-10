@@ -28,11 +28,8 @@ const styles = StyleSheet.create({
     visibility: 'hidden',
     pointerEvents: 'none',
     padding: '12px',
-    opacity: 0.95,
-    backgroundColor: '#fff',
     boxShadow: '0 2px 8px #00000029',
     margin: 8,
-    color: '#646669',
     zIndex: 999,
     transition: 'transform 0.1s ease-out 0s',
     // transition:
@@ -88,9 +85,10 @@ export class Tooltip extends BaseComponent<TooltipOption> {
   create() {
     if (!isBoolean(this.option)) {
       if (!this.container) {
+        const { popupContainer } = this.option;
         const overlay = document.createElement('div');
         overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
-        document.body.append(overlay);
+        (popupContainer || document.body).append(overlay);
         this.container = overlay;
       }
       this.createItem();
@@ -162,7 +160,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         return `<li class="${css(
           styles['tooltip-list-item'],
         )}" style="background: ${
-          item.activated ? this.ctrl.getTheme().colorVar['b-6'] : 'unset'
+          item.activated ? this.ctrl.getTheme().tooltip.activeBg : 'unset'
         }">
             <span class="${css(symbolStyle.symbol)} ${css(
           symbolStyle.line,
@@ -191,6 +189,8 @@ export class Tooltip extends BaseComponent<TooltipOption> {
 
   public showTooltip = () => {
     this.container.style.visibility = 'visible';
+    this.container.style.background = this.ctrl.getTheme().tooltip.background;
+    this.container.style.color = this.ctrl.getTheme().tooltip.color;
   };
 
   public hideTooltip = () => {

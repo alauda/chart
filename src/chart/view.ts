@@ -79,8 +79,8 @@ export class View extends EventEmitter {
     return !!this.shapeComponents.get('point');
   }
 
-  get hideTooltip () {
-    return this.options.tooltip === false
+  get hideTooltip() {
+    return this.options.tooltip === false;
   }
 
   constructor(props: ViewOption) {
@@ -134,7 +134,7 @@ export class View extends EventEmitter {
 
   interaction(name: string, steps?: InteractionSteps) {
     const interactionStep = getInteraction(name);
-    if (steps || interactionStep) {
+    if ((steps || interactionStep) && !this.interactions.get(name)) {
       const step =
         steps && interactionStep
           ? merge(interactionStep, steps)

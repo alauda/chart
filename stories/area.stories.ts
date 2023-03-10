@@ -94,7 +94,7 @@ const Template: Story = () => {
     // chart.data(data);
     // chart.title(false)
     chart.legend(false);
-    chart.line();
+    chart.area();
     // chart.annotation().lineY({
     //   data: 20,
     //   text: {
