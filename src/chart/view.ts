@@ -1,4 +1,4 @@
-import { isBoolean, isObject, merge, set } from 'lodash';
+import { isBoolean, isObject, merge, set, cloneDeep } from 'lodash';
 import { Annotation } from '../components/annotation.js';
 
 import { BaseComponent } from '../components/base.js';
@@ -139,7 +139,7 @@ export class View extends EventEmitter {
         steps && interactionStep
           ? merge(interactionStep, steps)
           : steps || interactionStep;
-      const interaction = new Interaction(this, step);
+      const interaction = new Interaction(this, cloneDeep(step));
       interaction.init();
       this.interactions.set(name, interaction);
     }

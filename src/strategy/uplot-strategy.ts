@@ -131,7 +131,7 @@ export class UPlotViewStrategy extends ViewStrategy {
     // TODO: 设置 uPlot padding 留空间给header  header 使用 position 定位
     const headerH =
       this.ctrl.chartContainer.querySelector(`.${generateName('header')}`)
-        .clientHeight || 0;
+        ?.clientHeight || 0;
     this.uPlot.setSize({ ...size, height: size.height - headerH });
     // if (this.ctrl.getData().length) {
     //   this.uPlot.redraw(false);

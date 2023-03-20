@@ -93,7 +93,7 @@ export default class Interaction {
         // 生成执行的方法，执行对应 action 的名称
         const actionCallback = (context: any) => {
           executeAction(step.actionObject, context);
-          step.callback?.(context) // 执行callback
+          step.callback?.(context); // 执行callback
         };
         callbackCaches.set(stepName, actionCallback);
       }
@@ -102,7 +102,7 @@ export default class Interaction {
     return null;
   }
 
-  private getActionObject(actionStr: string): ActionObject {
+  private getActionObject = (actionStr: string): ActionObject => {
     const [actionName, methodName] = actionStr.split(':');
     const Action = getAction(actionName);
     if (!Action) {
@@ -112,7 +112,7 @@ export default class Interaction {
       action: new Action(this.view),
       methodName,
     };
-  }
+  };
 
   /**
    * 销毁事件

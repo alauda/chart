@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     flex: 1,
     textAlign: 'right',
+    whiteSpace: 'nowrap',
   },
 });
 
@@ -165,12 +166,12 @@ export class Tooltip extends BaseComponent<TooltipOption> {
             <span class="${css(symbolStyle.symbol)} ${css(
           symbolStyle.line,
         )}" style="background: ${item.color};"></span>
-            <span class="tooltip-name ${css(styles['tooltip-name'])}">${
-          name || NOT_AVAILABLE
-        }</span>
-            <span class="${css(styles['tooltip-value'])}">${
-          value || NOT_AVAILABLE
-        }</span>
+            <span class="${generateName('tooltip-name')} ${css(
+          styles['tooltip-name'],
+        )}">${name || NOT_AVAILABLE}</span>
+            <span class="${generateName('tooltip-value')} ${css(
+          styles['tooltip-value'],
+        )}">${value || NOT_AVAILABLE}</span>
           </li>`;
       })
       .join('');
