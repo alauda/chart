@@ -70,14 +70,27 @@ export class Annotation extends BaseComponent<AnnotationOption> {
       }
       let ctx = u.ctx;
       ctx.save();
-      let x0 = u.valToPos(data as number, 'x', true);
-      let y0 = u.valToPos(u.scales.y.min, 'y', true);
+      const xData = u.data[0];
 
+      const isTransposed = u.scales.y.ori === 0 && u.axes[1].side === 2;
+
+      const posValue =
+        u.scales.x.distr === 2
+          ? xData.findIndex(d => d === data)
+          : (data as number);
+      const x0 = isTransposed
+        ? u.valToPos(u.scales.y.min, 'y', true)
+        : u.valToPos(posValue, 'x', true);
+      const x1 = isTransposed ? u.bbox.width : x0;
+      const y0 = isTransposed ? u.valToPos(posValue, 'x', true) : u.bbox.top;
+      const y1 = isTransposed
+        ? u.valToPos(posValue, 'x', true)
+        : u.valToPos(u.scales.y.min, 'y', true);
       ctx.beginPath();
       ctx.setLineDash(style?.lineDash);
       ctx.lineWidth = style?.width;
-      ctx.moveTo(x0, u.bbox.top);
-      ctx.lineTo(x0, y0);
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
       ctx.strokeStyle = style?.stroke;
       ctx.stroke();
 
@@ -88,7 +101,6 @@ export class Annotation extends BaseComponent<AnnotationOption> {
         ) as HTMLElement;
         let markEl = markE || document.createElement('div');
         markEl.className = `u-mark-x ${css(styles['mark-x'])}`;
-        const x = Math.round(u.valToPos(data as number, 'x'));
 
         let labelEl = markLabelE || document.createElement('div');
         labelEl.className = `u-mark-x-label ${css(styles['mark-x-label'])}`;
@@ -104,7 +116,14 @@ export class Annotation extends BaseComponent<AnnotationOption> {
         const labelStyle = getComputedStyle(labelEl);
 
         requestAnimationFrame(() => {
+          const x = isTransposed
+            ? u.valToPos(u.scales.y.max, 'y')
+            : Math.round(u.valToPos(posValue, 'x'));
           const markElWidth = parseInt(labelStyle.width, 10) / 2;
+
+          const y = isTransposed
+            ? u.valToPos(posValue, 'x') - parseInt(labelStyle.height, 10) / 2
+            : -parseInt(labelStyle.height, 10) + TEXT_SPACE;
           let left = x;
           if (x + markElWidth > u.over.clientWidth) {
             left = x - markElWidth;
@@ -113,9 +132,7 @@ export class Annotation extends BaseComponent<AnnotationOption> {
             left = x + markElWidth;
           }
           markEl.style.left = `${left}px`;
-          markEl.style.top = `-${
-            parseInt(labelStyle.height, 10) + TEXT_SPACE
-          }px`;
+          markEl.style.top = `${y}px`;
         });
 
         !markLabelE && markEl.appendChild(labelEl);
@@ -148,7 +165,7 @@ export class Annotation extends BaseComponent<AnnotationOption> {
         data,
         text,
         style = { lineDash: [8, 5], width: 2, stroke: 'red' },
-      } = get(this.option, 'lineY', {}) as AnnotationLineOption;;
+      } = get(this.option, 'lineY', {}) as AnnotationLineOption;
       if (!data) {
         return;
       }
@@ -160,7 +177,6 @@ export class Annotation extends BaseComponent<AnnotationOption> {
       let x1 = u.valToPos(d[i1], 'x', true);
       let y1 = u.valToPos(data as number, 'y', true);
 
-      // console.log('x1', x1, x0, y1, u);
       ctx.beginPath();
       ctx.setLineDash(style?.lineDash);
       ctx.lineWidth = style?.width;

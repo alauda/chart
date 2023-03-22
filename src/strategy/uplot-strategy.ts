@@ -65,6 +65,10 @@ export class UPlotViewStrategy extends ViewStrategy {
     this.getChartEvent();
   }
 
+  private get transposed() {
+    return this.ctrl.getCoordinate().isTransposed;
+  }
+
   /**
    * 监听 chart 事件
    */
@@ -357,9 +361,12 @@ export class UPlotViewStrategy extends ViewStrategy {
             cursorX.style.visibility = 'hidden';
           }
           over.addEventListener('click', () => {
-            const { left } = u.cursor;
+            const { left, top } = u.cursor;
             const data = this.ctrl.getData();
-            const x = u.data[0][u.valToIdx(u.posToVal(left, 'x'))];
+            const x =
+              u.data[0][
+                u.valToIdx(u.posToVal(this.transposed ? top : left, 'x'))
+              ];
             const values = data.reduce((pre, cur) => {
               const items = cur.values.find(c => c.x === x);
               const values = { ...items, ...omit(cur, 'values') };

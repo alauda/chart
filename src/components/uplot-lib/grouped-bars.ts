@@ -398,7 +398,7 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
         ori,
         xSpacing: dir === 1 ? 100 : -100,
       });
-      const values = time === false ? {values: (u: uPlot) => u.data[0]} : {}
+      const values = time === false ? { values: (u: uPlot) => u.data[0] } : {};
       uPlot.assign(axes[0], {
         // splits: (u: any, _axisIdx: number) => {
         //   const _dir = dir * (ori === 0 ? 1 : -1);
