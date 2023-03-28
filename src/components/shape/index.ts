@@ -1,7 +1,7 @@
 import { View } from '../../chart/view.js';
 import { ShapeOptions } from '../../types/index.js';
 
-export type ShapeCtor = new (view: View, opt: ShapeOptions) => Shape;
+export type ShapeCtor = new (view: View, opt: unknown) => Shape | PolarShape;
 
 export abstract class Shape<T = unknown> {
   readonly type: string;
@@ -56,4 +56,33 @@ export abstract class Shape<T = unknown> {
   //   this.mapName = name;
   //   console.log(this.type, this.option, this.mapName, this);
   // }
+}
+
+export abstract class PolarShape<T = unknown> {
+  readonly type: string;
+
+  protected option: T;
+
+  ctrl: View;
+
+  container: d3.Selection<SVGGElement, unknown, null, undefined>;
+
+  abstract init(): void;
+
+  abstract render(): void;
+
+
+  constructor(ctrl: View, opt = {}) {
+    this.ctrl = ctrl;
+    this.option = opt as T;
+  }
+
+  getData() {
+    const data = this.ctrl.getData();
+    return data;
+  }
+
+  destroy() {
+    this.container?.remove();
+  }
 }

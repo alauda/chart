@@ -5,7 +5,7 @@ import { SizeCallback } from '../components/shape/point.js';
 
 import { TooltipValue } from './component.js';
 
-import { Theme } from './index.js';
+import { Percentage, Theme } from './index.js';
 
 export interface ChartOption {
   container: string | HTMLElement;
@@ -65,8 +65,9 @@ export type Data = DataItem[];
 export interface DataItem {
   name: string;
   color?: string;
+  value?: number;
   // type-coverage:ignore-next-line
-  values: Array<{ x: any; y: number; size?: number }>;
+  values?: Array<{ x: any; y: number; size?: number }>;
 }
 
 export type TitleOption = TitleOpt | false;
@@ -146,6 +147,40 @@ export interface PointShapeOption extends ShapeOption {
   pointSize?: number;
   sizeField?: string;
   sizeCallback?: SizeCallback;
+}
+
+export interface PieShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  startAngle?: number; // 开始角度
+  endAngle?: number; // 结束角度
+  label?: {
+    text?: string;
+    position?: {
+      x?: string; // 50%
+      y?: string; // 50%
+    };
+  };
+  total?: number; // 指定总量
+  backgroundColor?: string;
+  itemStyle?: {
+    borderRadius?: number; //  item 圆角
+    borderWidth?: number; // item间隔宽度
+  };
+  innerDisc?: boolean; //内阴影盘
+}
+
+export interface GaugeShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  colors: Array<[number, string]>; // 指定颜色 [百分比, color]
+  label?: {
+    text?: string;
+    position?: {
+      x?: string; // 50%
+      y?: string; // 50%
+    };
+  };
 }
 
 export type ShapeOptions =

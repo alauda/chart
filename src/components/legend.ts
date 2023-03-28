@@ -14,6 +14,7 @@ type PositionBottom = 'bottom' | 'bottom-left' | 'bottom-right';
 export interface LegendItem {
   name: string;
   color: string;
+  isActive: boolean
 }
 
 const styles = StyleSheet.create({
@@ -130,10 +131,12 @@ export class Legend extends BaseComponent<LegendOption> {
         li.addEventListener('click', () => {
           const isActive = li.style.opacity === '1' || !li.style.opacity;
           li.style.opacity = isActive ? '0.5' : '1';
+          key.isActive = !isActive
           this.legendItemClick({
             index: Number(index),
-            data: value,
-            isActive,
+            data: data,
+            value,
+            isActive: !isActive,
           });
         });
         // li.addEventListener('mouseenter', e => {
@@ -159,14 +162,15 @@ export class Legend extends BaseComponent<LegendOption> {
 
   legendItemClick(props: {
     index: number;
-    data: { name: string; color?: string };
+    data: LegendItem[];
+    value: LegendItem;
     isActive: boolean;
   }) {
     const currentStatus = !props.isActive;
     if (currentStatus) {
-      this.inactivatedSet.delete(props.data.name);
+      this.inactivatedSet.delete(props.value.name);
     } else {
-      this.inactivatedSet.add(props.data.name);
+      this.inactivatedSet.add(props.value.name);
     }
     this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, props);
   }
@@ -177,6 +181,7 @@ export class Legend extends BaseComponent<LegendOption> {
       .map(({ name, color }) => ({
         name,
         color,
+        isActive: true
       }))
       .filter(d => d.name);
   }

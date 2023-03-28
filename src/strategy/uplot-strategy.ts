@@ -5,6 +5,7 @@ import { Annotation } from '../components/annotation.js';
 import { Axis } from '../components/axis.js';
 import { Tooltip } from '../components/index.js';
 import { Scale } from '../components/scale.js';
+import { Shape } from '../components/shape/index.js';
 import { autoPadRight } from '../components/uplot-lib/axis.js';
 import { ChartEvent, Data, LegendItemActive, Size } from '../types/index.js';
 import { generateName, SHAPE_TYPES } from '../utils/index.js';
@@ -83,7 +84,7 @@ export class UPlotViewStrategy extends ViewStrategy {
     // 监听 legend item click
     this.ctrl.on(ChartEvent.LEGEND_ITEM_CLICK, (data: LegendItemActive) => {
       if (this.uPlot) {
-        this.uPlot.setSeries(data.index + 1, { show: !data.isActive }, true);
+        this.uPlot.setSeries(data.index + 1, { show: data.isActive }, true);
       }
     });
 
@@ -114,14 +115,15 @@ export class UPlotViewStrategy extends ViewStrategy {
     });
 
     this.ctrl.on(ChartEvent.HOOKS_REDRAW, () => {
-      this.uPlot.redraw();
+      this.uPlot?.redraw();
     });
   }
 
   render(size?: Size) {
     const option = this.getOption();
-    const data = option.data?.length ? option.data : this.getData();
-    if (!this.uPlot) {
+
+    if (!this.uPlot && option.series.length > 1) {
+      const data = option.data?.length ? option.data : this.getData();
       this.uPlot = new UPlot(option, data, this.ctrl.container);
     }
     this.changeSize(size || this.ctrl.size);
@@ -133,13 +135,12 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   private changeSize(size: Size) {
     // TODO: 设置 uPlot padding 留空间给header  header 使用 position 定位
-    const headerH =
-      this.ctrl.chartContainer.querySelector(`.${generateName('header')}`)
-        ?.clientHeight || 0;
-    this.uPlot.setSize({ ...size, height: size.height - headerH });
-    // if (this.ctrl.getData().length) {
-    //   this.uPlot.redraw(false);
-    // }
+    if (this.uPlot) {
+      const headerH =
+        this.ctrl.chartContainer.querySelector(`.${generateName('header')}`)
+          ?.clientHeight || 0;
+      this.uPlot.setSize({ ...size, height: size.height - headerH });
+    }
   }
 
   /**
@@ -259,7 +260,7 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   getSeries() {
     const shapeSeries = this.shapes.reduce((prev, name) => {
-      const comp = this.ctrl.shapeComponents.get(name);
+      const comp = this.ctrl.shapeComponents.get(name) as Shape;
       return comp ? [comp.getSeries(), ...prev] : prev;
     }, []);
 
@@ -273,7 +274,7 @@ export class UPlotViewStrategy extends ViewStrategy {
    */
   getShapeChartOption() {
     return this.shapes.reduce((prev, name) => {
-      const comp = this.ctrl.shapeComponents.get(name);
+      const comp = this.ctrl.shapeComponents.get(name) as Shape;
       return comp ? merge(prev, comp.getOptions()) : prev;
     }, {});
   }

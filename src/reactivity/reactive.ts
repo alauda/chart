@@ -71,7 +71,6 @@ export class Dep {
   }
 
   private update(names: string[], value: unknown, prevValue: unknown) {
-    console.log(names, value, prevValue);
     if (names.includes('data') && names.length === 1) {
       this.ctrl.data(value as Data);
     }

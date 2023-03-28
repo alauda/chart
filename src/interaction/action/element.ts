@@ -1,3 +1,4 @@
+import Pie from '../../components/shape/pie.js';
 import { Action } from './action.js';
 
 /**
@@ -9,17 +10,20 @@ export class ElementAction extends Action {
     return 'element';
   }
 
+  get pieCtrl() {
+    return this.view.shapeComponents.get('pie') as Pie;
+  }
   /**
    * 激活
    */
-  active() {
-    console.log('active');
+  active(context: any) {
+    this.pieCtrl?.onMousemove(context);
   }
 
   /**
    * 重制
    */
-  reset() {
-    console.log('reset');
+  reset(context: any) {
+    this.pieCtrl?.onMouseleave(context);
   }
 }

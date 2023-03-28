@@ -67,3 +67,13 @@ export function resizeObserver(
   resizeObserver.observe(el);
   return resizeObserver;
 }
+
+
+export function createSvg(el: d3.Selection<HTMLElement, unknown, null, undefined>) {
+  return el
+    .append('svg')
+    .style('width', '100%')
+    .style('height', '100%')
+    .style('overflow', 'hidden')
+    .style('display', 'inline-block');
+}

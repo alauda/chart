@@ -44,6 +44,8 @@ export class Chart extends View {
       chartEle.style.justifyContent = 'space-between';
 
       ele.style.flex = '1';
+      ele.style.position = 'relative';
+
       // ele.style.width = '100%';
       // ele.style.height = '100%';
     }

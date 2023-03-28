@@ -118,7 +118,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
 
   private getTooltipTitle(title: string, values: TooltipValue[]) {
     const { showTitle, titleFormatter } = this.option as TooltipOpt;
-    if (String(showTitle) === 'false') {
+    if (String(showTitle) === 'false' || !title) {
       return '';
     }
     let tpl: string = title || NOT_AVAILABLE;
@@ -207,11 +207,11 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     // TODO: 是否纳管到 interaction
     this.ctrl.on(
       ChartEvent.U_PLOT_SET_CURSOR,
-      ({ anchor, title, values }: TooltipItemActive) => {
+      ({ anchor, title, values, position }: TooltipItemActive) => {
         // console.log(anchor)
         // @ts-ignore
         placement(anchor, this.container, {
-          placement: 'right',
+          placement: position || 'right',
         });
         this.createItem(title, values);
       },

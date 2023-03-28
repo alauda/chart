@@ -1,6 +1,9 @@
+import { LegendItem } from "../components/legend.js";
+
 export interface LegendItemActive {
   index: number;
-  data: { name: string; color: string };
+  value: LegendItem
+  data: LegendItem[];
   isActive: boolean;
 }
 
@@ -11,10 +14,25 @@ interface Coordinates {
   right?: number;
 }
 
+export type Placement =
+  | 'top'
+  | 'top-start'
+  | 'top-end'
+  | 'bottom'
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'right'
+  | 'right-start'
+  | 'right-end'
+  | 'left'
+  | 'left-start'
+  | 'left-end';
+
 export interface TooltipItemActive {
   anchor: Element | Range | Coordinates;
   bound: Element | Range | Coordinates;
   title: string;
+  position?: Placement;
   values: TooltipValue[];
 }
 
