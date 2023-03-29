@@ -10,6 +10,7 @@ import { Header } from './header.js';
 const styles = StyleSheet.create({
   title: {
     wordBreak: 'break-all',
+    width: '100%'
   },
 });
 

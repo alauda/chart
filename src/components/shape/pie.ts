@@ -1,15 +1,13 @@
-import { isNumber } from 'lodash';
 import { select } from 'd3';
 import * as d3 from 'd3';
 import { Data, PieShapeOption } from '../../types/options.js';
 import {
   createSvg,
   getChartColor,
-  isPercentage,
   PolarShapeType,
 } from '../../utils/index.js';
 
-import { PolarShape, Shape } from './index.js';
+import { PolarShape } from './index.js';
 import { ChartEvent } from '../../types/index.js';
 import { Tooltip } from '../tooltip.js';
 import { LegendItem } from '../legend.js';

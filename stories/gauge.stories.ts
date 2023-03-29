@@ -2,9 +2,7 @@ import addons from '@storybook/addons';
 import { Story, Meta } from '@storybook/html';
 import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
-import { dealWithTime, generateTime, generateY } from './utilt';
-
-import { ActionType, Chart, ChartEvent } from '@alauda/chart';
+import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
@@ -19,32 +17,6 @@ const Template: Story = () => {
   });
 
   setTimeout(() => {
-    const destroy = document.querySelector('#destroy');
-    const init = document.querySelector('#init');
-    const change = document.querySelector('#change');
-    const update = document.querySelector('#update');
-    const total = 60;
-    const step = 720;
-    const start = '2023-01-31 09:00:00';
-    const range1: [number, number] = [0, 100];
-    const range2: [number, number] = [0, 100];
-    const timeData = generateTime(start, total, step);
-    let yData1 = generateY(total, range1);
-    // let yData2 = generateY(total, range2);
-
-    const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
-    // const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
-    const data = [
-      {
-        name: 'area1',
-        // color: 'rgb(var(--aui-color-green))',
-        value: d1,
-      },
-      // {
-      //   name: 'area2',
-      //   values: d2,
-      // },
-    ];
     const groupPieData = [
       {
         name: '部署',
@@ -56,7 +28,7 @@ const Template: Story = () => {
       return {
         container,
         // data: [],
-        data: groupPieData,
+        data,
         options: {
           // axis: {
           //   x: {},
@@ -71,7 +43,7 @@ const Template: Story = () => {
     }
     initChart();
     function initChart() {
-      chart = new Chart(getOp('.chart', data));
+      chart = new Chart(getOp('.chart', groupPieData));
       chart.gauge({
         // outerRadius: 60,
         // innerRadius: 0.2,

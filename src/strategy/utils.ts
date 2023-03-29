@@ -1,6 +1,7 @@
 import UPlot from 'uplot';
 
 import { StepType } from '../components/shape/line.js';
+import { ShapeOption } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
 import { convertRgba } from '../utils/index.js';
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -79,14 +80,20 @@ export function scaleGradient(
 export function getSeriesPathType(
   type: ShapeType,
   color: string,
+  options: ShapeOption,
   stepType?: StepType,
 ) {
   const defaultType = UPlot.paths.spline();
+  const defaultOptions = {
+    width: options.width ?? 1.5,
+    alpha: options.alpha ?? 1,
+  };
   const stroke = convertRgba(color, 1);
   return (
     {
       [ShapeType.Line]: {
         stroke,
+        ...defaultOptions,
         paths: stepType
           ? UPlot.paths.stepped({
               align: stepType === 'start' ? 1 : -1,
@@ -95,6 +102,7 @@ export function getSeriesPathType(
       },
       [ShapeType.Area]: {
         paths: defaultType,
+        ...defaultOptions,
         stroke,
         fill: (u: UPlot, seriesIdx: number) => {
           const s = u.series[seriesIdx];
@@ -107,14 +115,17 @@ export function getSeriesPathType(
         },
       },
       [ShapeType.Bar]: {
+        ...defaultOptions,
         paths: UPlot.paths.bars(),
         fill: color,
       },
       [ShapeType.Point]: {
+        ...defaultOptions,
         stroke,
         paths: UPlot.paths.points(),
       },
     }[type] || {
+      ...defaultOptions,
       paths: defaultType,
     }
   );

@@ -49,8 +49,11 @@ const Template: Story = () => {
         ],
         options: {
           // title: { text: '1231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312' },
-          // title: { text: '11', custom: true },
-
+          // title: { text: '11', },
+          // legend: {
+          //   // position: 'bottom-right',
+          //   custom: true,
+          // },
           //   position: 'bottom-right',
           // }
           axis: {
@@ -94,14 +97,15 @@ const Template: Story = () => {
     // chart.data(data);
     // chart.title(false)
     // chart.legend(false);
-    chart.area();
-    // chart.annotation().lineY({
-    //   data: 20,
-    //   text: {
-    //     content: 'line',
-    //     position: 'right',
-    //   },
-    // });
+    chart.line({alpha: 1, width: 1}).map('area1');
+    chart.area({alpha: 1, width: 1}).map('area2');
+    chart.annotation().lineY({
+      data: 20,
+      text: {
+        content: 'line',
+        position: 'right',
+      },
+    });
     // chart.annotation().lineX({
     //   data: d1[10].x,
     //   text: {

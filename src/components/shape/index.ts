@@ -11,9 +11,6 @@ export abstract class Shape<T = unknown> {
   /** 是否连接空值 */
   connectNulls = false;
 
-  /** 颜色 */
-  // public color: boolean;
-
   // 映射值
   mapName: string;
 
@@ -27,7 +24,6 @@ export abstract class Shape<T = unknown> {
     this.ctrl = ctrl;
     const { connectNulls = false } = opt;
     this.connectNulls = connectNulls;
-    // this.color = color;
     this.option = opt;
   }
 

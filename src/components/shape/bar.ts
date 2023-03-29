@@ -61,7 +61,7 @@ export default class Bar extends Shape<Bar> {
         points: {
           show: false,
         },
-        ...getSeriesPathType(this.type, color),
+        ...getSeriesPathType(this.type, color, this.option),
       };
     });
   }

@@ -5,7 +5,7 @@ import { SizeCallback } from '../components/shape/point.js';
 
 import { TooltipValue } from './component.js';
 
-import { Percentage, Theme } from './index.js';
+import { Theme } from './index.js';
 
 export interface ChartOption {
   container: string | HTMLElement;
@@ -39,8 +39,9 @@ export interface ViewOption {
 }
 
 export interface Options {
-  padding?: Padding;
-  data?: Data;
+  readonly padding?: Padding;
+  readonly data?: Data;
+
   title?: TitleOption;
   legend?: LegendOption;
   tooltip?: TooltipOption;
@@ -123,10 +124,9 @@ export interface TooltipOpt {
 
 export interface ShapeOption {
   name?: string; // 指定 data name
-  color?: string;
   connectNulls?: boolean; // 是否链接空值 默认 false
   points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
-  width?: number;
+  width?: number; // 线宽
   alpha?: number;
   map?: string;
 }
@@ -135,12 +135,10 @@ export interface LineShapeOption extends ShapeOption {
   step?: 'start' | 'end';
 }
 
-export interface AreaShapeOption extends ShapeOption {
-  map?: string;
-}
+export interface AreaShapeOption extends ShapeOption {}
 
 export interface BarShapeOption extends ShapeOption {
-  adjustOpt?: AdjustOption;
+  adjust?: AdjustOption;
 }
 
 export interface PointShapeOption extends ShapeOption {

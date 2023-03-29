@@ -144,7 +144,8 @@
     "update": true,
     "ignoreFiles": [
       "src/components/uplot-lib/*.ts",
-      "src/interaction/interaction.ts"
+      "src/interaction/interaction.ts",
+      "stories/**"
     ]
   }
 }

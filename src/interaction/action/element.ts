@@ -2,8 +2,7 @@ import Pie from '../../components/shape/pie.js';
 import { Action } from './action.js';
 
 /**
- * Tooltip 显示隐藏的 Action
- * @ignore
+ * 元素激活
  */
 export class ElementAction extends Action {
   get name(): string {

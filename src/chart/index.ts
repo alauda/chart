@@ -45,9 +45,6 @@ export class Chart extends View {
 
       ele.style.flex = '1';
       ele.style.position = 'relative';
-
-      // ele.style.width = '100%';
-      // ele.style.height = '100%';
     }
     const size = getChartSize(ele, width, height);
     const opts = {
@@ -68,6 +65,9 @@ export class Chart extends View {
     this.bindAutoFit();
   }
 
+  /**
+   * 绑定自动伸缩视图
+   */
   private bindAutoFit() {
     this.sizeObserver = resizeObserver(this.chartEle, this.changeSize);
   }

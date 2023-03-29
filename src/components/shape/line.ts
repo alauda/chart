@@ -28,9 +28,9 @@ export default class Line extends Shape<Line> {
         label: name,
         spanGaps: this.connectNulls,
         points: {
-          show: false,
+          show: !!this.option.points,
         },
-        ...getSeriesPathType(this.type, color, this.stepType),
+        ...getSeriesPathType(this.type, color, this.option, this.stepType),
       };
     });
   }

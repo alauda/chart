@@ -22,27 +22,3 @@ registerTheme('dark',{
 // 覆盖当前 chart 主题配置
 chart.theme('dark', {//...})
 ```
-
-## 设计
-
-全局配置
-
-> 通过变量存储所有注册的主题
-
-```ts
-const Themes: Record<string, ThemeOptions> = {
-  default: Light(),
-};
-
-export function getTheme(theme: string, option?: ThemeOptions): ThemeOptions {
-  return Object.assign(get(Themes, theme, Themes.default), option);
-}
-
-export function registerTheme(name: string, value: ThemeOptions) {
-  Themes[name] = Object.assign({ type: name }, value);
-}
-```
-
-## Todo
-
-- theme 转换到 uPlot 对应 option

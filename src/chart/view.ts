@@ -113,7 +113,6 @@ export class View extends EventEmitter {
   init() {
     this.initViewStrategy();
     this.initComponent();
-    // this.render();
   }
 
   reactive() {
@@ -343,24 +342,6 @@ export class View extends EventEmitter {
     set(this.options, 'tooltip', tooltipOption);
     return this;
   }
-
-  // /**
-  //  * 图形配置
-  //  *
-  //  * ```ts
-  //  * view.shape('line'); // line area point bar pie gauge
-  //  * view.shape('area', {
-  //  *   //...
-  //  * });
-  //  * ```
-  //  * @param field 图形类型
-  //  * @param shapeOption 图形配置
-  //  * @param name 指定某个数据
-  //  */
-  // shape(field: string, shapeOption?: ShapeOption): View {
-  //   set(this.options, ['shape', field], { ...shapeOption, type: field });
-  //   return this;
-  // }
 
   /**
    * 辅助标记配置
