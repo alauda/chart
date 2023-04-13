@@ -59,9 +59,8 @@ export interface AreaShapeOption extends ShapeOption {}
 ```
 
 ### Todo
+
 - [ ] 支持自定义渐变范围
-
-
 
 ## Bar
 
@@ -81,7 +80,7 @@ new Chart({ bar: option }); // 配置式
 export type AdjustType = 'stack' | 'group';
 
 export interface AdjustOption {
-  type?: AdjustType; // 默认 group  支持堆叠及分组 
+  type?: AdjustType; // 默认 group  支持堆叠及分组
   marginRatio?: number; // type group 下有效 0-1 范围 默认 0.1
 }
 
@@ -114,7 +113,6 @@ export interface PointShapeOption extends ShapeOption {
 }
 ```
 
-
 ## Pie
 
 > 用于绘制饼图
@@ -135,11 +133,12 @@ export interface PieShapeOption {
   outerRadius?: number; // 外半径
   startAngle?: number; // 开始角度
   endAngle?: number; // 结束角度
-  label?: { // pie 中间文本
+  label?: {
+    // pie 中间文本
     text?: string; // 文本
     position?: {
-      x?: string; // 默认50%
-      y?: string; // 默认50%
+      x?: number;
+      y?: number;
     };
   };
   total?: number; // 指定总量
@@ -153,8 +152,8 @@ export interface PieShapeOption {
 ```
 
 ### Todo
-- [ ] 将 angle radius 等配置归纳到 coordinate 下 
 
+- [ ] 将 angle radius 等配置归纳到 coordinate 下
 
 ## Gauge
 
@@ -178,12 +177,19 @@ export interface GaugeShapeOption {
   label?: {
     text?: string;
     position?: {
-      x?: string; // 50%
-      y?: string; // 50%
+      x?: number;
+      y?: number;
     };
+  };
+  text?: {
+    // 计量文本
+    show?: boolean; // 默认展示,
+    size?: number; // 字体大小 默认12
+    color?: string | ((value: number) => string); // 文本颜色支持 fn 动态颜色默认 n-4
   };
 }
 ```
 
 ### Todo
+
 - [ ] 本身是属于 pie 的变种，只是默认了 start end angle 应该继承于 pie 实现

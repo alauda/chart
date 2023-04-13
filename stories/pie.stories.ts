@@ -17,7 +17,6 @@ const Template: Story = () => {
   });
 
   setTimeout(() => {
-  
     const groupPieData = [
       {
         name: '部署',
@@ -40,15 +39,7 @@ const Template: Story = () => {
         container,
         // data: [],
         data,
-        options: {
-          axis: {
-            x: {},
-          },
-          scale: {
-            x: {},
-            y: {},
-          },
-        },
+        // options: {},
       };
     }
     initChart();
@@ -57,8 +48,8 @@ const Template: Story = () => {
       chart.pie({
         // startAngle: -(Math.PI / 1.4),
         // endAngle: Math.PI / 1.4,
-        innerRadius: 0.5,
-        total: 100,
+        innerRadius: 0.8,
+        // total: 100,
         label: {
           text: '<div>1000</div>',
         },

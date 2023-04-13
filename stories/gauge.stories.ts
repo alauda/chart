@@ -30,13 +30,7 @@ const Template: Story = () => {
         // data: [],
         data,
         options: {
-          // axis: {
-          //   x: {},
-          // },
-          // scale: {
-          //   x: {},
-          //   y: {},
-          // },
+          legend: false,
           // tooltip: false,
         },
       };
@@ -48,13 +42,21 @@ const Template: Story = () => {
         // outerRadius: 60,
         // innerRadius: 0.2,
         colors: [
-          [0.8, '#73BF69'],
-          [0.1, '#EAB839'],
-          [0.1, 'red'],
+          [0.2, '#73BF69'],
+          [0.5, '#EAB839'],
+          [1, 'red'],
         ],
-        // label: {
-        //   text: '<div>1000</div>',
-        // },
+        label: {
+          text: '<div style="font-size: 30px; color: #666;">50</div>',
+          position: {
+            // y: 5,
+          },
+        },
+        text: {
+          show: true,
+          size: 12,
+          // color: 'red' || () => 'red'
+        },
       });
       chart.interaction('element-active');
       chart.render();

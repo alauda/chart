@@ -5,6 +5,9 @@ import { createSvg, getChartColor, PolarShapeType } from '../../utils/index.js';
 import { PolarShape } from './index.js';
 import { ACTIVE_RADIUS_ENLARGE_SIZE, getRadius } from './pie.js';
 import { measureText } from '../../strategy/utils.js';
+import { isFunction } from 'lodash';
+const START_ANGLE = -(Math.PI / 1.5);
+const END_ANGLE = Math.PI / 1.5;
 
 /**
  * Gauge
@@ -38,37 +41,51 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
   }
 
   renderText() {
-    const majorTicks = 5;
-    const scale = d3.scaleLinear().range([0, 1]).domain([0, 100]);
-    const labelInset = 0;
-    const ticks = scale.ticks(majorTicks);
-    const { clientHeight } = this.svgEl.node()!;
-    const minAngle = (this.startAngle * 180) / Math.PI;
-    const maxAngle = (this.endAngle * 360) / Math.PI;
-    const r = clientHeight / 2;
-    var lg = this.container
-      .append('g')
-      .attr('class', 'label')
-      .attr('transform', `translate(${0},${0})`);
-    lg.selectAll('text')
-      .data(ticks)
-      .enter()
-      .append('text')
-      .attr('transform', function (d, i, v) {
-        var ratio = scale(d);
-        const { width } = measureText(String(d));
-        var newAngle = minAngle + ratio * maxAngle;
-        const angle = v.length - 1 === i ? newAngle - width : newAngle;
-        return 'rotate(' + angle + ') translate(0,' + (labelInset - r) + ')';
-      })
-      .attr('fill', this.colorVar['n-4'])
-      .text(v => v);
+    if (this.option?.text?.show !== false) {
+      const { color, size = 12 } = this.option.text;
+      const majorTicks = 5;
+      const scale = d3.scaleLinear().range([0, 1]).domain([0, 100]);
+      const labelInset = 0;
+      const ticks = scale.ticks(majorTicks);
+      const { clientHeight } = this.svgEl.node()!;
+      const minAngle = (this.startAngle * 180) / Math.PI;
+      const maxAngle = (this.endAngle * 360) / Math.PI;
+      const spacing = 2;
+      const r = clientHeight / 2 + spacing;
+      var lg = this.container
+        .append('g')
+        .attr('class', 'label')
+        .attr('transform', `translate(${0},${0})`);
+      lg.selectAll('text')
+        .data(ticks)
+        .enter()
+        .append('text')
+        .attr('font-size', size)
+        .attr('transform', function (d, i, v) {
+          var ratio = scale(d);
+          const { width } = measureText(String(d));
+          var newAngle = minAngle + ratio * maxAngle;
+          const angle = v.length - 1 === i ? newAngle - (width - 4) : newAngle;
+          return 'rotate(' + angle + ') translate(0,' + (labelInset - r) + ')';
+        })
+        .attr('fill', (value: number) => {
+          if (isFunction(color)) {
+            return color(value);
+          }
+          return color || this.colorVar['n-4'];
+        })
+        .text(v => v);
+    }
   }
 
   renderPie() {
     const { clientWidth, clientHeight } = this.svgEl.node()!;
+    const colors = this.option.colors.reduce((pre, cur, index, arr) => {
+      const value = index ? cur[0] - arr[index - 1][0] : cur[0];
+      return [...pre, [parseFloat(value.toFixed(2)), cur[1]]];
+    }, []);
     const data =
-      this.option.colors?.map(([value, color]) => ({
+      colors?.map(([value, color]) => ({
         name: color,
         color,
         value,
@@ -94,18 +111,16 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
     );
     const outerRadius =
       this.option.outerRadius ?? clientHeight / 2 - ACTIVE_RADIUS_ENLARGE_SIZE;
-    const startAngle = -(Math.PI / 1.5);
-    const endAngle = Math.PI / 1.5;
     const innerRadius = this.option?.innerRadius || 0.8;
-    const r = (endAngle * 180) / Math.PI;
+    const r = (END_ANGLE * 180) / Math.PI;
     const padding = (clientHeight - r) / 2;
     const valuePaths = calculatePaths(
       this.ctrl.getData() as any,
       {
         ...this.option,
         total: 100,
-        startAngle,
-        endAngle,
+        startAngle: START_ANGLE,
+        endAngle: END_ANGLE,
         itemStyle: {
           borderRadius: 0,
           borderWidth: 0,
@@ -131,7 +146,10 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
 
   renderLabel() {
     if (this.option.label) {
-      const { x = '50%', y = '50%' } = this.option.label.position || {};
+      const { clientHeight } = this.svgEl.node()!;
+      const r = (END_ANGLE * 180) / Math.PI;
+      const padding = (clientHeight - r) / 2;
+      const { x = 0, y = 0 } = this.option.label.position || {};
       if (!this.pieGuide) {
         this.pieGuide = select(this.ctrl.container)
           .append('div')
@@ -140,9 +158,10 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
       if (this.option.label.text) {
         this.pieGuide.html(this.option.label.text);
       }
+
       this.pieGuide
-        .style('top', x)
-        .style('left', y)
+        .style('left', `calc(50% + ${x ?? 0}px`)
+        .style('top', `calc(50% + ${padding}px + ${y}px`)
         .style('transform', 'translate(-50%, -50%)');
     }
   }

@@ -1,11 +1,7 @@
 import { select } from 'd3';
 import * as d3 from 'd3';
 import { Data, PieShapeOption } from '../../types/options.js';
-import {
-  createSvg,
-  getChartColor,
-  PolarShapeType,
-} from '../../utils/index.js';
+import { createSvg, getChartColor, PolarShapeType } from '../../utils/index.js';
 
 import { PolarShape } from './index.js';
 import { ChartEvent } from '../../types/index.js';
@@ -166,7 +162,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
 
   renderLabel() {
     if (this.option.label) {
-      const { x = '50%', y = '50%' } = this.option.label.position || {};
+      const { x = 0, y = 0 } = this.option.label.position || {};
       if (!this.pieGuide) {
         this.pieGuide = select(this.ctrl.container)
           .append('div')
@@ -176,8 +172,8 @@ export default class Pie extends PolarShape<PieShapeOption> {
         this.pieGuide.html(this.option.label.text);
       }
       this.pieGuide
-        .style('top', x)
-        .style('left', y)
+        .style('top', `calc(50% + ${x}px`)
+        .style('left', `calc(50% + ${y}px`)
         .style('transform', 'translate(-50%, -50%)');
     }
   }
@@ -204,7 +200,11 @@ export function getPath(config: {
   });
 }
 
-export function calculatePaths(data: Data, option: PieShapeOption, color: string) {
+export function calculatePaths(
+  data: Data,
+  option: PieShapeOption,
+  color: string,
+) {
   const rawTotal = data.reduce((acc, curr) => acc + curr.value, 0);
   const total = Math.max(option.total || 0, rawTotal);
   const startAngle = (option.startAngle || 0) % (2 * Math.PI);
@@ -230,12 +230,13 @@ export function calculatePaths(data: Data, option: PieShapeOption, color: string
     borderRadius,
     borderWidth,
   };
+  const padding = 14
   const innerDisc = option.innerDisc
     ? [
         {
           path: arc({
-            innerRadius: innerRadius,
-            outerRadius: innerRadius - 4,
+            innerRadius: innerRadius - padding,
+            outerRadius: innerRadius - padding - 4,
             startAngle,
             endAngle,
           })!,

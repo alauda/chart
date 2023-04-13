@@ -18,10 +18,6 @@
 chart
 ├─ README.md
 ├─ docs // 文档
-│  ├─ alauda-chart.svg
-│  ├─ chart.md
-│  ├─ theme.md
-│  └─ view.md
 ├─ package.json
 ├─ src
 │  ├─ chart

@@ -155,8 +155,8 @@ export interface PieShapeOption {
   label?: {
     text?: string;
     position?: {
-      x?: string; // 50%
-      y?: string; // 50%
+      x?: number;
+      y?: number;
     };
   };
   total?: number; // 指定总量
@@ -175,9 +175,14 @@ export interface GaugeShapeOption {
   label?: {
     text?: string;
     position?: {
-      x?: string; // 50%
-      y?: string; // 50%
+      x?: number;
+      y?: number;
     };
+  };
+  text?: {
+    show?: boolean; // true,
+    size?: number; // 12
+    color?: string | ((value: number) => string); // n-4
   };
 }
 
