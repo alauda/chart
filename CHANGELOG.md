@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.11
+
+### Patch Changes
+
+- [#42](https://github.com/alauda/chart/pull/42) [`0cb860d`](https://github.com/alauda/chart/commit/0cb860db87450d9f24b99c087604d944bf6df1d2) Thanks [@zChanges](https://github.com/zChanges)! - fix: firefox getBBox size
+
 ## 0.1.10
 
 ### Patch Changes
