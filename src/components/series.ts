@@ -546,7 +546,11 @@ export class Series extends UIController {
   }
 
   private getStackX(pre: SVGRectElement, index: number) {
-    return index ? pre.getBBox().width + pre.getBBox().x : 0;
+    // firefox getBBox 不计算隐藏的元素
+    return index
+      ? (pre.getBBox().width || pre.width.baseVal.value) +
+          (pre.getBBox().x || pre.x.baseVal.value)
+      : 0;
   }
 
   private createGradient(data: ChartData, el: D3Selection, id: string) {
