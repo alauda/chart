@@ -1,0 +1,32 @@
+name: Release beta
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  release_beta:
+    name: Release Beta
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --ignore-engines
+
+      - name: Release beta
+        run: sh scripts/release.sh
+        env:
+          PUBLISH_VERSION: beta
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Sync Cnpm
+        run: npx cnpm sync @alauda/chart
