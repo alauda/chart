@@ -2,6 +2,7 @@
   "extends": "@1stg/tsconfig/node16",
   "compilerOptions": {
     "rootDir": ".",
+    "module": "Node16",
     "outDir": "../lib",
     "strictFunctionTypes": false,
     "strictNullChecks": false

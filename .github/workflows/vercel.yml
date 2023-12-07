@@ -11,20 +11,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js 16
-        uses: actions/setup-node@v3
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: lts/*
           cache: yarn
 
       - name: Check Branch
         id: branch
         if: ${{ github.ref  == 'refs/heads/main' }}
         run: |
-          echo "::set-output name=args::--prod"
-          echo "::set-output name=comment::false"
+          echo "args=--prod" >> $GITHUB_OUTPUT
+          echo "comment=false" >> $GITHUB_OUTPUT
 
       - name: Deploy
         uses: amondnet/vercel-action@v25

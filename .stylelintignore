@@ -3,5 +3,6 @@ lib
 node_modules
 LICENSE
 *.json
+*.sh
 *.tsbuildinfo
 *.lock

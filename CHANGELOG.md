@@ -58,20 +58,20 @@
 
 ### Patch Changes
 
-- [#11](https://github.com/alauda/alauda-chart/pull/11) [`8b4acb3`](https://github.com/alauda/alauda-chart/commit/8b4acb394eaa6efaf2e78f9de54fd315b7c44db3) Thanks [@zChanges](https://github.com/zChanges)! - fix: export type `ViewOptions`
+- [#11](https://github.com/alauda/chart/pull/11) [`8b4acb3`](https://github.com/alauda/chart/commit/8b4acb394eaa6efaf2e78f9de54fd315b7c44db3) Thanks [@zChanges](https://github.com/zChanges)! - fix: export type `ViewOptions`
 
 ## 0.1.1
 
 ### Patch Changes
 
-- [#9](https://github.com/alauda/alauda-chart/pull/9) [`5b6c3a5`](https://github.com/alauda/alauda-chart/commit/5b6c3a5acbc315594d70a0af44a4ba5e8a89fc89) Thanks [@zChanges](https://github.com/zChanges)! - fix: unexpected breaking change
+- [#9](https://github.com/alauda/chart/pull/9) [`5b6c3a5`](https://github.com/alauda/chart/commit/5b6c3a5acbc315594d70a0af44a4ba5e8a89fc89) Thanks [@zChanges](https://github.com/zChanges)! - fix: unexpected breaking change
 
 ## 0.1.0
 
 ### Minor Changes
 
-- [#4](https://github.com/alauda/alauda-chart/pull/4) [`ed3e9de`](https://github.com/alauda/alauda-chart/commit/ed3e9de6385e938016c63a9344c6bba601572659) Thanks [@JounQin](https://github.com/JounQin)! - feat: support native ESM with specific .js extension
+- [#4](https://github.com/alauda/chart/pull/4) [`ed3e9de`](https://github.com/alauda/chart/commit/ed3e9de6385e938016c63a9344c6bba601572659) Thanks [@JounQin](https://github.com/JounQin)! - feat: support native ESM with specific .js extension
 
 ### Patch Changes
 
-- [#5](https://github.com/alauda/alauda-chart/pull/5) [`dba255b`](https://github.com/alauda/alauda-chart/commit/dba255bca63a29eb35da6883d88742d4b1c8e528) Thanks [@zChanges](https://github.com/zChanges)! - fix: pie arc beyond limit
+- [#5](https://github.com/alauda/chart/pull/5) [`dba255b`](https://github.com/alauda/chart/commit/dba255bca63a29eb35da6883d88742d4b1c8e528) Thanks [@zChanges](https://github.com/zChanges)! - fix: pie arc beyond limit

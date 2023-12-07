@@ -3,7 +3,7 @@
   "version": "0.1.11",
   "type": "module",
   "description": "Alauda Chart components by Alauda Frontend Team",
-  "repository": "git+https://github.com/alauda/alauda-chart.git",
+  "repository": "git+https://github.com/alauda/chart.git",
   "author": "Alauda",
   "contributors": [
     "zChanges",
@@ -58,14 +58,10 @@
   },
   "peerDependencies": {
     "d3": "^7.1.1",
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21"
+    "lodash": "^4.17.21"
   },
   "peerDependenciesMeta": {
     "lodash": {
-      "optional": true
-    },
-    "lodash-es": {
       "optional": true
     }
   },
