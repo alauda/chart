@@ -1,67 +1,77 @@
+import addons from '@storybook/addons';
 import { Story, Meta } from '@storybook/html';
-
-import { groupPieData } from './data';
+import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
 import { Chart } from '@alauda/chart';
-
-import '../src/theme/default.scss';
+import 'uplot/dist/uPlot.min.css';
 
 export default {
   title: 'Pie',
 } as Meta;
 
+let chart: Chart;
+
 const Template: Story = () => {
+  addons.getChannel().on(DARK_MODE_EVENT_NAME, (e: boolean) => {
+    chart?.theme(e ? 'dark' : 'light');
+  });
+
   setTimeout(() => {
-    const chart = Chart({
-      container: '#pieChart',
-      type: 'pie',
-      // title: {
-      //   text: '环形图',
-      // },
-      legend: {
-        // hide: true,
+    const groupPieData = [
+      {
+        name: '部署',
+        value: 10,
+        color: '#999',
       },
-      seriesOption: {
-        outerRadius: 50,
-        // backgroundColor: '#ededed',
-        total: 100,
+      {
+        name: '有状态',
+        value: 20,
+        color: '#0abf5b',
+      },
+      {
+        name: '守护',
+        value: 50,
+        color: '#006eff',
+      },
+    ];
+    function getOp(container: string, data: any): any {
+      return {
+        container,
+        // data: [],
+        data,
+        // options: {},
+      };
+    }
+    initChart();
+    function initChart() {
+      chart = new Chart(getOp('.chart', groupPieData));
+      chart.pie({
+        // startAngle: -(Math.PI / 1.4),
+        // endAngle: Math.PI / 1.4,
+        innerRadius: 0.8,
+        // total: 100,
         label: {
           text: '<div>1000</div>',
-          position: {
-            x: '50%',
-            y: '50%',
-          },
         },
+        backgroundColor: '#ededed',
         itemStyle: {
-          borderRadius: 2,
-          borderWidth: 2,
+          borderWidth: 0,
+          borderRadius: 0,
         },
-        innerDisc: true,
-      },
-      tooltip: {
-        trigger: 'item',
-        hideTitle: true,
-      },
-      data: groupPieData,
-    });
-    // chart.on(PIE_EVENTS.ITEM_HOVERED, function (e) {
-    //   console.log(e);
-    // });
-    // chart.on(PIE_EVENTS.ITEM_MOUSEOUT, function (e) {
-    //   console.log(e);
-    // });
-    setTimeout(() => {
-      // chart.data(groupPieData);
-      chart.updatePie({
-        label: {
-          text: '<div>2222</div>',
-        },
+        // innerDisc: true
       });
-    }, 2000);
-  }, 0);
-  return `<div >
-    <div style="max-width: 300px; height: 300px;border:1px solid #eee; " id="pieChart"></div>
-  </div>`;
+      chart.interaction('element-active');
+      chart.render();
+    }
+  });
+
+  return `
+  <div style="width: 100%; height: 200px; display: flex;">
+  <div  style="width:100%;height:100%;padding: 20px 16px ;  box-sizing: border-box; flex: 2;">
+    <div class="chart"></div>
+  </div>
+</div>
+  `;
 };
 
-export const pie = Template.bind({});
+export const Pie = Template.bind({});

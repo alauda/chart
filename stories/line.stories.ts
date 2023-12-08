@@ -1,11 +1,9 @@
 import { Story, Meta } from '@storybook/html';
-import { timeFormat } from 'd3';
 
-import { data } from './data';
+import { dealWithTime, generateData } from './utilt';
 
-import { Chart, ScaleType } from '@alauda/chart';
-
-import '../src/theme/default.scss';
+import { Chart } from '@alauda/chart';
+import 'uplot/dist/uPlot.min.css';
 
 export default {
   title: 'Line',
@@ -13,128 +11,130 @@ export default {
 
 const Template: Story = () => {
   setTimeout(() => {
-    Chart({
-      container: '#chart',
-      type: 'line',
-      title: {
-        text: '折线图',
-        // hide: true,
-        formatter: () => '折线图',
-        // offsetX: 20,
-        // offsetY: 30,
-        // hide: true,
+    console.time('render');
+    const d1 = generateData('2023-01-31 09:00:00', 60, 60);
+    const opts = {
+      container: '.chart1',
+      data: [
+        {
+          name: 'line',
+          values: d1,
+        },
+        {
+          name: 'line2',
+          values: generateData('2023-01-31 09:00:00', 60, 60),
+        },
+      ],
+      options: {
+        title: { text: 'chart' },
+        // legend: {
+        //   position: 'bottom-right',
+        // }
+        annotation: {
+          // lineX: {
+          //   data: d1[i].x,
+          //   text: {
+          //     content: i,
+          //   }
+          // },
+          lineY: {
+            data: '3',
+            text: {
+              content: '1111',
+            },
+          },
+        },
+        scale: {
+          // y: { max: 100, min: 10 },
+          // y: {}
+        },
+        line: {
+          step: 'start',
+        },
+        tooltip: {
+          // showTitle: false
+          titleFormatter: (title: string) =>
+            `${dealWithTime(new Date(Number(title) * 1000))}`,
+        },
       },
-      legend: {
-        // hide: true,
-        // isMount: true,
-        // formatter: () => {
-        //   return document.getElementById('title').outerHTML;
-        // },
-        // offsetX: 20,
-        // offsetY: 30,
-        // formatter: data => `<div>11</div>`,
-        // itemFormatter: `legend {name}`,
-      },
-      data: data.map(d => ({
-        ...d,
-        values: d.values.map(a => ({
-          ...a,
-          x: a.x * 1000,
-          y: a.y * 1_000_000_000_000,
-        })),
-      })),
-      yAxis: {
-        // tickFormatter: (text) => {
-        //   console.log(text)
-        //   return text
-        // },
-      },
-      xAxis: {
-        type: ScaleType.TIME,
-        tickFormatter: () => timeFormat('%m-%d %H:%M'),
-      },
-      tooltip: {
-        // titleFormatter: (name: Date | number | string) =>
-        //   `<div>${new Date(name)}</div>`,
-        // itemFormatter: (values: TooltipContextItem[]) =>
-        //   `<div>${JSON.stringify(values)}</div>`,
-        // sort: (a, b) => a.y - b.y,
-      },
-      zoom: {
-        enabled: false,
-        // onzoomStart: d => {
-        //   console.log('zoom start', d);
-        // },
-        // onzoom: d => {
-        //   console.log('zoom', d);
-        // },
-        // onzoomEnd: d => {
-        //   console.log('zoom end', d);
-        // },
-      },
-      // contextCallbackFunction: (view: View) => {
-      //   console.log(view);
-      // },
-      xPlotLine: {
-        color: 'red',
-        value: 120,
-      },
-      // contextCallbackFunction: view => {
-      //   console.log('cb', view);
-      //   setTimeout(() => {
-      //     const legend = view.getController('legend');
+    };
+    const chart = new Chart(opts as any);
+    chart.line();
+    // console.log(chart);
+    // chart.data(data);
+    // chart.shape('line');
+    // chart.shape('bar', { name: 'line2' });
+    chart.render();
+    const reactive: any = chart.reactive();
 
-      //     legend.legendUnselectAll();
-      //     setTimeout(() => {
-      //       legend.legendSelectAll();
-      //     }, 1000);
-      //   }, 2000);
-      // },
+    const btn = document.querySelector('#change');
+    // let bb = true;
+    let i = 0;
+    btn.addEventListener('click', () => {
+      // reactive.options.title.text = String(Math.random() * 1000);
+      // reactive.options.legend = {
+      //   position: 'bottom-right',
+      // };
+      // bb = !bb
+      // reactive.options.tooltip = {
+      //   showTitle: bb,
+      //   titleFormatter: '{title}111'
+      // }
+      reactive.options.annotation = {
+        // lineX: {
+        //   data: d1[i].x,
+        //   text: {
+        //     content: i,
+        //   }
+        // },
+        lineY: {
+          data: d1[i].y,
+          text: {
+            content: String(i),
+          },
+        },
+      };
+      // reactive.options.scale = {
+      //   y: { max: 100, min: 10 },
+      // };
+      // reactive.options.tooltip = false;
+      // reactive.data = [
+      //   {
+      //     name: 'line1',
+      //     values: generateData('2023-01-31 09:00:00', 60, 60),
+      //   },
+      //   {
+      //     name: 'line2',
+      //     values: generateData('2023-01-31 09:00:00', 60, 60),
+      //   },
+      // ];
+      i = i + 1;
     });
-    // chart.on(RECT_EVENTS.CLICK, (value: TooltipContext) => {
-    //   chart.updateYPlotLine(value);
-    //   console.log(JSON.stringify(value));
-    // });
-
-    setTimeout(() => {
-      // chart.updateTitle({
-      //   text: '123123',
-      //   formatter: () => '123123####',
-      // });
-      // chart.updateYPlotLine({
-      //   title: 1637114400000,
-      //   values: [
-      //     {
-      //       x: 1637114400000,
-      //       y: 573,
-      //       name: 'running',
-      //       color: '#24b37a',
-      //       activated: false,
-      //     },
-      //     {
-      //       x: 1637114400000,
-      //       y: 599,
-      //       name: 'total_num',
-      //       color: '#006eff',
-      //       activated: false,
-      //     },
-      //   ],
-      // });
-      // chart.updateXPlotLine({value: 10});
-    }, 1000);
-
-    // setTimeout(() => {
-    //   chart.data(data1);
-    //   // chart.setOptions({
-    //   //   zoom: {
-    //   //     enabled: true,
-    //   //   },
-    //   // });
-    // }, 1000);
   });
-  return `<div>
-    <div style="width: 100%; height: 190px;" id="chart"></div>
-  </div>`;
+
+  return `
+    <button id="change">change params</button>
+    <div style="width: 500px; height: 200px;"> 
+      <div class="chart1" ></div>
+    </div>
+  `;
 };
 
 export const line = Template.bind({});
+// line.args = {
+//   primary: true,
+//   label: 'Button',
+// };
+// line.parameters = {
+//   backgrounds: {
+//     values: [
+//       { name: 'red', value: '#f00' },
+//       { name: 'green', value: '#0f0' },
+//       { name: 'blue', value: '#00f' },
+//     ],
+//   },
+// };
+
+// 图表类型  line area bar
+// 大数据量
+// sliding 动态效果

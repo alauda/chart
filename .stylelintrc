@@ -1,13 +1,7 @@
 {
   "extends": "@1stg/stylelint-config/loose",
   "rules": {
-    "scss/function-no-unknown": [
-      true,
-      {
-        "ignoreFunctions": [
-          "use-rgb"
-        ]
-      }
-    ]
+    "selector-type-no-unknown": null,
+    "rule-empty-line-before": null
   }
 }
