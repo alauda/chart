@@ -1,524 +1,401 @@
-import { find, isFunction, mergeWith } from 'lodash';
+import { isBoolean, isObject, merge, set, cloneDeep } from 'lodash';
 
+import { Annotation } from '../components/annotation.js';
+import { BaseComponent } from '../components/base.js';
+import { Coordinate } from '../components/coordinate.js';
+import { Legend } from '../components/legend.js';
+import { Scale } from '../components/scale.js';
+import { PolarShape, Shape, ShapeCtor } from '../components/shape/index.js';
+import { getInteraction } from '../interaction/index.js';
+import Interaction from '../interaction/interaction.js';
+import { reactive, Reactive } from '../reactivity/index.js';
+import { ViewStrategy } from '../strategy/abstract.js';
 import {
-  Controller,
-  ControllerCtor,
-  ServiceController,
-  UIController,
-} from '../abstract/index.js';
+  UPlotViewStrategy,
+  ViewStrategyManager,
+  InternalViewStrategy,
+} from '../strategy/index.js';
+import { getTheme } from '../theme/index.js';
 import {
-  Axis,
-  Legend,
-  YPlotLine,
-  Series,
-  Title,
-  Tooltip,
-  XPlotLine,
-  Pie,
-  Zoom,
-} from '../components/index.js';
-import {
-  basics,
-  CHART_DEPENDS_MAP,
-  CLASS_NAME,
-  LEGEND_EVENTS,
-  VIEW_HOOKS,
-} from '../constant.js';
-import EventEmitter from '../event-emitter.js';
-import { Scale, ControllerContextService } from '../service/index.js';
-import {
-  BarSeriesOption,
-  ChartData,
-  ChartEle,
-  ChartSize,
-  D3SvgSSelection,
+  AxisOption,
+  ChartEvent,
+  CoordinateOption,
   Data,
+  InteractionSteps,
+  LegendOption,
   Options,
-  PieSeriesOption,
+  ScaleOption,
+  ShapeOptions,
+  Size,
   Theme,
+  ThemeOptions,
   TitleOption,
-  TooltipContext,
-  ViewProps,
-  XData,
-  XPlotLineOptions,
+  TooltipOption,
+  ViewOption,
 } from '../types/index.js';
-import {
-  generateUID,
-  getChartColor,
-  getTextWidth,
-  template,
-} from '../utils/index.js';
+import { ShapeType } from '../utils/component.js';
+import { getChartColor } from '../utils/index.js';
 
-export type ViewOptions = Omit<Options, 'container'>;
+import EventEmitter from './event-emitter.js';
 
 export class View extends EventEmitter {
-  chartEle!: ChartEle;
+  /** 所有的组件  */
+  components: Map<string, BaseComponent> = new Map();
 
-  chartUId: string;
+  /** 图形组件 */
+  shapeComponents: Map<string, Shape | PolarShape> = new Map();
 
-  uiControllers: UIController[] = [];
-  serviceControllers: ServiceController[] = [];
+  // 配置信息存储
+  protected options: Options = {};
 
-  options: Options = {
-    data: [],
-    container: '',
+  readonly reactivity: Reactive;
+
+  interactions: Map<string, Interaction> = new Map();
+
+  // container
+  container: HTMLElement;
+
+  chartContainer: HTMLElement;
+
+  coordinateInstance: Coordinate;
+
+  /** 主题配置，存储当前主题配置。 */
+  protected themeObject: ThemeOptions;
+
+  strategyManage: ViewStrategyManager;
+
+  private strategy: ViewStrategy[];
+
+  private mediaQuery: MediaQueryList;
+
+  systemThemeType: 'light' | 'dark' = 'light';
+
+  size: Size = { width: 0, height: 0 };
+
+  defaultInteractions: string[];
+
+  // 判断是否是 element active  [point]
+  get isElementAction() {
+    return !!this.shapeComponents.get('point');
+  }
+
+  get hideTooltip() {
+    return this.options.tooltip === false;
+  }
+
+  fixedSize = {
+    width: 0,
+    height: 0,
   };
 
-  chartData: ChartData[] = [];
-
-  chartSize: ChartSize;
-
-  size: {
-    [key: string]: ChartSize;
-  } = {};
-
-  get isBar() {
-    return this.options.type === 'bar';
-  }
-
-  get isGroup() {
-    return (this.options?.seriesOption as BarSeriesOption)?.isGroup;
-  }
-
-  get isRotated() {
-    return this.options.rotated;
-  }
-
-  get noData() {
-    return (
-      this.chartData.length === 0 ||
-      this.chartData?.every(d => d?.values?.every(item => item?.y === null))
-    );
-  }
-
-  get tooltipDisabled() {
-    return this.options.tooltip?.disabled;
-  }
-
-  get legendDisabled() {
-    return !this.options.legend;
-  }
-
-  get titleDisabled() {
-    return !this.options.title;
-  }
-
-  get zoomDisabled() {
-    return !this.options.zoom?.enabled;
-  }
-
-  get yPlotLineDisabled() {
-    return this.options?.yPlotLine?.hide;
-  }
-
-  get xPlotLineDisabled() {
-    return this.options?.xPlotLine?.hide || !this.options.xPlotLine;
-  }
-
-  get noHeader() {
-    return (
-      (!this.options.title && !this.options.legend) ||
-      (this.options?.title?.hide && this.options?.legend?.hide)
-    );
-  }
-
-  get headerHeight() {
-    const title = document.querySelector(`svg.${CLASS_NAME.title}`);
-    const legend = document.querySelector(`svg.${CLASS_NAME.legend}`);
-    const header = document.querySelector('.ac-header');
-    const titleH = title?.getBBox?.()?.height || title?.clientHeight;
-    const legendH = legend?.getBBox?.()?.height || legend?.clientHeight;
-    return Math.max(header?.clientHeight || 0, titleH || 0, legendH || 0, 0);
-  }
-
-  get headerTotalHeight() {
-    return this.options.customHeader
-      ? this.headerHeight
-      : this.headerHeight + this.basics.main.top;
-  }
-
-  context = new ControllerContextService();
-
-  basics = basics;
-
-  static setTheme(theme: Theme) {
-    const root = document.querySelector('html');
-    root.setAttribute('ac-theme-mode', theme);
-  }
-
-  constructor({ ele, size, svg, header, options }: ViewProps) {
+  constructor(props: ViewOption) {
     super();
-    this.options = {
-      type: 'line',
-      offset: { x: 0, y: 0 },
-      grid: { top: 0 },
-      ...this.options,
-      ...options,
-      data: this.handelData(options.data),
-    };
-    this.handleBasics();
-    this.chartEle = { chart: ele, svg, header, main: this.createMain(svg) };
-    this.chartUId = `ac-chart-uid-${generateUID()}`;
-    this.chartEle.chart.attr('class', `ac-chart-wrapper ${this.chartUId}`);
-    this.chartEle.chart.style('width', '100%').style('height', '100%');
-    this.chartData = this.options.data;
-    this.changeSize(size);
-    this.chartEle.svg.attr('width', '100%');
-    this.chartEle.svg.attr('height', size.height - this.basics.main.top);
-    this.init();
-    this.options.contextCallbackFunction?.(this);
-  }
-
-  setOptions(options: ViewOptions) {
-    // TODO: 异步修改 option 调整方法
-    if (!this.options.contextCallbackFunction) {
-      options.contextCallbackFunction?.(this);
+    const {
+      width,
+      height,
+      chartEle,
+      ele,
+      options,
+      data,
+      theme,
+      chartOption,
+      padding,
+      defaultInteractions,
+    } = props;
+    this.reactivity = reactive(chartOption, this);
+    this.chartContainer = chartEle;
+    this.container = ele;
+    if (options) {
+      this.options = { ...options, padding };
     }
-    this.asyncUpdateZoomOption(options);
-    const newOptions = mergeWith(this.options, options) as Options;
-    this.options = newOptions;
-  }
-
-  handelData(data: ChartData[]) {
-    return data.map((d, index) => ({
-      ...d,
-      ...(d.color ? {} : { color: getChartColor(index) }),
-    }));
+    data && this.data(data);
+    this.defaultInteractions = defaultInteractions;
+    this.size = { ...this.size, width, height };
+    this.fixedSize = {
+      width,
+      height,
+    };
+    this.initTheme(theme);
+    this.init();
   }
 
   init() {
-    this.registerComponents();
-    this.initComponentController();
-    this.render();
-    // 监听事件
-    this.subscribeEvents();
+    this.initViewStrategy();
+    this.initComponent();
   }
 
-  registerComponents() {
-    if (!this.tooltipDisabled) {
-      this.context.registerComponent(Tooltip);
-    }
-    if (!this.titleDisabled) {
-      this.context.registerComponent(Title);
-    }
+  reactive() {
+    return this.reactivity.reactiveObject;
+  }
 
-    if (!this.yPlotLineDisabled) {
-      this.context.registerComponent(YPlotLine);
+  render(size?: Size) {
+    if (size) {
+      this.size = size;
     }
+    [...this.components.values()].forEach(c => c.render());
+    this.strategy.forEach(item => {
+      item.render();
+    });
+    // TODO: 去除依赖 shape 判断 is point
+    this.initDefaultInteractions(this.defaultInteractions);
+  }
 
-    if (!this.xPlotLineDisabled) {
-      this.context.registerComponent(XPlotLine);
-    }
-
-    CHART_DEPENDS_MAP[this.options.type].forEach(C =>
-      this.context.registerComponent(C),
-    );
-
-    if (!this.legendDisabled) {
-      this.context.registerComponent(Legend);
-    }
-
-    if (!this.zoomDisabled) {
-      this.context.registerComponent(Zoom);
+  interaction(name: string, steps?: InteractionSteps) {
+    const interactionStep = getInteraction(name);
+    if ((steps || interactionStep) && !this.interactions.get(name)) {
+      const step =
+        steps && interactionStep
+          ? merge(interactionStep, steps)
+          : steps || interactionStep;
+      const interaction = new Interaction(this, cloneDeep(step));
+      interaction.init();
+      this.interactions.set(name, interaction);
     }
   }
 
-  // TODO: 先手动异步注册 zoom
-  asyncUpdateZoomOption(options: ViewOptions) {
-    if (options?.zoom?.enabled && !this.getController('zoom')) {
-      this.context.registerComponent(Zoom);
-      const instance = this.buildController(Zoom, this);
-      this.uiControllers.push(instance as UIController);
-      this.getController('zoom').init();
+  private initDefaultInteractions(interactions: string[]) {
+    for (const name of interactions) {
+      if (name) {
+        this.interaction(name);
+      }
     }
   }
 
-  render() {
-    // 触发 component render
-    this.renderComponent();
-    // 渲染后事件
-    this.emit(VIEW_HOOKS.AFTER_RENDER);
+  /**
+   * 基于注册组件初始化
+   */
+  private initComponent() {
+    this.createCoordinate();
+    this.strategyManage.getComponent().forEach(c => {
+      this.components.set(c.name, c);
+    });
   }
 
+  /**
+   * 初始化策略 uPlot internal
+   */
+  private initViewStrategy() {
+    this.strategyManage = new ViewStrategyManager();
+    const uPlot = new UPlotViewStrategy(this);
+    const internal = new InternalViewStrategy(this);
+    this.strategyManage.add(uPlot);
+    this.strategyManage.add(internal);
+    this.strategy = this.strategyManage.getAllStrategy();
+  }
+
+  /**
+   *
+   * @param theme 主题
+   * 不设置默认根据系统切换 light dark
+   */
+  private initTheme(theme: Theme) {
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeType = this.mediaQuery.matches ? 'dark' : 'light';
+    if (!theme || theme?.type === 'system') {
+      this.bindThemeListener();
+    }
+    this.theme(theme || this.systemThemeType);
+  }
+
+  private bindThemeListener() {
+    this.mediaQuery.addEventListener('change', this.systemChangeTheme);
+  }
+
+  private unbindThemeListener() {
+    this.mediaQuery.removeEventListener('change', this.systemChangeTheme);
+  }
+
+  private readonly systemChangeTheme = (e: MediaQueryListEvent) => {
+    const theme = e.matches ? 'dark' : 'light';
+    this.theme(theme);
+  };
+
+  /**
+   * 设置主题。
+   * @param theme 主题名或者主题配置
+   * @returns View
+   */
+  theme(theme?: string | Theme): View {
+    this.themeObject = isObject(theme)
+      ? getTheme(theme.type, theme)
+      : getTheme(theme);
+    this.emit(ChartEvent.THEME_CHANGE);
+    return this;
+  }
+
+  /**
+   * 获取主题配置。
+   * @returns themeObject
+   */
+  getTheme(): ThemeOptions {
+    return this.themeObject;
+  }
+
+  /**
+   * 获取 view options 配置
+   */
+  getOption() {
+    return this.options;
+  }
+
+  /**
+   * 装载数据源。
+   *
+   * ```ts
+   * chart.data();
+   * ```
+   *
+   * @param data 数据源。
+   * @returns View
+   */
+  data(data: Data): View {
+    data.forEach((d, index) => {
+      if (!d.color) {
+        d.color = getChartColor(index);
+      }
+    });
+    set(this.options, 'data', data);
+    this.emit(ChartEvent.DATA_CHANGE, data);
+    return this;
+  }
+
+  getData() {
+    return this.options.data || [];
+  }
+
+  // -------------- Component ---------------//
+  title(titleOption: TitleOption): View {
+    set(this.options, 'title', titleOption);
+    return this;
+  }
+
+  legend(legendOption: boolean | LegendOption): Legend {
+    set(this.options, 'legend', legendOption);
+    return this.components.get('legend') as Legend;
+  }
+
+  /**
+   * 对特定的某条坐标轴进行配置。
+   *
+   * ```ts
+   * view.axis('x', false); // 不展示 'x' 坐标轴
+   * // 将 'x' 字段对应的坐标轴的标题隐藏
+   * view.axis('x', {
+   *   //...
+   * });
+   * ```
+   * @param field 坐标轴 x y
+   * @param axisOption 坐标轴配置
+   */
+  axis(field: string, axisOption: AxisOption): View;
+  axis(field: string | boolean, axisOption?: AxisOption): View {
+    if (isBoolean(field)) {
+      set(this.options, ['axis'], field);
+    } else {
+      set(this.options, ['axis', field], axisOption);
+    }
+    return this;
+  }
+
+  /**
+   * 对x y 度量进行配置。
+   * ```
+   * @param field 度量 x y
+   * @param scaleOption 度量配置
+   */
+  scale(field: string, axisOption: ScaleOption): Scale {
+    if (isBoolean(field)) {
+      set(this.options, ['scale'], field);
+    } else {
+      set(this.options, ['scale', field], axisOption);
+    }
+    return this.components.get('scale') as Scale;
+  }
+
+  setScale(field: 'x' | 'y', limits: { min?: number; max?: number }) {
+    const scale = this.components.get('scale') as Scale;
+    scale.setScale(field, limits);
+  }
+
+  /**
+   * 创建坐标系
+   * @private
+   */
+  private createCoordinate() {
+    this.coordinateInstance = new Coordinate(this);
+  }
+
+  /**
+   * 坐标系配置。
+   *
+   * ```ts
+   * // 直角坐标系，并进行转置变换
+   * chart.coordinate().transpose();
+   * ```
+   * @returns
+   */
+  coordinate(option?: CoordinateOption): Coordinate {
+    set(this.options, 'coordinate', option);
+    // 更新 coordinate 配置
+    // this.coordinateInstance.update(option);
+    return this.coordinateInstance;
+  }
+
+  getCoordinate() {
+    return this.coordinateInstance;
+  }
+
+  tooltip(tooltipOption: TooltipOption): View {
+    set(this.options, 'tooltip', tooltipOption);
+    return this;
+  }
+
+  /**
+   * 辅助标记配置
+   */
+  annotation(): Annotation {
+    return this.components.get('annotation') as Annotation;
+  }
+
+  // 命令式设置 option
+  setOption(name: string | string[], option: unknown) {
+    set(this.options, name, option);
+    // console.log(this.options)
+    return this;
+  }
+
+  redraw() {
+    this.emit(ChartEvent.HOOKS_REDRAW);
+  }
+
+  /**
+   * 生命周期：销毁，完全无法使用。
+   */
   destroy() {
-    // 销毁前事件
-    this.emit(VIEW_HOOKS.BEFORE_DESTROY);
+    // ...
+    this.chartContainer.innerHTML = '';
+    this.options = {};
+    this.reactivity.unsubscribe();
+    [...this.components.values()].forEach(c => c.destroy());
+    [...this.shapeComponents.values()].forEach(c => c.destroy());
+    this.strategyManage.getStrategy('uPlot')?.destroy();
+    this.unbindThemeListener();
+    this.off();
   }
+}
 
-  changeSize(size: ChartSize) {
-    this.chartSize = size;
-    this.chartEle.svg
-      .attr('width', size.width || '100%')
-      .attr('height', size.height || '100%');
-    this.flush(size);
-  }
-
-  data(data: ChartData[]) {
-    const res = this.handelData(data);
-    this.options.data = res;
-    this.emit(VIEW_HOOKS.SET_DATA, this.options.data);
-    const legend = this.getController('legend');
-    if (legend.disabledLegend.size) {
-      const data = this.handleLegendDisableData();
-      this.changeData(data);
-      return;
-    }
-    this.changeData(res);
-  }
-
-  changeData(data: ChartData[]) {
-    this.emit(VIEW_HOOKS.CHANGE_DATA, data);
-    this.chartData = data;
-    this.flush();
-  }
-
-  getTranslate() {
-    const {
-      margin: { left, top },
-    } = this.basics;
-    return `translate(${left}, ${top})`;
-  }
-
-  flush(size?: ChartSize) {
-    this.handleBasics();
-    this.computeSize(size || this.chartSize);
-    this.handleMainTransform();
-    // TODO: 先手动触发更新函数
-    const axis = this.getController('axis');
-    const legend = this.getController('legend');
-    const series = this.getController('series');
-    const tooltip = this.getController('tooltip');
-    const yPlotLine = this.getController('yPlotLine');
-    const xPlotLine = this.getController('xPlotLine');
-    const pie = this.getController('pie');
-
-    axis?.updateAxis();
-    legend?.updateLegend();
-    series?.updateSeries();
-    tooltip?.update();
-    yPlotLine?.update();
-    xPlotLine?.update();
-    pie?.update();
-  }
-
-  getController(name: 'scale'): Scale;
-
-  getController(name: 'title'): Title;
-
-  getController(name: 'legend'): Legend;
-
-  getController(name: 'series'): Series;
-
-  getController(name: 'axis'): Axis;
-
-  getController(name: 'tooltip'): Tooltip;
-
-  getController(name: 'zoom'): Zoom;
-
-  getController(name: 'yPlotLine'): YPlotLine;
-
-  getController(name: 'xPlotLine'): XPlotLine;
-
-  getController(name: 'pie'): Pie;
-
-  getController(name: string): Controller;
-
-  getController(name: string) {
-    return find(
-      [...this.uiControllers, ...this.serviceControllers],
-      (c: Controller) => c.name === name,
-    );
-  }
-
-  // TODO: 组件实例挂在到 Chart
-  // chart.yPlotLine(options)
-  updateYPlotLine = (value: TooltipContext) => {
-    const yPlotLine = this.getController('yPlotLine');
-    this.options.yPlotLine = {
-      ...this.options.yPlotLine,
-      value,
-    };
-    yPlotLine?.update(value);
+/**
+ * 注册 geometry 组件
+ * @param name
+ * @param Ctor
+ * @returns Geometry
+ */
+export function registerShape(name: string, Ctor: ShapeCtor) {
+  const key = name.toLowerCase() as ShapeType;
+  // 语法糖，在 view API 上增加原型方法
+  View.prototype[key] = function (options?: ShapeOptions) {
+    const shape = new Ctor(this, options);
+    this.shapeComponents.set(key, shape);
+    return shape as any;
   };
-
-  updateXPlotLine = (option: XPlotLineOptions) => {
-    const xPlotLine = this.getController('xPlotLine');
-    this.options.xPlotLine = {
-      ...this.options.xPlotLine,
-      ...option,
-    };
-    xPlotLine?.update(this.options.xPlotLine);
-  };
-
-  updateTitle = (option: TitleOption) => {
-    const title = this.getController('title');
-    this.options.title = {
-      ...this.options.xPlotLine,
-      ...option,
-    };
-    title?.update(this.options.title);
-  };
-
-  updatePie = (option: PieSeriesOption) => {
-    const pie = this.getController('pie');
-    const newSeries = mergeWith(
-      this.options.seriesOption,
-      option,
-    ) as PieSeriesOption;
-    this.options.seriesOption = newSeries;
-    pie?.update();
-  };
-
-  // 计算
-  private computeSize({ width, height }: ChartSize) {
-    const { margin, tickLabelWidth, main } = this.basics;
-    const mainW = width - margin.left - tickLabelWidth;
-    const headerH =
-      (this.options.legend.hide && this.options.title.hide) ||
-      !this.options.customHeader
-        ? main.top
-        : this.headerHeight + main.top;
-    this.size = {
-      chart: { width, height },
-      main: {
-        width: mainW,
-        height: height - headerH,
-      },
-      grid: {
-        width: mainW,
-        height:
-          height - margin.top - this.headerHeight - this.headerTotalHeight,
-      },
-    };
-  }
-
-  private createMain(svg: D3SvgSSelection) {
-    return svg.append('g').classed('chart-main', true);
-  }
-
-  private initComponentController() {
-    const components = this.context.getComponents();
-    for (let i = 0, len = components.length; i < len; i++) {
-      const Ctor = components[i];
-      const instance = this.buildController(Ctor, this);
-      if (typeof (instance as UIController).render === 'function') {
-        this.uiControllers.push(instance as UIController);
-      } else {
-        this.serviceControllers.push(instance);
-      }
-    }
-    [...this.uiControllers, ...this.serviceControllers].forEach(i => {
-      i.init();
-    });
-  }
-
-  private readonly widgets: Map<
-    ControllerCtor,
-    UIController | ServiceController
-  > = new Map();
-
-  private buildController(Ctor: ControllerCtor, ctx: View) {
-    if (!this.widgets.has(Ctor)) {
-      this.widgets.set(Ctor, new Ctor(ctx));
-    }
-    return this.widgets.get(Ctor)!;
-  }
-
-  private renderComponent() {
-    const components = this.uiControllers;
-    for (let i = 0, len = components.length; i < len; i++) {
-      const c = components[i];
-      c.render();
-    }
-  }
-
-  private handleMainTransform() {
-    this.chartEle?.main?.attr('transform', this.getTranslate());
-  }
-
-  private subscribeEvents() {
-    if (this.legendDisabled) {
-      return;
-    }
-    this.on(LEGEND_EVENTS.CLICK, () => {
-      const data = this.handleLegendDisableData();
-      this.changeData(data);
-    });
-
-    this.on(LEGEND_EVENTS.SELECT_ALL, () => {
-      this.changeData(this.options.data);
-    });
-    this.on(LEGEND_EVENTS.UNSELECT_ALL, () => {
-      this.changeData([]);
-    });
-  }
-
-  private handleLegendDisableData() {
-    const legend = this.getController('legend');
-    return this.options.data.reduce<ChartData[]>((prev, curr) => {
-      if (this.isBar) {
-        return [
-          ...prev,
-          {
-            ...curr,
-            values: curr.values.reduce<Array<Data<XData>>>(
-              (acc, value) =>
-                legend.disabledLegend.has(value.x as string)
-                  ? acc
-                  : [...acc, value],
-              [],
-            ),
-          },
-        ];
-      }
-      if (!legend.disabledLegend.has(curr.name)) {
-        return [...prev, curr];
-      }
-      return prev;
-    }, []);
-  }
-
-  private handleBasics() {
-    const { left, top } = basics.margin;
-    const { x = 0, y = 0 } = this.options.offset;
-    const scale = this.getController('scale');
-    const domain = this.isRotated
-      ? (scale?.xDomain as string[])
-      : scale?.yDomain;
-    const yLabel = this.getYLabel(
-      domain?.[1] || '',
-      this.options.yAxis?.tickFormatter,
-    );
-    const yLabelWidth = getTextWidth(yLabel) || 10;
-    const data = {
-      ...basics,
-      margin: { ...basics.margin, left: left + yLabelWidth + x, top: y + top },
-      main: { top: basics.main.top + (this.options?.grid?.top || 0) },
-    };
-    this.basics = this.noHeader
-      ? {
-          ...data,
-          margin: { ...data.margin, top: 0 },
-        }
-      : data;
-  }
-
-  getYLabel(
-    value: string | number,
-    tickFormatter?:
-      | string
-      | ((value?: any) => string | ((value: any) => string)),
-  ) {
-    const text = isNaN(+parseInt(value as string))
-      ? value
-      : parseInt(value as string);
-    if (tickFormatter) {
-      if (isFunction(tickFormatter)) {
-        const formatter = tickFormatter(text);
-        return isFunction(formatter) ? formatter(text) : formatter;
-      }
-      return template(tickFormatter, { text });
-    }
-    return text;
-  }
 }

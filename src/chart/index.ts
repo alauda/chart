@@ -1,78 +1,111 @@
-import { select as d3Select } from 'd3';
-
-import { D3EelSelection, D3Selection, Options } from '../types/index.js';
-import { getChartSize, getElement, resizeOn } from '../utils/index.js';
+import { ChartOption, Size } from '../types/index.js';
+import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
+// import { DEFAULT_INTERACTIONS } from '../utils/constant.js';
+import {
+  generateName,
+  getChartSize,
+  getElement,
+  resizeObserver,
+} from '../utils/index.js';
 
 import { View } from './view.js';
 
-export * from './view.js';
-
-function createSvg(el: D3Selection) {
-  return el
-    .append('svg')
-    .style('width', '100%')
-    .style('height', '100%')
-    .style('overflow', 'hidden')
-    .style('display', 'inline-block');
-}
-
-function parseConstructorOption(options: Options) {
-  const { container, width, height, customHeader } = options;
-  const ele = getElement(container);
-  const d3El = d3Select(ele);
-  let header: D3EelSelection;
-  d3El.attr('position', 'relative');
-
-  if (customHeader) {
-    header = d3El.append('div');
-    header.attr('class', 'ac-header');
-  }
-  const containerDom = d3El
-    .append('div')
-    .attr('class', 'ac-container')
-    .style('width', '100%')
-    .style('height', '100%');
-  const svg = createSvg(containerDom);
-  return {
-    ele: d3El as unknown as D3EelSelection,
-    container: containerDom,
-    header,
-    svg,
-    size: getChartSize(ele, width, height),
-    options,
-  };
-}
-
 export class Chart extends View {
-  ele: Element | HTMLElement;
-  container: Element | HTMLElement;
+  chartEle: HTMLElement;
+  ele: HTMLElement;
+  width: number;
+  height: number;
 
-  private resizeOn: () => void;
+  private sizeObserver: ResizeObserver;
 
-  constructor(options: Options) {
-    const opt = parseConstructorOption(options);
-    super(opt);
-    this.ele = getElement(options.container);
-    this.container = opt.container.node();
-    this.bindResize();
+  constructor(props: ChartOption) {
+    const {
+      container,
+      width,
+      autoFit = true,
+      height,
+      padding,
+      defaultInteractions = DEFAULT_INTERACTIONS,
+      options,
+      data,
+    } = props;
+    const chartEle: HTMLElement = getElement(container);
+    const header = document.createElement('div');
+    header.className = generateName('header');
+    chartEle.append(header);
+    const ele = document.createElement('div');
+    chartEle.append(ele);
+
+    if (autoFit) {
+      chartEle.style.width = '100%';
+      chartEle.style.height = '100%';
+      chartEle.style.justifyContent = 'space-between';
+    }
+    ele.style.position = 'relative';
+    ele.style.height = '100%';
+    chartEle.style.flexDirection = 'column';
+    chartEle.style.display = 'flex';
+    ele.style.flex = '1';
+    if (width) {
+      chartEle.style.width = `${width}px`;
+    }
+    if (height) {
+      chartEle.style.height = `${height}px`;
+    }
+    const size = getChartSize(ele, width, height);
+    const opts = {
+      chartEle,
+      ele,
+      ...size,
+      padding,
+      data,
+      options,
+      defaultInteractions,
+      chartOption: props,
+    };
+    super(opts);
+    this.chartEle = chartEle;
+    this.ele = ele;
+    this.width = size.width;
+    this.height = size.height;
+    this.bindAutoFit();
   }
 
+  /**
+   * 绑定自动伸缩视图
+   */
+  private bindAutoFit() {
+    this.sizeObserver = resizeObserver(this.chartEle, this.changeSize);
+  }
+
+  private unbindAutoFit() {
+    this.sizeObserver.disconnect();
+  }
+
+  /**
+   * 改变图表大小，重新渲染 （由 bbox内部处理）
+   * @param width
+   * @param height
+   * @returns Chart
+   */
+  changeSize = ({ width, height }: Size) => {
+    if (this.width === width && this.height === height) {
+      return;
+    }
+    const size = getChartSize(this.ele, width, height);
+    this.width = size.width;
+    this.height = size.height;
+    // 重新渲染
+    this.render(size);
+    return this;
+  };
+
+  /**
+   * 销毁图表
+   */
   override destroy() {
     super.destroy();
-    this.unbindResize();
+    this.unbindAutoFit();
+    this.ele = null;
   }
-
-  private bindResize() {
-    this.resizeOn = resizeOn(this.container, this.onResize);
-  }
-
-  private unbindResize() {
-    this.resizeOn();
-  }
-
-  private readonly onResize = (entry: ResizeObserverEntry) => {
-    const { width: w, height: h } = this.options;
-    const { width, height } = entry.contentRect;
-    this.changeSize(getChartSize(this.container, w || width, h || height));
-  };
 }

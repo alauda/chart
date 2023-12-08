@@ -1,299 +1,177 @@
-import { select, Selection } from 'd3';
-import { clone } from 'lodash';
+import { StyleSheet, css } from 'aphrodite/no-important.js';
+import { get, isBoolean, isObject } from 'lodash';
 
-import { UIController } from '../abstract/index.js';
-import { View } from '../chart/index.js';
-import { CLASS_NAME, LEGEND_EVENTS } from '../constant.js';
-import { D3Selection, Data, LegendOption } from '../types/index.js';
-import { getChartColor, template } from '../utils/index.js';
+import { ChartEvent, DIRECTION, LegendOption } from '../types/index.js';
+import { generateName } from '../utils/index.js';
+
+import { BaseComponent } from './base.js';
+import { Header } from './header.js';
+import { symbolStyle } from './styles.js';
+
+type PositionTop = 'top' | 'top-left' | 'top-right';
+type PositionBottom = 'bottom' | 'bottom-left' | 'bottom-right';
 
 export interface LegendItem {
   name: string;
-  activate: boolean;
   color: string;
+  activated: boolean;
 }
-const OPTIONS = {
-  x: 0,
-  y: 10,
-  margin: 12,
-  rectWidth: 16,
-  rectHeight: 2,
-  rectMargin: 4,
-  rx: 0,
-};
-export class Legend extends UIController<LegendOption> {
-  container!: D3Selection;
 
-  legendCt!: Selection<SVGGElement, LegendItem, any, any>;
+const styles = StyleSheet.create({
+  ul: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  item: {
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    ':not(:last-child)': {
+      marginRight: 12,
+    },
+  },
+  name: {
+    display: 'block',
+    whiteSpace: 'nowrap',
+  },
+  legend: {
+    display: 'flex',
+    marginTop: 8,
+  },
+  bottom: {
+    justifyContent: 'center',
+  },
+  'bottom-left': {
+    justifyContent: 'flex-start',
+  },
+  'bottom-right': {
+    justifyContent: 'flex-end',
+  },
+});
 
-  legendRectCt!: Selection<SVGRectElement, LegendItem, any, any>;
-
-  legendIconCt!: Selection<SVGRectElement, LegendItem, any, any>;
-
-  get name() {
+export class Legend extends BaseComponent<LegendOption> {
+  get name(): string {
     return 'legend';
   }
 
-  get isCircle() {
-    return ['pie', 'scatter'].includes(this.owner.options.type);
-  }
-
-  get isScatter() {
-    return this.owner.options.type === 'scatter';
-  }
-
-  get hasTpl() {
-    return (
-      typeof this.option.formatter === 'function' ||
-      this.owner.options.customHeader
-    );
-  }
-
-  get isMount() {
-    return this.option.isMount;
-  }
-
-  get innerOptions() {
-    const circle = {
-      rectWidth: 6,
-      rectHeight: 6,
-      rx: 6,
-    };
-    return {
-      ...OPTIONS,
-      ...(this.isCircle ? circle : {}),
-    };
-  }
-
-  disabledLegend: Set<string> = new Set();
-
-  legendItems: LegendItem[] = [];
-
-  constructor(owner: View) {
-    super(owner);
-    this.option = owner.options.legend || {};
-  }
-
-  init() {
-    if (!this.option.hide) {
-      const legendEl = this.hasTpl
-        ? (this.owner.chartEle.header || this.owner.chartEle.chart).append(
-            'div',
-          )
-        : this.owner.chartEle.svg.append('g');
-      this.container = legendEl;
-      this.owner.chartEle.legend = legendEl;
-    }
-  }
+  inactivatedSet = new Set<string>();
 
   render() {
-    if (this.owner.chartEle.legend) {
-      this.updateLegend();
-    }
-  }
-
-  destroy() {
-    this.container.remove();
-  }
-
-  reset() {
-    this.disabledLegend.clear();
-  }
-
-  updateLegend() {
-    this.setLegendItemsData();
-    if (this.container) {
-      const { offsetX, offsetY } = this.option;
-      const box = this.owner.chartEle.svg.node();
-      const width = box.clientWidth - this.owner.basics.padding.left || 0;
-      const x = width + (offsetX || 0);
-      const y = this.innerOptions.y + (offsetY || 0);
-      if (
-        !this.container.selectAll(`.${CLASS_NAME.legendItem}`).size() &&
-        !this.isMount
-      ) {
-        this.setLegendItem();
-      }
-      if (this.hasTpl) {
-        return this.container
-          .attr('class', CLASS_NAME.legend)
-          .attr(
-            'style',
-            `padding-top: ${offsetY || 0}px; padding-right: ${
-              this.owner.basics.margin.right + (offsetX || 0)
-            }px`,
-          );
-      }
-      this.container
-        .attr('class', CLASS_NAME.legend)
-        .attr('transform', `translate(${x}, ${y})`);
-    }
-  }
-
-  setLegendItem() {
-    if (this.hasTpl) {
-      if (typeof this.option.formatter === 'function') {
-        this.container.html(this.option.formatter(this.legendItems));
-      }
+    const opt = this.ctrl.getOption();
+    this.option = get(opt, this.name, {});
+    if (!this.container) {
+      this.create();
     } else {
-      this.createLegendItemDom();
+      this.update();
     }
-    this.bindEvent(this.legendCt);
   }
 
-  bindEvent(el: D3Selection) {
-    el?.on('click', (event: Event, data: LegendItem) => {
-      this.changeLegend(this.legendItems.find(d => data.name === d.name));
-      this.setTargetClass(event, CLASS_NAME.legendItemHidden);
-    });
+  update() {
+    this.option = get(this.ctrl.getOption(), this.name);
+    this.createItem();
   }
 
-  changeLegend(legend: LegendItem) {
-    const { name, activate } = legend;
-    if (activate) {
-      this.disabledLegend.add(name);
+  create() {
+    if (isObject(this.option) || this.option === true) {
+      const { position } = isBoolean(this.option)
+        ? { position: DIRECTION.TOP_RIGHT }
+        : this.option;
+      let dom: HTMLElement = this.ctrl.container;
+      this.container = document.createElement('div');
+      this.container.className = generateName('legend');
+      if (position?.includes('top') || !position) {
+        const header = new Header(
+          this.ctrl,
+          position?.includes('top')
+            ? (position as PositionTop)
+            : DIRECTION.TOP_RIGHT,
+        );
+        dom = header.container;
+        dom.append(this.container);
+        this.createItem();
+      } else {
+        this.ctrl.on(ChartEvent.U_PLOT_READY, () => {
+          dom.append(this.container);
+          this.container.className = `${generateName('legend')} ${css(
+            styles.legend,
+          )} ${css(styles[position as PositionBottom])}`;
+          this.createItem();
+        });
+      }
+    }
+  }
+
+  createItem() {
+    if (
+      (isObject(this.option) || this.option === true) &&
+      !get(this.option, 'custom')
+    ) {
+      this.container.innerHTML = '';
+      const ul = document.createElement('ul');
+      ul.className = css(styles.ul);
+      const data = this.getLegend();
+      for (const key of data.entries()) {
+        const li = document.createElement('li');
+        const value = key[1];
+        li.className = css(styles.item);
+        li.innerHTML = `
+        <span class="${css(symbolStyle.symbol)} ${css(
+          symbolStyle.line,
+        )}" style="background: ${value.color};"></span> 
+        <span class="${css(styles.name)}">${value.name}</span>`;
+        ul.append(li);
+        // TODO: 挪到 interaction 管理
+        li.addEventListener('click', () => {
+          const activated = li.style.opacity === '1' || !li.style.opacity;
+          li.style.opacity = activated ? '0.5' : '1';
+          value.activated = !activated;
+          this.legendItemClick({
+            name: value.name,
+            activated: !activated,
+          });
+        });
+        // li.addEventListener('mouseenter', e => {
+        //   console.log(e);
+        //   const item = this.container.querySelectorAll('li');
+        //   item.forEach(value => {
+        //     if (li !== value) {
+        //       value.style.opacity = '0.5';
+        //     }
+        //   });
+        // });
+
+        // li.addEventListener('mouseleave', () => {
+        //   const item = this.container.querySelectorAll('li');
+        //   item.forEach(value => {
+        //     value.style.opacity = '1';
+        //   });
+        // });
+      }
+      this.container.append(ul);
+    }
+  }
+
+  legendItemClick(props: { name: string; activated: boolean }) {
+    if (props.activated) {
+      this.inactivatedSet.delete(props.name);
     } else {
-      this.disabledLegend.delete(name);
+      this.inactivatedSet.add(props.name);
     }
-    this.setLegendItemsData();
-    this.owner.emit(LEGEND_EVENTS.CLICK, {
-      legend,
-      source: this.legendItems,
-    });
+    this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, props);
   }
 
-  legendSelectAll() {
-    this.disabledLegend.clear();
-    this.owner.emit(LEGEND_EVENTS.SELECT_ALL);
+  getLegend(): LegendItem[] {
+    const data = this.ctrl.getData();
+    return data
+      .map(({ name, color }) => ({
+        name,
+        color,
+        activated: !this.inactivatedSet.has(name),
+      }))
+      .filter(d => d.name);
   }
-
-  legendUnselectAll() {
-    const all = this.owner.options.data.map(d => d.name);
-    this.disabledLegend = new Set(all);
-    this.owner.emit(LEGEND_EVENTS.UNSELECT_ALL);
-  }
-
-  setLegendItemsData() {
-    let cloneData = this.hasTpl
-      ? this.owner.options.data
-      : clone(this.owner.options.data).reverse();
-    cloneData = cloneData.filter(d => d.name);
-    const values = cloneData.flatMap(item => item.values) as Array<
-      Data<{ x: string; color: string; name: string }>
-    >;
-    this.legendItems =
-      this.owner.options.type === 'bar'
-        ? values.reduce<Array<Data<LegendItem>>>(
-            (pre, cur) => [
-              ...pre,
-              ...(pre.some(d => d.name === cur.x)
-                ? []
-                : [
-                    {
-                      name: cur.x,
-                      color: cur.color || getChartColor(pre.length),
-                      activate: !this.disabledLegend.has(cur.x),
-                    },
-                  ]),
-            ],
-            [],
-          )
-        : cloneData.map(d => ({
-            name: d.name,
-            color: d.color || '',
-            activate: !this.disabledLegend.has(d.name),
-          }));
-  }
-
-  private setTargetClass(event: Event, className: string) {
-    const rect = this.getRectTarget(event);
-    const hide = rect.classed(className);
-    rect.classed(className, !hide);
-  }
-
-  private getRectTarget(event: Event) {
-    const target = event.target as SVGRectElement;
-    return select(target.parentNode as SVGRectElement);
-  }
-
-  private createLegendItemDom() {
-    this.legendCt = this.container
-      .selectAll(`.${CLASS_NAME.legend}`)
-      .data(this.legendItems)
-      .enter()
-      .append('g')
-      .attr('class', CLASS_NAME.legendItem)
-      .style('cursor', 'pointer');
-
-    this.legendRectCt = this.legendCt
-      .append('rect')
-      .attr('class', CLASS_NAME.legendItemEvent);
-
-    this.legendIconCt = this.legendCt
-      .append('rect')
-      .attr('class', CLASS_NAME.legendItemIcon)
-      .attr('width', this.innerOptions.rectWidth)
-      .attr('height', this.innerOptions.rectHeight)
-      .attr('rx', this.innerOptions.rx)
-      .attr('fill', d => d.color || '');
-
-    this.setPosition();
-  }
-
-  private setPosition() {
-    this.legendCt
-      .append('text')
-      .text(data => {
-        if (this.option.itemFormatter) {
-          if (typeof this.option.itemFormatter === 'function') {
-            return this.option.itemFormatter(data.name);
-          }
-          return template(this.option.itemFormatter, data);
-        }
-        return data.name;
-      })
-      .attr('x', (_, index, target) => -target[index].getBBox().width)
-      .attr('y', (_, index, target) => target[index].getBBox().height / 4);
-
-    this.legendIconCt
-      .attr('y', -(this.innerOptions.rectHeight / 2))
-      .attr(
-        'x',
-        (_, index, target) =>
-          -(getParentNode(index, target).width + this.innerOptions.rectMargin),
-      );
-
-    this.legendCt.attr('transform', (_, index, targets) => {
-      const width = targets[0].getBBox().width * (index - 1);
-      const x = index
-        ? targets[index - 1].getBBox().width +
-          width +
-          this.innerOptions.margin * index
-        : 0;
-      return `translate(${-x}, 0)`;
-    });
-
-    this.legendRectCt
-      .attr('width', (_, index, target) => getParentNode(index, target).width)
-      .attr(
-        'height',
-        (_, index, target) => getParentNode(index, target).height || 0,
-      )
-      .attr(
-        'y',
-        (_, index, target) => -(getParentNode(index, target).height / 3),
-      )
-      .attr(
-        'x',
-        (_, index, target) => -(getParentNode(index, target).width / 2),
-      )
-      .attr('opacity', 0);
-  }
-}
-
-function getParentNode(
-  index: number,
-  target: ArrayLike<SVGRectElement> | SVGRectElement[],
-) {
-  return (target[index].parentNode as SVGRectElement).getBBox();
 }

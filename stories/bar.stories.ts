@@ -1,51 +1,90 @@
 import { Story, Meta } from '@storybook/html';
 
-import { groupBarData } from './data';
+import { dealWithTime, generateData } from './utilt';
 
-import { Chart, ScaleType } from '@alauda/chart';
-
-import '../src/theme/default.scss';
+import { Chart } from '@alauda/chart';
+import 'uplot/dist/uPlot.min.css';
 
 export default {
   title: 'Bar',
 } as Meta;
 
-// More on component templates: https://storybook.js.org/docs/html/writing-stories/introduction#using-args
 const Template: Story = () => {
   setTimeout(() => {
-    Chart({
-      container: '#barChart',
-      type: 'bar',
-      // offset: {
-      //   x: 220,
-      //   y: 40,
-      // },
-      rotated: true,
-      title: {
-        text: '柱状图',
-      },
-      legend: {},
-      tooltip: {
-        trigger: 'axis',
-      },
-      seriesOption: {
-        isGroup: true,
-        stack: true,
-        radius: 5,
-        closeRadiusLadder: true,
-        bandwidth: 10,
-      },
-      data: groupBarData,
-      xAxis: {
-        type: ScaleType.ORDINAL,
-      },
-      yAxis: {
-        minStep: 2,
+    const chart = new Chart({
+      container: '.chart-bar',
+      data: [
+        // {
+        //   name: 'bar1',
+        //   values: [
+        //     { x: 'a', y: 2 },
+        //     { x: 'b', y: 4 },
+        //     { x: 'c', y: 1 },
+        //   ],
+        // },
+        // {
+        //   name: 'bar2',
+        //   values: [
+        //     { x: 'a', y: 4 },
+        //     { x: 'b', y: 2 },
+        //     { x: 'c', y: 1 },
+        //   ],
+        // },
+        // {
+        //   name: 'bar3',
+        //   values: [
+        //     { x: 'a', y: 1 },
+        //     { x: 'b', y: 1 },
+        //     { x: 'c', y: 1 },
+        //   ],
+        // },
+        { name: 'bar2', values: generateData('2023-01-31 09:00:00', 2, 2) },
+        { name: 'bar3', values: generateData('2023-01-31 09:00:00', 2, 2) },
+      ],
+      options: {
+        title: { text: 'bar chart' },
+        // legend: {
+        //   position: 'bottom-right',
+        // }
+        scale: {
+          x: {
+            time: false,
+          },
+        },
+        tooltip: {
+          // showTitle: false
+          titleFormatter: title =>
+            `${dealWithTime(new Date(Number(title) * 1000))}`,
+        },
+        coordinate: { transposed: true },
+        bar: {
+          adjust: { type: 'stack' },
+        },
       },
     });
-  }, 0);
+    // console.log(chart);
+    // chart.data(data);
+    // chart.coordinate().transpose();
+    chart.bar();
+    // chart.bar().adjust({ type: 'stack' });
+    // chart.shape('line', { name: 'bar2' });
+    chart.annotation().lineY({
+      data: 10,
+      text: {
+        content: 'line',
+      },
+    });
+    chart.render();
+  });
   return `
-  <div style="width: 100%; height: 220px" id="barChart"></div>`;
+  <div style="height: 200px">
+    <div class="chart-bar" style="width: 100%; height: 200px; "></div>
+  </div>
+  `;
 };
 
-export const bar = Template.bind({});
+export const Bar = Template.bind({});
+
+// 图表类型  line area bar
+// 大数据量
+// sliding 动态效果

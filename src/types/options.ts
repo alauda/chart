@@ -1,211 +1,224 @@
-import { CurveFactory } from 'd3';
+import uPlot, { Padding as UPadding } from 'uplot';
 
-import { View } from '../chart/index.js';
-import { LegendItem, AreaParams } from '../components/index.js';
+import { AdjustOption } from '../components/shape/bar.js';
+import { SizeCallback } from '../components/shape/point.js';
 
-import { Percentage } from './helpers.js';
-import { TooltipContext, TooltipContextItem } from './tooltip.js';
+import { TooltipValue } from './component.js';
 
-export enum ScaleType {
-  TIME = 'time',
-  LINEAR = 'linear',
-  ORDINAL = 'ordinal',
-}
+import { Theme } from './index.js';
 
-export type ChartType = 'area' | 'bar' | 'line' | 'pie' | 'scatter';
+// eslint-disable-next-line no-restricted-syntax
+export type Padding = UPadding;
 
-export type ChartSeriesOption =
-  | AreaSeriesOption
-  | BarSeriesOption
-  | LineSeriesOption
-  | PieSeriesOption
-  | ScatterOption;
-
-// 提供setOptions
-export interface Options {
+export interface ChartOption {
+  container: string | HTMLElement;
+  data?: Data;
+  autoFit?: boolean; // true
+  // 图表宽高度 不设置默认根据父容器高度自适应
   width?: number;
   height?: number;
-  offset?: { x?: number; y?: number };
-  grid?: { top?: number };
-  customHeader?: boolean;
-  container: HTMLElement | string;
-  type?: ChartType;
-  data?: ChartData[]; // 数据源
+  // 图表内边距 上 右 下 左  不包含 header
+  padding?: Padding; // [16,0,0,0]
+  // 默认交互 ['tooltip', 'legend-filter', 'legend-active']
+  defaultInteractions?: string[];
+  // 图表组件等相关的配置。同时支持配置式 和 声明式
+  options?: Options;
+  /** 主题 */
+  theme?: Theme; // default system
+}
+
+export interface ViewOption {
+  readonly ele: HTMLElement;
+  readonly chartEle: HTMLElement;
+  readonly chartOption: ChartOption;
+  width?: number;
+  height?: number;
+  padding?: Padding;
+  data?: Data;
+  options?: Options;
+  defaultInteractions: string[];
+  /** 主题 */
+  theme?: Theme; // default system
+}
+
+export interface Options {
+  readonly padding?: Padding;
+  readonly data?: Data;
+
   title?: TitleOption;
   legend?: LegendOption;
-  xAxis?: AxisOption;
-  yAxis?: AxisOption;
   tooltip?: TooltipOption;
-  rotated?: boolean; // x y 轴旋转
-  colors?: string[]; // 根据数组中循环展示颜色
-  seriesOption?: ChartSeriesOption;
-  zoom?: ZoomOption;
-  contextCallbackFunction?: (view: View) => void;
-  yPlotLine?: YPlotLineOptions;
-  xPlotLine?: XPlotLineOptions;
-}
-
-export interface XPlotLineOptions {
-  hide?: boolean;
-  value?: number;
-  text?: string;
-  color?: string;
-  dashType?: 'dash' | 'solid';
-}
-
-export interface YPlotLineOptions {
-  hide?: boolean;
-  value?: TooltipContext;
-  text?: string;
-  dashType?: 'dash' | 'solid';
-  textFormatter?: string | ((text: string) => string);
-}
-export interface ZoomOption {
-  enabled: boolean;
-
-  onzoomStart?(d: AreaParams): void;
-
-  onzoom?(d: AreaParams): void;
-
-  onzoomEnd?(d: AreaParams): void;
-}
-
-export interface TitleOption {
-  text?: string;
-  offsetX?: number;
-  offsetY?: number;
-  hide?: boolean;
-  formatter?: string | ((text: string) => string);
-}
-
-export interface LegendOption {
-  hide?: boolean;
-  // template: string => 'legend {name}'  fn => custom  插入 dom
-  formatter?: string | ((d: LegendItem[]) => string);
-  itemFormatter?: string | ((name: string) => string);
-  offsetX?: number;
-  offsetY?: number;
-  isMount?: boolean;
-  // textStyle?: {} // TODO
-  onClick?: () => void; // chart.on TODO
-}
-
-// <Function|string|undefined> undefined
-export interface AxisOption {
-  offsetX?: number;
-  offsetY?: number;
-  tickFormatter?: string | ((value?: any) => string | ((value: any) => string)); // 'xxx {value}'
-  type?: ScaleType;
-  min?: number;
-  max?: number;
-  minStep?: number; // axis 最小步宽，例如整数可以设置为 1
-  tickCount?: number; // 设置 坐标 tick 总数
-  ticks?: unknown; // 完全控制的d3.ticks，如果要传递多个参数，可以使用数组形式，参见 https://observablehq.com/@d3/axis-ticks?collection=@d3/d3-axis
-}
-
-export interface TooltipOption {
-  hideTitle?: boolean;
-  titleFormatter?: string | ((value: TooltipContext) => string);
-  itemFormatter?: (value: TooltipContextItem[]) => string;
-  nameFormatter?: string | ((value: TooltipContextItem) => string);
-  valueFormatter?: string | ((value: TooltipContextItem) => string); // 添加 行 formatter
-  sort?: (a: Data<XData>, b: Data<XData>) => number; // 支持 sort 函数
-  disabled?: boolean;
-  trigger?: 'axis' | 'item' | 'none';
-}
-
-export interface LineSeriesOption {
-  // https://d3js.org.cn/document/d3-shape/#curves
-  curveType?: CurveFactory; // export d3 curve 业务使用 curve
-  lineWidth?: number;
-  activeLineWidth?: number;
-}
-
-export interface AreaSeriesOption {
-  curveType?: CurveFactory;
-  lineWidth?: number;
-  activeLineWidth?: number;
-  startOpacity?: number;
-  endOpacity?: number;
-}
-
-export interface BarSeriesOption {
-  stack?: boolean;
-  rotated?: boolean; // x y 轴旋转
-  barWidth?: number;
-  padding?: number; // bar 相邻 padding
-  radius?: number; // 圆角
-  bandwidth?: number; // bar 宽度
-  closeRadiusLadder?: boolean; // 关闭叠加 bar 圆角是否阶阶梯优化
-  isGroup?: boolean; // 是否分组 [{name: 'xxx1'}, {name: 'xxx2'}]
-  columnClick?: (data: BarColumnParams) => void;
-  minHeight?: number; // 单个柱状的高度，如果 isGroup 为 true 时不生效
-}
-
-export interface BarColumnParams {
-  name: string | number | Date;
-  value: number;
-  color?: string;
-}
-
-export interface PieSeriesOption {
-  innerRadius?: number | Percentage;
-  outerRadius?: number | Percentage;
-  startAngle?: number;
-  endAngle?: number;
-  label?: {
-    text?: string;
-    position?: {
-      x?: string;
-      y?: string;
-    };
+  annotation?: AnnotationOption;
+  scale?: {
+    x?: ScaleOption;
+    y?: ScaleOption;
   };
-  // 指定总量
-  total?: number;
-  backgroundColor?: string;
-  itemStyle?: {
-    borderRadius?: number;
-    borderWidth?: number;
+  axis?: {
+    x?: AxisOption;
+    y?: AxisOption;
   };
-  innerDisc?: boolean;
+  coordinate?: CoordinateOption;
+  line?: LineShapeOption;
+  area?: AreaShapeOption;
+  bar?: BarShapeOption;
+  point?: PointShapeOption;
+  gauge?: GaugeShapeOption;
 }
 
-export interface ScatterOption {
-  size?: number; // 圆大小  默认 5
-  minSize?: number; // 默认 5
-  maxSize?: number; // 默认 20
-  type?: 'bubble'; // 设置 bubble 会默认使用 气泡样式渲染
-  opacity?: number; // bubble 透明度 默认 0.2
-}
+export type Data = DataItem[];
 
-export interface ChartData {
+export interface DataItem {
   name: string;
   color?: string;
   value?: number;
-  values?: Array<Data<XData>>;
+  // type-coverage:ignore-next-line
+  values?: Array<{ x: any; y: number; size?: number }>;
 }
 
-export type Data<T extends object = object> = T &
-  (
-    | {
-        value?: number;
-      }
-    | {
-        x: Date | number | string;
-        y: number;
-        color?: string;
-      }
-  );
-
-export interface XData {
-  x: Date | number | string;
-  y: number;
-  name?: string;
-  size?: number;
-  color?: string;
+export type TitleOption = TitleOpt | false;
+export interface TitleOpt {
+  custom?: boolean;
+  text?: string;
+  formatter?: string | ((text: string) => string);
 }
 
-export interface Point {
-  x: number;
-  y: number;
+export type LegendOption = LegendOpt | boolean;
+
+export type LegendPosition =
+  | 'top'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom'
+  | 'bottom-left'
+  | 'bottom-right';
+
+export interface LegendOpt {
+  custom?: boolean;
+  position?: LegendPosition;
+}
+
+export interface ScaleOption {
+  time?: boolean; // true
+  min?: number;
+  max?: number;
+}
+
+export type CoordinateOption = CoordinateOpt | boolean;
+
+export interface CoordinateOpt {
+  transposed?: boolean;
+}
+
+export type AxisOption = AxisOpt | boolean;
+export interface AxisOpt {
+  autoSize?: boolean; // 默认 true
+  formatter?: string | ((value: string | number) => string);
+}
+
+export type TooltipOption = TooltipOpt | boolean;
+export interface TooltipOpt {
+  showTitle?: boolean;
+  popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
+  titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
+  nameFormatter?: string | ((name: string) => string);
+  valueFormatter?: string | ((value: number) => string);
+  itemFormatter?: (value: TooltipValue[]) => string | TooltipValue[] | Element;
+  sort?: (a: TooltipValue, b: TooltipValue) => number;
+}
+
+export interface ShapeOption {
+  name?: string; // 指定 data name
+  connectNulls?: boolean; // 是否链接空值 默认 false
+  points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
+  width?: number; // 线宽
+  alpha?: number;
+  map?: string;
+}
+
+export interface LineShapeOption extends ShapeOption {
+  step?: 'start' | 'end';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AreaShapeOption extends ShapeOption {}
+
+export interface BarShapeOption extends ShapeOption {
+  adjust?: AdjustOption;
+}
+
+export interface PointShapeOption extends ShapeOption {
+  pointSize?: number;
+  sizeField?: string;
+  sizeCallback?: SizeCallback;
+}
+
+export interface PieShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  startAngle?: number; // 开始角度
+  endAngle?: number; // 结束角度
+  label?: {
+    text?: string | ((value: number, total?: number) => string);
+    description?: string | ((data: Data) => string);
+    position?: {
+      x?: number;
+      y?: number;
+    };
+  };
+  total?: number; // 指定总量
+  backgroundColor?: string;
+  itemStyle?: {
+    borderRadius?: number; //  item 圆角
+    borderWidth?: number; // item间隔宽度
+  };
+  innerDisc?: boolean; // 内阴影盘
+}
+
+export interface GaugeShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  max?: number; // 100
+  colors?: Array<[number, string]>; // 指定颜色 [数值, color]
+  label?: {
+    text?: string | ((data: Data, total?: number) => string);
+    description?: string | ((data: Data) => string);
+    position?: {
+      x?: number;
+      y?: number;
+    };
+  };
+  text?: {
+    show?: boolean; // true,
+    size?: number; // 12
+    color?: string | ((value: number) => string); // n-4
+  };
+}
+
+export type ShapeOptions =
+  | LineShapeOption
+  | AreaShapeOption
+  | BarShapeOption
+  | PointShapeOption;
+
+export interface AnnotationOption {
+  lineX?: AnnotationLineOption;
+  lineY?: AnnotationLineOption[];
+}
+
+export interface AnnotationLineOption {
+  data: string | number;
+  text?: {
+    position?: 'left' | 'right' | string; //
+    content: unknown;
+    style?: object;
+    border?: {
+      style?: string;
+      padding?: [number, number];
+    };
+  };
+  style?: {
+    stroke?: string;
+    width?: number;
+    lineDash?: [number, number];
+  };
 }

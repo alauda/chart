@@ -1,6 +1,6 @@
 {
   "name": "@alauda/chart",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "type": "module",
   "description": "Alauda Chart components by Alauda Frontend Team",
   "repository": "git+https://github.com/alauda/chart.git",
@@ -23,8 +23,7 @@
       "fesm2015": "./lib/index.es2015.mjs",
       "import": "./lib/index.js",
       "require": "./lib.index.cjs"
-    },
-    "./default.css": "./lib/default.css"
+    }
   },
   "fesm2020": "lib/index.es2020.mjs",
   "fesm2015": "lib/index.es2015.mjs",
@@ -41,7 +40,6 @@
   "scripts": {
     "build": "run-p build:*",
     "build:r": "r -f cjs,es2015,es2020",
-    "build:sass": "sass src/theme/default.scss ./lib/default.css",
     "build:tsc": "tsc -p src",
     "clean": "rimraf .type-coverage dist lib '.*cache' '*.tsbuildinfo'",
     "dev": "start-storybook",
@@ -65,6 +63,12 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "aphrodite": "^2.4.0",
+    "on-change": "^4.0.2",
+    "placement.js": "^1.0.0-beta.5",
+    "uplot": "^1.6.26"
+  },
   "devDependencies": {
     "@1stg/app-config": "^6.1.4",
     "@1stg/lib-config": "^9.0.1",
@@ -86,6 +90,7 @@
     "resolve-typescript-plugin": "^1.2.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
+    "storybook-dark-mode": "^2.0.5",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "type-coverage": "^2.22.0",
     "typed-query-selector": "^2.6.1",
@@ -98,7 +103,7 @@
     "webpack": "^5.73.0"
   },
   "typeCoverage": {
-    "atLeast": 99.83,
+    "atLeast": 100,
     "cache": true,
     "detail": true,
     "ignoreAsAssertion": true,
@@ -106,6 +111,12 @@
     "ignoreNonNullAssertion": true,
     "showRelativePath": true,
     "strict": true,
-    "update": true
+    "update": true,
+    "ignoreFiles": [
+      "src/components/**",
+      "src/interaction/**",
+      "src/strategy/**",
+      "stories/**"
+    ]
   }
 }
