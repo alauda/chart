@@ -14,6 +14,7 @@ type PositionBottom = 'bottom' | 'bottom-left' | 'bottom-right';
 export interface LegendItem {
   name: string;
   color: string;
+  activated: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -22,6 +23,7 @@ const styles = StyleSheet.create({
     padding: 0,
     margin: 0,
     display: 'flex',
+    flexWrap: 'wrap',
   },
   item: {
     padding: 0,
@@ -33,11 +35,8 @@ const styles = StyleSheet.create({
     },
   },
   name: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
     display: 'block',
-    maxWidth: '120px',
-    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   legend: {
     display: 'flex',
@@ -115,8 +114,7 @@ export class Legend extends BaseComponent<LegendOption> {
       const ul = document.createElement('ul');
       ul.className = css(styles.ul);
       const data = this.getLegend();
-
-      for (const [index, key] of data.entries()) {
+      for (const [_index, key] of data.entries()) {
         const li = document.createElement('li');
         const value = key;
         li.className = css(styles.item);
@@ -128,12 +126,12 @@ export class Legend extends BaseComponent<LegendOption> {
         ul.append(li);
         // TODO: 挪到 interaction 管理
         li.addEventListener('click', () => {
-          const isActive = li.style.opacity === '1' || !li.style.opacity;
-          li.style.opacity = isActive ? '0.5' : '1';
+          const activated = li.style.opacity === '1' || !li.style.opacity;
+          li.style.opacity = activated ? '0.5' : '1';
+          key.activated = !activated;
           this.legendItemClick({
-            index: Number(index),
-            data: value,
-            isActive,
+            name: value.name,
+            activated: !activated,
           });
         });
         // li.addEventListener('mouseenter', e => {
@@ -157,16 +155,11 @@ export class Legend extends BaseComponent<LegendOption> {
     }
   }
 
-  legendItemClick(props: {
-    index: number;
-    data: { name: string; color?: string };
-    isActive: boolean;
-  }) {
-    const currentStatus = !props.isActive;
-    if (currentStatus) {
-      this.inactivatedSet.delete(props.data.name);
+  legendItemClick(props: { name: string; activated: boolean }) {
+    if (props.activated) {
+      this.inactivatedSet.delete(props.name);
     } else {
-      this.inactivatedSet.add(props.data.name);
+      this.inactivatedSet.add(props.name);
     }
     this.ctrl.emit(ChartEvent.LEGEND_ITEM_CLICK, props);
   }
@@ -177,6 +170,7 @@ export class Legend extends BaseComponent<LegendOption> {
       .map(({ name, color }) => ({
         name,
         color,
+        activated: !this.inactivatedSet.has(name),
       }))
       .filter(d => d.name);
   }

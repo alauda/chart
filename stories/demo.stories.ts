@@ -2,9 +2,9 @@ import addons from '@storybook/addons';
 import { Story, Meta } from '@storybook/html';
 import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
-import { dealWithTime, generateTime, generateY,  } from './utilt';
+import { dealWithTime, generateTime, generateY } from './utilt';
 
-import { ActionType, Chart, ChartEvent, } from '@alauda/chart';
+import { ActionType, Chart, ChartEvent } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
@@ -27,13 +27,14 @@ const Template: Story = () => {
     const step = 720;
     const start = '2023-01-31 09:00:00';
     const range1: [number, number] = [0, 100];
-    const range2: [number, number] = [0, 100];
+    // const range2: [number, number] = [0, 100];
     const timeData = generateTime(start, total, step);
     let yData1 = generateY(total, range1);
     // let yData2 = generateY(total, range2);
 
-    const d1 = timeData.map((x, i) => ({ x, y: yData1[i]  }));
+    const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
     // const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
+    console.log(JSON.stringify(d1));
     const data = [
       {
         name: 'area1',
@@ -57,20 +58,15 @@ const Template: Story = () => {
           //   position: 'bottom-right',
           // }
           axis: {
-            x: {
-            
-            },
+            x: {},
             // y: {
             //   autoSize: true,
             //   formatter: `{value}%1`,
             // },
           },
           scale: {
-            x: {
-            },
-            y: {
-       
-            },
+            x: {},
+            y: {},
           },
           annotation: {
             // lineX: {
@@ -95,7 +91,7 @@ const Template: Story = () => {
     initChart();
     function initChart() {
       chart = new Chart(getOp('.chart-area', data));
-      chart.line();
+      chart.point();
       chart.render();
       chart.on(ChartEvent.PLOT_CLICK, () => {});
     }
@@ -108,12 +104,14 @@ const Template: Story = () => {
     init.addEventListener('click', () => {
       initChart();
     });
+    let l = true;
     change.addEventListener('click', () => {
       const timeData = generateTime('2023-01-01 09:00:00', 200, 120);
       // let yData1 = generateY(200, range1);
-      let yData2 = generateY(200, range2);
+      // let yData2 = generateY(200, range2);
       // const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
-      const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
+      l = !l;
+      const d2 = timeData.map((x, i) => ({ x, y: l ? null : yData1[i] }));
       const data = [
         {
           name: 'area11',
@@ -140,7 +138,7 @@ const Template: Story = () => {
           },
         ],
       });
-    })
+    });
   });
 
   return `

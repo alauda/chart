@@ -1,7 +1,7 @@
+
 export interface LegendItemActive {
-  index: number;
-  data: { name: string; color: string };
-  isActive: boolean;
+  name: string;
+  activated: boolean;
 }
 
 interface Coordinates {
@@ -11,10 +11,25 @@ interface Coordinates {
   right?: number;
 }
 
+export type Placement =
+  | 'top'
+  | 'top-start'
+  | 'top-end'
+  | 'bottom'
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'right'
+  | 'right-start'
+  | 'right-end'
+  | 'left'
+  | 'left-start'
+  | 'left-end';
+
 export interface TooltipItemActive {
   anchor: Element | Range | Coordinates;
   bound: Element | Range | Coordinates;
   title: string;
+  position?: Placement;
   values: TooltipValue[];
 }
 

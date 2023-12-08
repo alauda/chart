@@ -90,6 +90,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         const overlay = document.createElement('div');
         overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
         (popupContainer || document.body).append(overlay);
+        overlay.style.visibility = 'hidden';
         this.container = overlay;
       }
       this.createItem();
@@ -104,6 +105,9 @@ export class Tooltip extends BaseComponent<TooltipOption> {
    */
   private createItem(title?: string, values?: TooltipValue[]) {
     const itemTpl = this.getTooltipItem(values);
+    if (!itemTpl) {
+      return;
+    }
     const isEl = isElement(itemTpl);
     const list = `<ul class="${css(styles['tooltip-list'])}">${itemTpl}</ul>`;
     this.container.innerHTML = `
@@ -118,7 +122,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
 
   private getTooltipTitle(title: string, values: TooltipValue[]) {
     const { showTitle, titleFormatter } = this.option as TooltipOpt;
-    if (String(showTitle) === 'false') {
+    if (String(showTitle) === 'false' || !title) {
       return '';
     }
     let tpl: string = title || NOT_AVAILABLE;
@@ -188,13 +192,13 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     return value;
   }
 
-  public showTooltip = () => {
+  showTooltip = () => {
     this.container.style.visibility = 'visible';
     this.container.style.background = this.ctrl.getTheme().tooltip.background;
     this.container.style.color = this.ctrl.getTheme().tooltip.color;
   };
 
-  public hideTooltip = () => {
+  hideTooltip = () => {
     if (this.container) {
       this.container.style.visibility = 'hidden';
     }
@@ -207,13 +211,14 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     // TODO: 是否纳管到 interaction
     this.ctrl.on(
       ChartEvent.U_PLOT_SET_CURSOR,
-      ({ anchor, title, values }: TooltipItemActive) => {
-        // console.log(anchor)
-        // @ts-ignore
-        placement(anchor, this.container, {
-          placement: 'right',
-        });
-        this.createItem(title, values);
+      ({ anchor, title, values, position }: TooltipItemActive) => {
+        if(title && values?.length) {
+          // @ts-ignore
+          placement(anchor, this.container, {
+            placement: position || 'right',
+          });
+          this.createItem(title, values);
+        }
       },
     );
   }

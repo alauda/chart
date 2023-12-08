@@ -29,12 +29,17 @@ view.getTheme();
 view.getOption();
 
 // 设置组件配置 详细查看各组件配置文档
-view.title(option);
-view.legend(option);
-view.tooltip(option);
-view.axis('x', option);
-view.shape('line', option);
-view.annotation(option);
+view.title(option); // 标题
+view.legend(option); // 图例
+view.axis('x', option); // 坐标系
+view.scale('x', options); // 度量
+view.shape('line', option); // 设置图形
+view.annotation(option); // 标注
+view.coordinate(option); // 坐标系
+view.tooltip(options); // 工具提示
+view.theme(theme); // 设置主题
+view.redraw(); // 重绘
+view.destroy(); // 销毁图表
 ```
 
 ## Option
@@ -42,7 +47,7 @@ view.annotation(option);
 > view 参数配置
 
 ```ts
-export interface ViewOption {
+export interface ViewOption { // chart option 类似
   readonly ele: HTMLElement; // 容器元素
   width?: number;
   height?: number;
@@ -52,8 +57,8 @@ export interface ViewOption {
 }
 
 export interface Options {
-  title?: TitleOption; //
-  // ... component 待补充完整
+  title?: TitleOption;
+  // ... component
 }
 ```
 
@@ -64,88 +69,3 @@ export interface Options {
 > uPlot：由第三方库 uPlot 渲染，支持有坐标轴的图表 line area point bar 等
 > internal： 内部实现图表，例如 pie gauge
 > 支持增加新策略，例如使用第三方画其他类型图表
-
-### View Strategy Manager
-
-> view 策略管理
-> 策略： internal uPlot
-
-```ts
-export class ViewStrategyManager {
-  strategy = new Map<string, ViewStrategy>();
-  // 添加策略
-  add(strategy: ViewStrategy) {}
-  // 根据名称获取策略
-  getStrategy(name: string) {}
-  // 获取所有策略实例
-  getAllStrategy() {}
-  // 获取所有策略下的组件
-  getComponent() {}
-}
-```
-
-#### View Strategy
-
-> 视图策略：类似子 view
-> 负责：根据当前策略 组件初始化、适配 option (转换: 数据、主题、配置)、渲染等
-
-```ts
-/**
- * view strategy 视图策略抽象类
- * 规范 strategy 的实现
- */
-export abstract class ViewStrategy {
-  // 当前策略名称
-  public abstract get name(): string;
-
-  // 当前策略需要的组件
-  public abstract get component(): string[];
-
-  // 存储当前策略下实力化的组件
-  public components: BaseComponent[] = [];
-
-  // 初始化
-  public abstract init(): void;
-
-  // 渲染函数
-  public abstract render(): void;
-
-  // 全局配置的组件
-  readonly usedComponent: string[] = getComponentNames();
-
-  readonly ctrl: View;
-
-  constructor(view: View) {
-    this.ctrl = view;
-    this.initComponent();
-    this.init();
-  }
-
-  /**
-   * 根据当前策略初始化组件
-   */
-  initComponent() {}
-
-  public destroy() {}
-}
-```
-
-### Strategy 使用方式
-
-> view 中初始化策略
-
-```ts
-private initViewStrategy() {
-  this.strategyManage = new ViewStrategyManager();
-
-  const uPlot = new UPlotViewStrategy(this);
-
-  const internal = new InternalViewStrategy(this);
-
-  this.strategyManage.add(uPlot);
-
-  this.strategyManage.add(internal);
-
-  this.strategy = this.strategyManage.getAllStrategy();
-}
-```

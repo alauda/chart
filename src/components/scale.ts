@@ -48,7 +48,7 @@ export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
     if (!this.option.x) {
       return {};
     }
-    const { max, min } = (this.option.x || {}) as ScaleOption;
+    const { max, min } = this.option.x || {};
     const maxV = isNumber(max) ? { max } : {};
     const minV = isNumber(min) ? { min } : {};
     return {
@@ -58,12 +58,7 @@ export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
   }
 
   private getYOptions() {
-    if (!this.option.y) {
-      return {
-        auto: true,
-      };
-    }
-    const { max, min } = (this.option.y || {}) as ScaleOption;
+    const { max, min } = this.option.y || {};
     const notAuto = !isNumber(max) && !isNumber(min);
     return {
       auto: notAuto,
@@ -71,8 +66,8 @@ export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
         const minV = min
           ? Math.max(dataMin, min || 0)
           : Math.min(dataMin, min || 0);
-        const maxV = Math.max(dataMax ? dataMax + 5 : dataMax, max || 1);
-        return [minV, maxV];
+        const maxV = Math.max(dataMax, max || 1);
+        return [minV, maxV > 1 ? maxV + 1 : maxV];
       },
     };
   }

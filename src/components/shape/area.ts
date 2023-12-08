@@ -16,17 +16,11 @@ export default class Area extends Shape<Area> {
 
   getSeries() {
     const baseSeries = this.getBaseSeries();
-    const { width, alpha } = this.option;
-    const defaultOpt = {
-      width: width ?? 1.5,
-      alpha: alpha ?? 1,
-    };
     return this.getData().map(({ color, name }) => {
       return {
-        ...defaultOpt,
         stroke: color,
         label: name,
-        ...getSeriesPathType(this.type, color),
+        ...getSeriesPathType(this.type, color, this.option),
         ...baseSeries,
       };
     });

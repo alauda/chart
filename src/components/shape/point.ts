@@ -91,13 +91,17 @@ export default class Point extends Shape<Point> {
                 const chartData = this.ctrl.getData();
                 const data = chartData[seriesIdx - 1].values;
                 return data.map(d => {
-                  const field: number = get(d, this.sizeField) || this.pointSize;
+                  const field: number =
+                    get(d, this.sizeField) || this.pointSize;
                   const [min, max] = this.sizeRange;
                   let value = field;
                   if (field < min) {
                     value = min;
                   } else if (field > max) {
                     value = max;
+                  }
+                  if (d.y === null) {
+                    return 0;
                   }
                   return this.sizeCallback ? this.sizeCallback(value) : value;
                 });

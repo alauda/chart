@@ -1,4 +1,4 @@
-import uPlot, { Padding } from 'uplot';
+import uPlot, { Padding as UPadding } from 'uplot';
 
 import { AdjustOption } from '../components/shape/bar.js';
 import { SizeCallback } from '../components/shape/point.js';
@@ -6,6 +6,9 @@ import { SizeCallback } from '../components/shape/point.js';
 import { TooltipValue } from './component.js';
 
 import { Theme } from './index.js';
+
+// eslint-disable-next-line no-restricted-syntax
+export type Padding = UPadding;
 
 export interface ChartOption {
   container: string | HTMLElement;
@@ -39,8 +42,9 @@ export interface ViewOption {
 }
 
 export interface Options {
-  padding?: Padding;
-  data?: Data;
+  readonly padding?: Padding;
+  readonly data?: Data;
+
   title?: TitleOption;
   legend?: LegendOption;
   tooltip?: TooltipOption;
@@ -58,6 +62,7 @@ export interface Options {
   area?: AreaShapeOption;
   bar?: BarShapeOption;
   point?: PointShapeOption;
+  gauge?: GaugeShapeOption;
 }
 
 export type Data = DataItem[];
@@ -65,8 +70,9 @@ export type Data = DataItem[];
 export interface DataItem {
   name: string;
   color?: string;
+  value?: number;
   // type-coverage:ignore-next-line
-  values: Array<{ x: any; y: number; size?: number }>;
+  values?: Array<{ x: any; y: number; size?: number }>;
 }
 
 export type TitleOption = TitleOpt | false;
@@ -115,17 +121,16 @@ export interface TooltipOpt {
   popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
   titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
   nameFormatter?: string | ((name: string) => string);
-  valueFormatter?: string | ((value: TooltipValue) => string);
+  valueFormatter?: string | ((value: number) => string);
   itemFormatter?: (value: TooltipValue[]) => string | TooltipValue[] | Element;
   sort?: (a: TooltipValue, b: TooltipValue) => number;
 }
 
 export interface ShapeOption {
   name?: string; // 指定 data name
-  color?: string;
   connectNulls?: boolean; // 是否链接空值 默认 false
   points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
-  width?: number;
+  width?: number; // 线宽
   alpha?: number;
   map?: string;
 }
@@ -134,18 +139,59 @@ export interface LineShapeOption extends ShapeOption {
   step?: 'start' | 'end';
 }
 
-export interface AreaShapeOption extends ShapeOption {
-  map?: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AreaShapeOption extends ShapeOption {}
 
 export interface BarShapeOption extends ShapeOption {
-  adjustOpt?: AdjustOption;
+  adjust?: AdjustOption;
 }
 
 export interface PointShapeOption extends ShapeOption {
   pointSize?: number;
   sizeField?: string;
   sizeCallback?: SizeCallback;
+}
+
+export interface PieShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  startAngle?: number; // 开始角度
+  endAngle?: number; // 结束角度
+  label?: {
+    text?: string | ((value: number, total?: number) => string);
+    description?: string | ((data: Data) => string);
+    position?: {
+      x?: number;
+      y?: number;
+    };
+  };
+  total?: number; // 指定总量
+  backgroundColor?: string;
+  itemStyle?: {
+    borderRadius?: number; //  item 圆角
+    borderWidth?: number; // item间隔宽度
+  };
+  innerDisc?: boolean; // 内阴影盘
+}
+
+export interface GaugeShapeOption {
+  innerRadius?: number; // 内半径 0 - 1
+  outerRadius?: number; // 外半径
+  max?: number; // 100
+  colors?: Array<[number, string]>; // 指定颜色 [数值, color]
+  label?: {
+    text?: string | ((data: Data, total?: number) => string);
+    description?: string | ((data: Data) => string);
+    position?: {
+      x?: number;
+      y?: number;
+    };
+  };
+  text?: {
+    show?: boolean; // true,
+    size?: number; // 12
+    color?: string | ((value: number) => string); // n-4
+  };
 }
 
 export type ShapeOptions =
@@ -156,7 +202,7 @@ export type ShapeOptions =
 
 export interface AnnotationOption {
   lineX?: AnnotationLineOption;
-  lineY?: AnnotationLineOption;
+  lineY?: AnnotationLineOption[];
 }
 
 export interface AnnotationLineOption {

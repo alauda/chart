@@ -54,7 +54,7 @@ export class Dep {
     // console.log(path, value, previousValue, applyData);
     const names = path.split('.');
     this.syncConfig(names, value, previousValue);
-    this.update(names, value, previousValue);
+    this.update(names, value);
   }
 
   /**
@@ -70,8 +70,7 @@ export class Dep {
     this.ctrl.setOption(str === 'options' ? name : names, option);
   }
 
-  private update(names: string[], value: unknown, prevValue: unknown) {
-    console.log(names, value, prevValue);
+  private update(names: string[], value: unknown) {
     if (names.includes('data') && names.length === 1) {
       this.ctrl.data(value as Data);
     }

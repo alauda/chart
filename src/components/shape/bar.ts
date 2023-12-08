@@ -5,6 +5,8 @@ import { ShapeType } from '../../utils/index.js';
 import { seriesBarsPlugin, stack } from '../uplot-lib/index.js';
 
 import { Shape } from './index.js';
+import { BarShapeOption, ShapeOptions } from '../../types/options.js';
+import { View } from '../../chart/view.js';
 
 export type AdjustType = 'stack' | 'group';
 export interface AdjustOption {
@@ -18,14 +20,12 @@ export interface AdjustOption {
 export default class Bar extends Shape<Bar> {
   override type = ShapeType.Bar;
 
-  adjustType: AdjustType = 'group';
-
   private get transposed() {
     return this.ctrl.getCoordinate().isTransposed;
   }
 
   private adjustOption: AdjustOption = {
-    type: this.adjustType,
+    type: 'group',
     marginRatio: 0.2,
   };
 
@@ -33,22 +33,28 @@ export default class Bar extends Shape<Bar> {
     return this.ctrl.strategyManage.getStrategy('uPlot') as UPlotViewStrategy;
   }
 
-  private get isStack() {
-    return this.adjustType === 'stack';
+  constructor(ctrl: View, opt: ShapeOptions = {}) {
+    super(ctrl, opt);
+    const option: BarShapeOption = get(this.ctrl.getOption(), this.type);
+    if (typeof option === 'object') {
+      this.option = option;
+      this.adjustOption = {
+        ...this.adjustOption,
+        ...option.adjust,
+      };
+    }
   }
 
-  map(name: string) {
+  map(name: string): this {
     this.mapName = name;
     return this;
   }
 
   adjust(adjustOpt: AdjustType | AdjustOption) {
     if (typeof adjustOpt === 'string') {
-      this.adjustType = adjustOpt;
+      this.adjustOption.type = adjustOpt;
     }
     if (typeof adjustOpt === 'object') {
-      const { type = 'group' } = adjustOpt || {};
-      this.adjustType = type;
       this.adjustOption = adjustOpt;
     }
   }
@@ -61,14 +67,15 @@ export default class Bar extends Shape<Bar> {
         points: {
           show: false,
         },
-        ...getSeriesPathType(this.type, color),
+        ...getSeriesPathType(this.type, color, this.option),
       };
     });
   }
 
   override getOptions() {
     const data = this.strategy.getData();
-    const stackOpt = this.isStack ? stack(data) : {};
+    const isStack = this.adjustOption.type === 'stack';
+    const stackOpt = isStack ? stack(data) : {};
     return {
       ...stackOpt,
       plugins: [
@@ -76,7 +83,7 @@ export default class Bar extends Shape<Bar> {
           time: !!get(this.ctrl.getOption()?.scale?.x, 'time'),
           ori: this.transposed ? 1 : 0,
           dir: this.transposed ? -1 : 1,
-          stacked: this.isStack,
+          stacked: isStack,
           marginRatio: this.adjustOption.marginRatio / 10,
         }),
       ],

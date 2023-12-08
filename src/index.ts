@@ -6,7 +6,9 @@ import { Legend } from './components/legend.js';
 import { Scale } from './components/scale.js';
 import Area from './components/shape/area.js';
 import Bar from './components/shape/bar.js';
+import Gauge from './components/shape/gauge.js';
 import Line from './components/shape/line.js';
+import Pie from './components/shape/pie.js';
 import Point from './components/shape/point.js';
 import { Title } from './components/title.js';
 import { Tooltip } from './components/tooltip.js';
@@ -21,7 +23,9 @@ import { ActionType, ChartEvent } from './types/index.js';
 import {
   AreaShapeOption,
   BarShapeOption,
+  GaugeShapeOption,
   LineShapeOption,
+  PieShapeOption,
   PointShapeOption,
 } from './types/options.js';
 
@@ -42,7 +46,6 @@ registerComponent('scale', Scale);
 
 registerComponent('annotation', Annotation);
 
-
 // 注册黑暗主题
 registerTheme('dark', Dark());
 
@@ -61,6 +64,10 @@ declare module './chart/view.js' {
     bar(option?: BarShapeOption): Bar;
 
     point(option?: PointShapeOption): Point;
+
+    pie(option?: PieShapeOption): Pie;
+
+    gauge(option?: GaugeShapeOption): Pie;
   }
 }
 
@@ -73,6 +80,10 @@ registerShape('point', Point);
 
 registerShape('Bar', Bar);
 
+registerShape('Pie', Pie);
+
+registerShape('Gauge', Gauge);
+
 // register interaction action
 registerAction('tooltip', TooltipAction);
 
@@ -81,7 +92,6 @@ registerAction('element-active', ElementAction);
 registerAction('legend', LegendToggle);
 
 registerAction('brush-x', BrushXAction);
-
 
 // register interaction
 registerInteraction('tooltip', {
@@ -102,23 +112,26 @@ registerInteraction('legend-active', {
   // ],
 });
 
-
 registerInteraction('brush-x', {
   start: [
     { trigger: ChartEvent.PLOT_MOUSEDOWN, action: ActionType.BRUSH_X_START },
   ],
-  end: [
-    { trigger: ChartEvent.PLOT_MOUSEUP, action: ActionType.BRUSH_X_END },
-  ],
+  end: [{ trigger: ChartEvent.PLOT_MOUSEUP, action: ActionType.BRUSH_X_END }],
 });
 
-// registerInteraction('element-active', {
-//   start: [
-//     { trigger: ChartEvent.ELEMENT_MOUSEMOVE, action: ActionType.ELEMENT_ACTIVE },
-//   ],
-//   end: [
-//     { trigger: ChartEvent.ELEMENT_MOUSELEAVE, action: ActionType.ELEMENT_RESET },
-//   ],
-// });
+registerInteraction('element-active', {
+  start: [
+    {
+      trigger: ChartEvent.ELEMENT_MOUSEMOVE,
+      action: ActionType.ELEMENT_ACTIVE,
+    },
+  ],
+  end: [
+    {
+      trigger: ChartEvent.ELEMENT_MOUSELEAVE,
+      action: ActionType.ELEMENT_RESET,
+    },
+  ],
+});
 
 export * from './components/index.js';

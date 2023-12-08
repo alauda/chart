@@ -10,3 +10,11 @@ export const ShapeType = {
 export type ShapeType = ValueOf<typeof ShapeType>;
 
 export const SHAPE_TYPES = Object.values(ShapeType);
+
+export const PolarShapeType = {
+  Pie: 'pie',
+  Gauge: 'gauge',
+}
+export type PolarShapeType = ValueOf<typeof PolarShapeType>;
+
+export const POLAR_SHAPE_TYPES = Object.values(PolarShapeType);

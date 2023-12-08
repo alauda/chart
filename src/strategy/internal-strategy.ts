@@ -1,3 +1,4 @@
+import { PolarShape } from '../components/shape/index.js';
 import { ViewStrategy } from './abstract.js';
 
 /**
@@ -13,11 +14,12 @@ export class InternalViewStrategy extends ViewStrategy {
     return ['title', 'legend', 'pie', 'gauge'];
   }
 
-  init() {
-    // ..
-  }
+  init() {}
 
   render() {
-    // ..
+    this.component.forEach(c => {
+      const comp = this.ctrl.shapeComponents.get(c) as PolarShape;
+      comp && comp.render();
+    });
   }
 }
