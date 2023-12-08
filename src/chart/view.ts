@@ -83,6 +83,11 @@ export class View extends EventEmitter {
     return this.options.tooltip === false;
   }
 
+  fixedSize = {
+    width: 0,
+    height: 0,
+  };
+
   constructor(props: ViewOption) {
     super();
     const {
@@ -106,6 +111,10 @@ export class View extends EventEmitter {
     data && this.data(data);
     this.defaultInteractions = defaultInteractions;
     this.size = { ...this.size, width, height };
+    this.fixedSize = {
+      width,
+      height,
+    };
     this.initTheme(theme);
     this.init();
   }
@@ -251,7 +260,7 @@ export class View extends EventEmitter {
   }
 
   getData() {
-    return this.options.data;
+    return this.options.data || [];
   }
 
   // -------------- Component ---------------//
@@ -262,8 +271,7 @@ export class View extends EventEmitter {
 
   legend(legendOption: boolean | LegendOption): Legend {
     set(this.options, 'legend', legendOption);
-    const legend = this.components.get('legend') as Legend;
-    return legend;
+    return this.components.get('legend') as Legend;
   }
 
   /**
@@ -367,10 +375,13 @@ export class View extends EventEmitter {
   destroy() {
     // ...
     this.chartContainer.innerHTML = '';
+    this.options = {};
     this.reactivity.unsubscribe();
     [...this.components.values()].forEach(c => c.destroy());
+    [...this.shapeComponents.values()].forEach(c => c.destroy());
     this.strategyManage.getStrategy('uPlot')?.destroy();
     this.unbindThemeListener();
+    this.off();
   }
 }
 

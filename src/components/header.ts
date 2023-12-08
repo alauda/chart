@@ -56,6 +56,7 @@ export class Header {
       this.container = header || document.createElement('div');
       header.style.wordBreak = 'break-all;';
       this.container.style.display = 'flex';
+      this.container.style.justifyContent = 'flex-end';
       if (!header) {
         this.ctrl.chartContainer.append(this.container);
       }

@@ -4,9 +4,8 @@ import { Data, PieShapeOption } from '../../types/options.js';
 import { createSvg, getChartColor, PolarShapeType } from '../../utils/index.js';
 
 import { PolarShape } from './index.js';
-import { ChartEvent } from '../../types/index.js';
+import { ChartEvent, LegendItemActive } from '../../types/index.js';
 import { Tooltip } from '../tooltip.js';
-import { LegendItem } from '../legend.js';
 
 export const DEFAULT_RADIUS_DIFF = 8;
 export const ACTIVE_RADIUS_ENLARGE_SIZE = 2;
@@ -55,15 +54,10 @@ export default class Pie extends PolarShape<PieShapeOption> {
     this.renderPie();
     this.renderLabel();
 
-    this.ctrl.on(ChartEvent.LEGEND_ITEM_CLICK, res => {
-      const names: string[] = res.data.reduce(
-        (pre: string[], cur: LegendItem) => [
-          ...pre,
-          ...(cur.isActive ? [cur.name] : []),
-        ],
-        [],
+    this.ctrl.on(ChartEvent.LEGEND_ITEM_CLICK, (res: LegendItemActive) => {
+      this.data = this.getData().filter(
+        d => !(!res.activated && d.name === res.name),
       );
-      this.data = this.getData().filter(d => names.includes(d.name));
       this.renderPie();
       this.renderLabel();
     });
@@ -230,7 +224,7 @@ export function calculatePaths(
     borderRadius,
     borderWidth,
   };
-  const padding = 14
+  const padding = 14;
   const innerDisc = option.innerDisc
     ? [
         {

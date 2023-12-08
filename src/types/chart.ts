@@ -15,7 +15,6 @@ export enum ChartEvent {
   PLOT_MOUSEDOWN = 'plot:mousedown',
   PLOT_MOUSEUP = 'plot:mouseup',
 
-
   // element
   ELEMENT_MOUSEMOVE = 'element:mousemove',
   ELEMENT_MOUSELEAVE = 'element:mouseleave',

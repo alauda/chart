@@ -27,7 +27,7 @@ export class LegendToggle extends Action {
    */
   // toggle(value: LegendItemActive) {
   //   if (this.uPlot) {
-  //     this.uPlot?.setSeries(value.index + 1, { show: !value.isActive }, true);
+  //     this.uPlot?.setSeries(value.index + 1, { show: !value.activated }, true);
   //   }
   // }
   toggle() {

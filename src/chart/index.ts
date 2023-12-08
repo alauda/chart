@@ -39,12 +39,18 @@ export class Chart extends View {
     if (autoFit) {
       chartEle.style.width = '100%';
       chartEle.style.height = '100%';
-      chartEle.style.display = 'flex';
-      chartEle.style.flexDirection = 'column';
       chartEle.style.justifyContent = 'space-between';
-
-      ele.style.flex = '1';
-      ele.style.position = 'relative';
+    }
+    ele.style.position = 'relative';
+    ele.style.height = '100%'
+    chartEle.style.flexDirection = 'column';
+    chartEle.style.display = 'flex';
+    ele.style.flex = '1';
+    if (width) {
+      chartEle.style.width = `${width}px`;
+    }
+    if (height) {
+      chartEle.style.height = `${height}px`;
     }
     const size = getChartSize(ele, width, height);
     const opts = {

@@ -10,7 +10,7 @@ import { Header } from './header.js';
 const styles = StyleSheet.create({
   title: {
     wordBreak: 'break-all',
-    width: '100%'
+    width: '100%',
   },
 });
 
@@ -34,12 +34,12 @@ export class Title extends BaseComponent<TitleOption> {
   createTitle() {
     if (typeof this.option === 'object') {
       this.container = document.createElement('div');
-      this.container.style.wordBreak = 'break-all'
+      this.container.style.wordBreak = 'break-all';
       this.container.style.flex = '1';
       this.container.className = `${generateName('title')} ${css(
         styles.title,
       )}`;
-      this.update()
+      this.update();
       const header = new Header(this.ctrl);
       header.container.append(this.container);
       this.headerContainer = header.container;

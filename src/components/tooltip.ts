@@ -90,6 +90,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         const overlay = document.createElement('div');
         overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
         (popupContainer || document.body).append(overlay);
+        overlay.style.visibility = 'hidden';
         this.container = overlay;
       }
       this.createItem();
@@ -104,6 +105,9 @@ export class Tooltip extends BaseComponent<TooltipOption> {
    */
   private createItem(title?: string, values?: TooltipValue[]) {
     const itemTpl = this.getTooltipItem(values);
+    if (!itemTpl) {
+      return;
+    }
     const isEl = isElement(itemTpl);
     const list = `<ul class="${css(styles['tooltip-list'])}">${itemTpl}</ul>`;
     this.container.innerHTML = `
@@ -188,13 +192,13 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     return value;
   }
 
-  public showTooltip = () => {
+  showTooltip = () => {
     this.container.style.visibility = 'visible';
     this.container.style.background = this.ctrl.getTheme().tooltip.background;
     this.container.style.color = this.ctrl.getTheme().tooltip.color;
   };
 
-  public hideTooltip = () => {
+  hideTooltip = () => {
     if (this.container) {
       this.container.style.visibility = 'hidden';
     }
@@ -208,12 +212,13 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     this.ctrl.on(
       ChartEvent.U_PLOT_SET_CURSOR,
       ({ anchor, title, values, position }: TooltipItemActive) => {
-        // console.log(anchor)
-        // @ts-ignore
-        placement(anchor, this.container, {
-          placement: position || 'right',
-        });
-        this.createItem(title, values);
+        if(title && values?.length) {
+          // @ts-ignore
+          placement(anchor, this.container, {
+            placement: position || 'right',
+          });
+          this.createItem(title, values);
+        }
       },
     );
   }

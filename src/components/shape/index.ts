@@ -48,6 +48,10 @@ export abstract class Shape<T = unknown> {
   getOptions() {
     return {};
   }
+
+  destroy() {
+    this.mapName = '';
+  }
   // map(name: string) {
   //   this.mapName = name;
   //   console.log(this.type, this.option, this.mapName, this);
@@ -67,15 +71,13 @@ export abstract class PolarShape<T = unknown> {
 
   abstract render(): void;
 
-
   constructor(ctrl: View, opt = {}) {
     this.ctrl = ctrl;
     this.option = opt as T;
   }
 
   getData() {
-    const data = this.ctrl.getData();
-    return data;
+    return this.ctrl.getData();
   }
 
   destroy() {

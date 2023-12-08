@@ -1,6 +1,8 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get, merge, set } from 'lodash';
+import { get, merge, set, uniqBy } from 'lodash';
+
 import { AnnotationLineOption, AnnotationOption } from '../types/index.js';
+
 import { BaseComponent } from './base.js';
 
 const TEXT_SPACE = 4;
@@ -34,27 +36,30 @@ export class Annotation extends BaseComponent<AnnotationOption> {
     const opt = this.ctrl.getOption();
     this.option = get(opt, this.name, {});
     const x = get(this.option, 'lineX');
-    const y = get(this.option, 'lineY');
+    const yList = get(this.option, 'lineY', []);
     this.lineX(x);
-    this.lineY(y);
+    yList?.forEach(y => this.lineY(y));
   }
 
   update() {
     // ..
     this.option = get(this.ctrl.getOption(), this.name);
     const x = get(this.option, 'lineX');
-    const y = get(this.option, 'lineY');
+    const yList = get(this.option, 'lineY', []);
     this.lineX(x);
-    this.lineY(y);
+    yList?.forEach(y => this.lineY(y));
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   lineX(options: AnnotationLineOption) {
     if (this.annotationXFn.length) {
-      this.updateLine('lineX', options);
+      const opt = merge(get(this.option, 'lineX'), options);
+      set(this.option, 'lineX', opt);
+      this.ctrl.setOption([this.name, 'lineX'], opt);
+      this.ctrl.redraw();
       return this;
-    } else {
-      this.ctrl.setOption([this.name, 'lineX'], options);
     }
+    this.ctrl.setOption([this.name, 'lineX'], options);
     const fn = (u: uPlot) => {
       const {
         data,
@@ -87,11 +92,11 @@ export class Annotation extends BaseComponent<AnnotationOption> {
         ? u.valToPos(posValue, 'x', true)
         : u.valToPos(u.scales.y.min, 'y', true);
       ctx.beginPath();
-      ctx.setLineDash(style?.lineDash);
-      ctx.lineWidth = style?.width;
+      ctx.setLineDash(style?.lineDash || [5, 5]);
+      ctx.lineWidth = style?.width || 2;
       ctx.moveTo(x0, y0);
       ctx.lineTo(x1, y1);
-      ctx.strokeStyle = style?.stroke;
+      ctx.strokeStyle = style?.stroke || 'red';
       ctx.stroke();
 
       if (x0 && text?.content) {
@@ -145,61 +150,68 @@ export class Annotation extends BaseComponent<AnnotationOption> {
     return this;
   }
 
-  private updateLine(type: 'lineX' | 'lineY', options?: AnnotationLineOption) {
-    const opt = merge(get(this.option, type), options);
-    set(this.option, type, opt);
-    this.ctrl.setOption([this.name, type], opt);
-    this.ctrl.redraw();
-  }
-
   lineY(options: AnnotationLineOption) {
+    this.setOptions('lineY', options);
     if (this.annotationYFn.length) {
-      this.updateLine('lineY', options);
+      this.ctrl.redraw();
       return this;
-    } else {
-      this.ctrl.setOption([this.name, 'lineY'], options);
     }
-
     const fn = (u: uPlot) => {
-      const {
-        data,
-        text,
-        style = { lineDash: [8, 5], width: 2, stroke: 'red' },
-      } = get(this.option, 'lineY', {}) as AnnotationLineOption;
-      if (!data) {
+      const values = get(this.option, 'lineY', []) as AnnotationLineOption[];
+      if (!values.length) {
         return;
       }
-      let ctx = u.ctx;
-      ctx.save();
-      let [i0, i1] = u.series[0].idxs;
-      let d = u.data[0];
-      let x0 = u.valToPos(d[i0], 'x', true);
-      let x1 = u.valToPos(d[i1], 'x', true);
-      let y1 = u.valToPos(data as number, 'y', true);
+      const ctx = u.ctx;
+      values.forEach(item => {
+        const {
+          data,
+          text,
+          style = { lineDash: [8, 5], width: 2, stroke: 'red' },
+        } = item;
+        ctx.save();
+        const isTransposed = u.scales.y.ori === 0 && u.axes[1].side === 2;
+        const [i0, i1] = u.series[0].idxs;
+        const d = u.data[0];
+        const x0 = isTransposed
+          ? u.valToPos(data as number, 'y', true)
+          : u.bbox.left || u.valToPos(d[i0], 'x', true); // x 开始位置
+        const x1 = isTransposed
+          ? u.valToPos(data as number, 'y', true)
+          : u.bbox.width + u.bbox.left || u.valToPos(d[i1], 'x', true); // x 结束为止
+        const y1 = isTransposed
+          ? u.bbox.height
+          : u.valToPos(data as number, 'y', true); // y 位置
+        ctx.beginPath();
+        ctx.setLineDash(style?.lineDash || [8, 5]);
+        ctx.lineWidth = style?.width || 2;
 
-      ctx.beginPath();
-      ctx.setLineDash(style?.lineDash);
-      ctx.lineWidth = style?.width;
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x0, y1);
-      ctx.strokeStyle = 'red' || style?.stroke;
-      ctx.stroke();
-
-      if (text?.content) {
-        const { width, actualBoundingBoxDescent } = ctx.measureText(
-          String(text.content),
-        );
-        ctx.fillStyle = 'red';
-        ctx.fillText(
-          String(text.content),
-          this.getTextPosition(text.position, x0, width, u.bbox.width),
-          y1 - (actualBoundingBoxDescent + TEXT_SPACE),
-        );
-      }
-
+        ctx.moveTo(x1, isTransposed ? 0 : y1);
+        ctx.lineTo(x0, y1);
+        // ctx.moveTo(x1, y1);
+        // ctx.lineTo(x0, y1);
+        ctx.strokeStyle = style?.stroke || 'red';
+        ctx.stroke();
+        if (text?.content) {
+          const { width, actualBoundingBoxDescent } = ctx.measureText(
+            String(text.content),
+          );
+          ctx.fillStyle = style?.stroke || 'red';
+          ctx.fillText(
+            String(text.content),
+            this.getTextPosition(text.position, x0, width, u.bbox.width),
+            isTransposed ? 0 : y1 - (actualBoundingBoxDescent + TEXT_SPACE),
+          );
+        }
+      });
       ctx.restore();
     };
     this.annotationYFn.push(fn);
+  }
+
+  setOptions(type: 'lineY' | 'lineX', options: AnnotationLineOption) {
+    const option = get(this.ctrl.getOption(), [this.name, type]) || [];
+    const data = uniqBy([...option, options], 'data');
+    this.ctrl.setOption([this.name, type], data);
   }
 
   getTextPosition(

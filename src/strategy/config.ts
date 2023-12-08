@@ -19,6 +19,14 @@ export const UPLOT_DEFAULT_OPTIONS = {
     show: false,
     live: false, // 关闭当前值
   },
+  scales: {
+    y: {
+      range: (_u: uPlot, dataMin: number, dataMax: number) => {
+        const maxV = Math.max(dataMax ? dataMax + 5 : dataMax, 1);
+        return [dataMin || 0, maxV];
+      },
+    },
+  },
   axes: [
     {
       space: axesSpace,

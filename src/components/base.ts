@@ -21,6 +21,9 @@ export abstract class BaseComponent<O = unknown> {
   }
 
   destroy() {
-    this.container?.remove();
+    if (this.container) {
+      this.container.innerHTML = '';
+      this.container.remove();
+    }
   }
 }

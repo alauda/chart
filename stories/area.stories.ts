@@ -2,7 +2,7 @@ import addons from '@storybook/addons';
 import { Story, Meta } from '@storybook/html';
 import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
-import { dealWithTime, generateTime, generateY, getRandom } from './utilt';
+import { generateTime, generateY } from './utilt';
 
 import { ActionType, Chart, ChartEvent, resizeObserver } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
@@ -49,13 +49,11 @@ const Template: Story = () => {
         ],
         options: {
           // title: { text: '1231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312' },
-          // title: { text: '11', },
-          // legend: {
-          //   // position: 'bottom-right',
-          //   custom: true,
-          // },
-          //   position: 'bottom-right',
-          // }
+          title: { text: '11' },
+          legend: {
+            position: 'bottom-right',
+            // position: 'bottom-right',
+          },
           axis: {
             // x: {
             //   formatter: (value: string) => {
@@ -68,25 +66,27 @@ const Template: Story = () => {
             //   formatter: `{value}%1`,
             // },
           },
-          scale: {
-            x: {
-              time: true
-            },
-            y: {
-              // max: undefined,
-              // min: undefined,
-            },
-          },
+
           annotation: {
-            // lineX: {
-            //   data: null,
-            // },
-            // lineY: {
-            //   data: 1,
-            //   text: {
-            //     content: 'lineY',
+            // lineX: [
+            //   {
+            //     data: null,
             //   },
-            // },
+            // ],
+            // lineY: [
+            //   {
+            //     data: 1,
+            //     text: {
+            //       content: 'lineY',
+            //     },
+            //   },
+            //   {
+            //     data: 10,
+            //     text: {
+            //       content: 'lineYxxxx',
+            //     },
+            //   },
+            // ],
           },
           // tooltip: false,
         },
@@ -97,29 +97,29 @@ const Template: Story = () => {
     // chart.data(data);
     // chart.title(false)
     // chart.legend(false);
-    chart.line({alpha: 1, width: 1}).map('area1');
-    chart.area({alpha: 1, width: 1}).map('area2');
-    chart.annotation().lineY({
-      data: 20,
-      text: {
-        content: 'line',
-        position: 'right',
-      },
-    });
-    // chart.annotation().lineX({
-    //   data: d1[10].x,
+    chart.line({ alpha: 1, width: 1 }).map('area1');
+    chart.area({ alpha: 1, width: 1 }).map('area2');
+    // chart.annotation().lineY({
+    //   data: 20,
     //   text: {
-    //     // border: {
-    //     //  style: '2px solid red',
-    //     //  padding: [0, 5]
-    //     // },
-    //     style: {
-    //       fontSize: '20px',
-    //       color: 'red',
-    //     },
-    //     content: '1111',
+    //     content: 'line',
+    //     position: 'right',
     //   },
     // });
+    chart.annotation().lineX({
+      data: d1[10].x,
+      text: {
+        // border: {
+        //  style: '2px solid red',
+        //  padding: [0, 5]
+        // },
+        style: {
+          fontSize: '20px',
+          color: 'red',
+        },
+        content: '1111',
+      },
+    });
     // chart.axis('y', {autoSize: false})
     // chart.shape('bar', { name: 'line2' });
     chart.interaction('brush-x', {
@@ -156,7 +156,7 @@ const Template: Story = () => {
       //   },
       // ]);
       // bb = !bb;
-      ind += 1
+      ind += 1;
       chart.annotation().lineY({
         data: ind,
         text: {
@@ -193,7 +193,15 @@ const Template: Story = () => {
     let animationFrame: number;
     let index = 0;
     function update() {
-      const end = new Date(start).valueOf() / 1000 + total * step;
+      index += 3;
+      chart.annotation().lineY({
+        data: index,
+        text: {
+          content: 'line',
+          position: 'left',
+        },
+      });
+      // const end = new Date(start).valueOf() / 1000 + total * step;
       // interval = setInterval(() => {
       //   index += 1;
       //   const time = end + index * step;
@@ -214,25 +222,25 @@ const Template: Story = () => {
       //   chart.data(data);
       // }, 200);
 
-      index += 1;
-      const time = end + index * step;
-      const current = dealWithTime(new Date(time * 1000));
-      const timeData = generateTime(current, total, step);
-      yData1 = yData1.slice(1).concat(getRandom(range1));
-      yData2 = yData2.slice(1).concat(getRandom(range2));
-      const data = [
-        {
-          name: 'area1',
-          values: timeData.map((x, i) => ({ x, y: yData1[i] })),
-        },
-        {
-          name: 'area2',
-          values: timeData.map((x, i) => ({ x, y: yData2[i] })),
-        },
-      ];
-      chart.data(data);
+      // index += 1;
+      // const time = end + index * step;
+      // const current = dealWithTime(new Date(time * 1000));
+      // const timeData = generateTime(current, total, step);
+      // yData1 = yData1.slice(1).concat(getRandom(range1));
+      // yData2 = yData2.slice(1).concat(getRandom(range2));
+      // const data = [
+      //   {
+      //     name: 'area1',
+      //     values: timeData.map((x, i) => ({ x, y: yData1[i] })),
+      //   },
+      //   {
+      //     name: 'area2',
+      //     values: timeData.map((x, i) => ({ x, y: yData2[i] })),
+      //   },
+      // ];
+      // chart.data(data);
 
-      animationFrame = requestAnimationFrame(update);
+      // animationFrame = requestAnimationFrame(update);
     }
 
     auto.addEventListener('click', () => {

@@ -30,8 +30,26 @@ const Template: Story = () => {
         // legend: {
         //   position: 'bottom-right',
         // }
+        annotation: {
+          // lineX: {
+          //   data: d1[i].x,
+          //   text: {
+          //     content: i,
+          //   }
+          // },
+          lineY: {
+            data: '3',
+            text: {
+              content: '1111',
+            },
+          },
+        },
         scale: {
-          y: { max: 100, min: 10 },
+          // y: { max: 100, min: 10 },
+          // y: {}
+        },
+        line: {
+          step: 'start',
         },
         tooltip: {
           // showTitle: false
@@ -40,7 +58,7 @@ const Template: Story = () => {
         },
       },
     };
-    const chart = new Chart(opts);
+    const chart = new Chart(opts as any);
     chart.line();
     // console.log(chart);
     // chart.data(data);
@@ -62,24 +80,24 @@ const Template: Story = () => {
       //   showTitle: bb,
       //   titleFormatter: '{title}111'
       // }
-      // reactive.options.annotation = {
-      //   // lineX: {
-      //   //   data: d1[i].x,
-      //   //   text: {
-      //   //     content: i,
-      //   //   }
-      //   // },
-      //   lineY: {
-      //     data: d1[i].y,
-      //     text: {
-      //       content: String(i),
-      //     }
-      //   }
-      // }
+      reactive.options.annotation = {
+        // lineX: {
+        //   data: d1[i].x,
+        //   text: {
+        //     content: i,
+        //   }
+        // },
+        lineY: {
+          data: d1[i].y,
+          text: {
+            content: String(i),
+          },
+        },
+      };
       // reactive.options.scale = {
       //   y: { max: 100, min: 10 },
       // };
-      reactive.options.tooltip = false;
+      // reactive.options.tooltip = false;
       // reactive.data = [
       //   {
       //     name: 'line1',
@@ -93,36 +111,12 @@ const Template: Story = () => {
       i = i + 1;
     };
   });
-  return `
-  <div style="width: 500px; height: 200px;"> 
-  <div class="chart1" ></div>
-</div>
-  `
+
   return `
     <button id="change">change params</button>
-    <div style="position: fixed; top: 0; left: 0;  width: 100%; height: 100%;">
-    <div style="display: flex; position: absolute; top: 0; left: 0;">
-      <div style="    width: 100vw;
-      height: 100vh;
-      position: static;
-      margin-left: 0px;
-      margin-top: 0px;
-      margin-right: 0px;overflow: auto;
-      display: flex;
-      justify-content: center;
-      align-items: normal;">
-        <div style="
-        margin: 18vh auto 20px;
-        display: flex;
-        flex-direction: column; border: 1px solid red;">
-        <div style="width: 500px; height: 200px;"> 
-          <div class="chart1" ></div>
-        </div>
-        </div>
-
-      </div>
+    <div style="width: 500px; height: 200px;"> 
+      <div class="chart1" ></div>
     </div>
-  </div>
   `;
 };
 

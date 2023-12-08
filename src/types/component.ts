@@ -1,10 +1,7 @@
-import { LegendItem } from "../components/legend.js";
 
 export interface LegendItemActive {
-  index: number;
-  value: LegendItem
-  data: LegendItem[];
-  isActive: boolean;
+  name: string;
+  activated: boolean;
 }
 
 interface Coordinates {

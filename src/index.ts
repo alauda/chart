@@ -46,7 +46,6 @@ registerComponent('scale', Scale);
 
 registerComponent('annotation', Annotation);
 
-
 // 注册黑暗主题
 registerTheme('dark', Dark());
 
@@ -69,7 +68,6 @@ declare module './chart/view.js' {
     pie(option?: PieShapeOption): Pie;
 
     gauge(option?: GaugeShapeOption): Pie;
-
   }
 }
 
@@ -86,7 +84,6 @@ registerShape('Pie', Pie);
 
 registerShape('Gauge', Gauge);
 
-
 // register interaction action
 registerAction('tooltip', TooltipAction);
 
@@ -95,7 +92,6 @@ registerAction('element-active', ElementAction);
 registerAction('legend', LegendToggle);
 
 registerAction('brush-x', BrushXAction);
-
 
 // register interaction
 registerInteraction('tooltip', {
@@ -116,22 +112,25 @@ registerInteraction('legend-active', {
   // ],
 });
 
-
 registerInteraction('brush-x', {
   start: [
     { trigger: ChartEvent.PLOT_MOUSEDOWN, action: ActionType.BRUSH_X_START },
   ],
-  end: [
-    { trigger: ChartEvent.PLOT_MOUSEUP, action: ActionType.BRUSH_X_END },
-  ],
+  end: [{ trigger: ChartEvent.PLOT_MOUSEUP, action: ActionType.BRUSH_X_END }],
 });
 
 registerInteraction('element-active', {
   start: [
-    { trigger: ChartEvent.ELEMENT_MOUSEMOVE, action: ActionType.ELEMENT_ACTIVE },
+    {
+      trigger: ChartEvent.ELEMENT_MOUSEMOVE,
+      action: ActionType.ELEMENT_ACTIVE,
+    },
   ],
   end: [
-    { trigger: ChartEvent.ELEMENT_MOUSELEAVE, action: ActionType.ELEMENT_RESET },
+    {
+      trigger: ChartEvent.ELEMENT_MOUSELEAVE,
+      action: ActionType.ELEMENT_RESET,
+    },
   ],
 });
 

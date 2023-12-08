@@ -20,8 +20,9 @@ const Template: Story = () => {
     const groupPieData = [
       {
         name: '部署',
-        value: 50,
+        value: 1,
         color: '#006eff',
+        util: '%',
       },
     ];
     function getOp(container: string, data: any): any {
@@ -29,9 +30,33 @@ const Template: Story = () => {
         container,
         // data: [],
         data,
+        // height: 80,
         options: {
+          title: {
+            text: '123123',
+          },
           legend: false,
           // tooltip: false,
+          gauge: {
+            max: 100,
+            label: {
+              text: '<div style="font-size: 30px; color: #666;">{value}{data[0].util}</div>',
+              description: 'asd12312312312',
+              // position: {
+              //   y: 10,
+              // },
+            },
+            colors: [
+              [0, '#73BF69'],
+              [20, '#EAB839'],
+              [70, 'red'],
+            ],
+            // text: {
+            //   show: true,
+            //   size: 12,
+            //   // color: 'red' || () => 'red'
+            // },
+          },
         },
       };
     }
@@ -41,22 +66,22 @@ const Template: Story = () => {
       chart.gauge({
         // outerRadius: 60,
         // innerRadius: 0.2,
-        colors: [
-          [0.2, '#73BF69'],
-          [0.5, '#EAB839'],
-          [1, 'red'],
-        ],
-        label: {
-          text: '<div style="font-size: 30px; color: #666;">50</div>',
-          position: {
-            // y: 5,
-          },
-        },
-        text: {
-          show: true,
-          size: 12,
-          // color: 'red' || () => 'red'
-        },
+        // colors: [
+        //   [0.2, '#73BF69'],
+        //   [0.5, '#EAB839'],
+        //   [1, 'red'],
+        // ],
+        // label: {
+        //   text: '<div style="font-size: 30px; color: #666;">50</div>',
+        //   position: {
+        //     // y: 5,
+        //   },
+        // },
+        // text: {
+        //   show: false,
+        //   size: 12,
+        //   // color: 'red' || () => 'red'
+        // },
       });
       chart.interaction('element-active');
       chart.render();
@@ -64,7 +89,7 @@ const Template: Story = () => {
   });
 
   return `
-  <div style="width: 100%; height: 200px; display: flex;">
+  <div style="width: 100%; height: 260px; display: flex;">
   <div  style="width:100%;height:100%;padding: 20px 16px ;  box-sizing: border-box; flex: 2;">
     <div class="chart"></div>
   </div>

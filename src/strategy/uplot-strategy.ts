@@ -1,9 +1,9 @@
-import { cloneDeep, merge, mergeWith, omit, isFunction } from 'lodash';
+import { cloneDeep, merge, mergeWith, omit, isFunction, get } from 'lodash';
 import UPlot from 'uplot';
 import { Annotation } from '../components/annotation.js';
 
 import { Axis } from '../components/axis.js';
-import { Tooltip } from '../components/index.js';
+import { Legend, Tooltip } from '../components/index.js';
 import { Scale } from '../components/scale.js';
 import { Shape } from '../components/shape/index.js';
 import { autoPadRight } from '../components/uplot-lib/axis.js';
@@ -14,23 +14,18 @@ import { ViewStrategy } from './abstract.js';
 import { UPLOT_DEFAULT_OPTIONS } from './config.js';
 import { Quadtree } from './quadtree.js';
 
-export interface MarkContext {
-  title: Date | number | string;
-  values: MarkContextItem[];
-}
+// export interface MarkContext {
+//   title: Date | number | string;
+//   values: MarkContextItem[];
+// }
 
-export interface MarkContextItem {
-  name: string;
-  color: string;
-  x: string;
-  y: number;
-  activated?: boolean;
-}
-
-export interface BrushContext {
-  start: number;
-  end: number;
-}
+// export interface MarkContextItem {
+//   name: string;
+//   color: string;
+//   x: string;
+//   y: number;
+//   activated?: boolean;
+// }
 
 const SHAPES = SHAPE_TYPES;
 /**
@@ -84,7 +79,10 @@ export class UPlotViewStrategy extends ViewStrategy {
     // 监听 legend item click
     this.ctrl.on(ChartEvent.LEGEND_ITEM_CLICK, (data: LegendItemActive) => {
       if (this.uPlot) {
-        this.uPlot.setSeries(data.index + 1, { show: data.isActive }, true);
+        const index = this.uPlot.series
+          .filter(d => d.scale === 'y')
+          .findIndex(item => item.label === data.name);
+        this.uPlot.setSeries(index + 1, { show: data.activated }, true);
       }
     });
 
@@ -94,6 +92,8 @@ export class UPlotViewStrategy extends ViewStrategy {
         const data = this.getData();
         const ySeries = this.uPlot.series.filter(s => s.scale === 'y');
         const series = this.getSeries();
+        const legend = this.ctrl.components.get('legend') as Legend;
+
         ySeries.forEach((s: uPlot.Series) => {
           if (series.every(d => d.label !== s.label)) {
             this.uPlot.delSeries(
@@ -104,12 +104,16 @@ export class UPlotViewStrategy extends ViewStrategy {
 
         this.getSeries().forEach((s: uPlot.Series, index) => {
           const no = ySeries.every(d => d.label !== s.label);
+          if (legend.inactivatedSet.has(s.label)) {
+            s.show = false;
+          }
           if (no && index) {
             this.uPlot.addSeries(s, this.uPlot.series.length);
+            return;
           }
+          this.uPlot.setSeries(this.uPlot.series.length + 1, { show: false });
         });
         this.uPlot.setData(data);
-        const legend = this.ctrl.components.get('legend');
         legend.update();
       }
     });
@@ -136,10 +140,23 @@ export class UPlotViewStrategy extends ViewStrategy {
   private changeSize(size: Size) {
     // TODO: 设置 uPlot padding 留空间给header  header 使用 position 定位
     if (this.uPlot) {
+      const position: string = get(this.options.legend, 'position', '');
+      const legendEl = this.ctrl.chartContainer.querySelector(
+        `.${generateName('legend')}`,
+      );
+      const legendH = position.includes('bottom')
+        ? legendEl?.clientHeight || 0
+          ? (legendEl?.clientHeight || 0) + 8
+          : 0
+        : 0;
       const headerH =
         this.ctrl.chartContainer.querySelector(`.${generateName('header')}`)
           ?.clientHeight || 0;
-      this.uPlot.setSize({ ...size, height: size.height - headerH });
+
+      this.uPlot.setSize({
+        ...size,
+        height: size.height - (headerH + legendH),
+      });
     }
   }
 
@@ -249,7 +266,13 @@ export class UPlotViewStrategy extends ViewStrategy {
     const values = data.map(value => value.values);
     // type-coverage:ignore-next-line
     const x = values[0].map(value => value.x);
-    const yItem = values.map(data => data.map(d => d.y));
+    // const yItem = values.map(data => data.map(d => d.y));
+
+    const yItem = values.map(data =>
+      data.map(d =>
+        isNaN(+d.y) || !isFinite(+d.y) || d.y === null ? null : +d.y,
+      ),
+    );
     return [x, ...yItem];
   }
 
@@ -381,7 +404,9 @@ export class UPlotViewStrategy extends ViewStrategy {
           over.addEventListener('mouseenter', () => {
             if (u.series.some(d => d.scale === 'y' && d.show)) {
               this.ctrl.emit(ChartEvent.PLOT_MOUSEMOVE);
-              const noData = !u.data[1].some(d => d !== null);
+              const noData = !Array.from(u.data.slice(1))
+                .flat()
+                .some(d => d !== null);
               if (!noData && !this.ctrl.hideTooltip && !this.isElementAction) {
                 (this.ctrl.components.get('tooltip') as Tooltip).showTooltip();
               }
@@ -440,6 +465,12 @@ export class UPlotViewStrategy extends ViewStrategy {
 
           if (cursorX) {
             cursorX.style.visibility = visibilityX;
+            const tooltip = this.ctrl.components.get('tooltip') as Tooltip;
+            if (visibilityX === 'hidden') {
+              tooltip.hideTooltip();
+            } else {
+              tooltip.showTooltip();
+            }
           }
           if (cursorY) {
             cursorY.style.visibility = visibility;
@@ -512,7 +543,7 @@ export class UPlotViewStrategy extends ViewStrategy {
     };
   }
 
-  public override destroy(): void {
+  override destroy(): void {
     this.components = [];
     this.uPlot?.destroy();
   }

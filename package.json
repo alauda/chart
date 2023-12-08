@@ -1,6 +1,6 @@
 {
   "name": "zz-chart",
-  "version": "0.1.1-beta.7",
+  "version": "0.1.1-beta.24",
   "type": "module",
   "author": "Alauda",
   "donate": {
@@ -97,7 +97,7 @@
     "aphrodite": "^2.4.0",
     "on-change": "^4.0.2",
     "placement.js": "^1.0.0-beta.5",
-    "uplot": "^1.6.23"
+    "uplot": "^1.6.26"
   },
   "devDependencies": {
     "@1stg/app-config": "^6.1.4",

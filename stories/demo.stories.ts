@@ -34,6 +34,7 @@ const Template: Story = () => {
 
     const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
     // const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
+    console.log(JSON.stringify(d1));
     const data = [
       {
         name: 'area1',

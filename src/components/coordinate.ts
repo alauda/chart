@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import uPlot from 'uplot';
 import { View } from '../chart/view.js';
-import { CoordinateOpt } from '../types/index.js';
+import { CoordinateOpt, CoordinateOption } from '../types/index.js';
 
 export class Coordinate {
   name = 'coordinate';
@@ -14,6 +14,7 @@ export class Coordinate {
 
   constructor(ctrl: View) {
     this.ctrl = ctrl;
+    this.render();
   }
 
   render() {
@@ -28,7 +29,9 @@ export class Coordinate {
 
   setOption() {
     this.option = get(this.ctrl.getOption(), this.name);
-    this.isTransposed = this.option.transposed;
+    if (this.option) {
+      this.isTransposed = this.option?.transposed;
+    }
   }
 
   transpose() {
@@ -41,6 +44,10 @@ export class Coordinate {
     };
     axes?: uPlot.Axis[];
   } {
+    const option: CoordinateOption = get(this.ctrl.getOption(), this.name);
+    if (typeof option === 'object' && option.transposed) {
+      this.isTransposed = option.transposed;
+    }
     return this.isTransposed
       ? {
           scales: {

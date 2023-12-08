@@ -1,4 +1,4 @@
-import uPlot, { Padding } from 'uplot';
+import uPlot, { Padding as UPadding } from 'uplot';
 
 import { AdjustOption } from '../components/shape/bar.js';
 import { SizeCallback } from '../components/shape/point.js';
@@ -6,6 +6,9 @@ import { SizeCallback } from '../components/shape/point.js';
 import { TooltipValue } from './component.js';
 
 import { Theme } from './index.js';
+
+// eslint-disable-next-line no-restricted-syntax
+export type Padding = UPadding;
 
 export interface ChartOption {
   container: string | HTMLElement;
@@ -59,6 +62,7 @@ export interface Options {
   area?: AreaShapeOption;
   bar?: BarShapeOption;
   point?: PointShapeOption;
+  gauge?: GaugeShapeOption;
 }
 
 export type Data = DataItem[];
@@ -117,7 +121,7 @@ export interface TooltipOpt {
   popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
   titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
   nameFormatter?: string | ((name: string) => string);
-  valueFormatter?: string | ((value: TooltipValue) => string);
+  valueFormatter?: string | ((value: number) => string);
   itemFormatter?: (value: TooltipValue[]) => string | TooltipValue[] | Element;
   sort?: (a: TooltipValue, b: TooltipValue) => number;
 }
@@ -135,6 +139,7 @@ export interface LineShapeOption extends ShapeOption {
   step?: 'start' | 'end';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AreaShapeOption extends ShapeOption {}
 
 export interface BarShapeOption extends ShapeOption {
@@ -153,7 +158,8 @@ export interface PieShapeOption {
   startAngle?: number; // 开始角度
   endAngle?: number; // 结束角度
   label?: {
-    text?: string;
+    text?: string | ((value: number, total?: number) => string);
+    description?: string | ((data: Data) => string);
     position?: {
       x?: number;
       y?: number;
@@ -165,15 +171,17 @@ export interface PieShapeOption {
     borderRadius?: number; //  item 圆角
     borderWidth?: number; // item间隔宽度
   };
-  innerDisc?: boolean; //内阴影盘
+  innerDisc?: boolean; // 内阴影盘
 }
 
 export interface GaugeShapeOption {
   innerRadius?: number; // 内半径 0 - 1
   outerRadius?: number; // 外半径
-  colors: Array<[number, string]>; // 指定颜色 [百分比, color]
+  max?: number; // 100
+  colors?: Array<[number, string]>; // 指定颜色 [数值, color]
   label?: {
-    text?: string;
+    text?: string | ((data: Data, total?: number) => string);
+    description?: string | ((data: Data) => string);
     position?: {
       x?: number;
       y?: number;
@@ -194,7 +202,7 @@ export type ShapeOptions =
 
 export interface AnnotationOption {
   lineX?: AnnotationLineOption;
-  lineY?: AnnotationLineOption;
+  lineY?: AnnotationLineOption[];
 }
 
 export interface AnnotationLineOption {
