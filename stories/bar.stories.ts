@@ -45,7 +45,9 @@ const Template: Story = () => {
     });
   }, 0);
   return `
-  <div style="width: 100%; height: 220px" id="barChart"></div>`;
+  <div style="width: 500px; height: 210px">
+  <div style="width: 100%; height: 100%" id="barChart"></div>
+  </div>`;
 };
 
 export const bar = Template.bind({});
