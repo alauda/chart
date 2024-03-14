@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.12
+
+### Patch Changes
+
+- [#45](https://github.com/alauda/chart/pull/45) [`8a82dd4`](https://github.com/alauda/chart/commit/8a82dd48b74904599a329698f38b786e73467264) Thanks [@yangxiaolang](https://github.com/yangxiaolang)! - fix: ratate bar first yaxis idx error
+
 ## 0.1.11
 
 ### Patch Changes
