@@ -34,7 +34,10 @@ const Template: Story = () => {
       },
     });
   }, 0);
-  return `<div style="width: 100%; height: 220px" id="baseBar"></div>`;
+  return `
+  <div style="width: 500px; height: 250px">
+  <div style="width: 100%; height: 250px" id="baseBar"></div>
+  </div>`;
 };
 
 export const BaseBar = Template.bind({});

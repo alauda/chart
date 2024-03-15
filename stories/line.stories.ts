@@ -132,7 +132,7 @@ const Template: Story = () => {
     //   // });
     // }, 1000);
   });
-  return `<div>
+  return `<div style="width: 800px; height: 250px">
     <div style="width: 100%; height: 190px;" id="chart"></div>
   </div>`;
 };
