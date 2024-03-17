@@ -35,8 +35,9 @@ const Template: Story = () => {
         tickFormatter: () => timeFormat('%H:%M'),
       },
       tooltip: {
-        // titleFormatter: (name: Date | number | string) =>
-        //   `<div>${new Date(name)}</div>`,
+        titleFormatter: v => {
+          return timeFormat('%m-%d %H:%M')(new Date(v.title));
+        },
         // itemFormatter: (values: TooltipContextItem[]) =>
         //   `<div>${JSON.stringify(values)}</div>`,
         sort: (a, b) => a.y - b.y,
