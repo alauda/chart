@@ -24,7 +24,13 @@ export function findClosestPointIndex(
   if (owner.isBar) {
     const offsets = getBarsOffsets(owner)
       .map(pos => pos[isRotated ? 1 : 0])
-      .map(offset => (isRotated ? offset - owner.basics.main.top : offset));
+      .map(offset =>
+        // Rotate 时， 标题会影响垂直轴上的 offset
+        isRotated && !owner.options.title.hide && owner.options.title.text
+          ? offset - owner.basics.main.top
+          : offset,
+      );
+
     return offsets.reduce(
       (prev, curr, index) =>
         Math.abs(xPos - curr) < Math.abs(xPos - offsets[prev]) ? index : prev,

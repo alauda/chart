@@ -1520,6 +1520,22 @@ export const groupBarData = [
       { x: 'stopped', y: 2, index: 2, color: '#999' },
     ],
   },
+  {
+    name: 'pod1',
+    values: [
+      { x: 'running', y: 3, index: 0, color: '#0abf5b' },
+      { x: 'pending', y: 1, index: 1, color: '#006eff' },
+      { x: 'stopped', y: 2, index: 2, color: '#999' },
+    ],
+  },
+  {
+    name: 'pod2',
+    values: [
+      { x: 'running', y: 3, index: 0, color: '#0abf5b' },
+      { x: 'pending', y: 1, index: 1, color: '#006eff' },
+      { x: 'stopped', y: 2, index: 2, color: '#999' },
+    ],
+  },
 ];
 
 export const barData = [
