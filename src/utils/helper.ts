@@ -21,7 +21,7 @@ export function findClosestPointIndex(
   owner: View,
   isRotated: boolean,
 ) {
-  if (owner.isBar) {
+  if (owner.isBar && owner.isGroup) {
     const offsets = getBarsOffsets(owner)
       .map(pos => pos[isRotated ? 1 : 0])
       .map(offset =>
