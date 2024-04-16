@@ -16,12 +16,34 @@ export function getPos(
     : e.pageX - ((rectDom || svgE).getBoundingClientRect().left + scrollLeft);
 }
 
+export function getBarsOffsets(owner: View) {
+  const containerEl =
+    typeof owner.options.container === 'string'
+      ? document.querySelector(owner.options.container)
+      : owner.options.container;
+
+  return owner.isGroup
+    ? Array.from(
+        containerEl.querySelectorAll(`.${CLASS_NAME.bars} .${CLASS_NAME.bar}`),
+      ).map(el => getElTransFormPosition(el))
+    : Array.from(
+        containerEl.querySelectorAll(
+          `.${CLASS_NAME.bars} .${CLASS_NAME.barItem}`,
+        ),
+      ).map(el => {
+        const barWidth = parseFloat(el.getAttribute('width'));
+        return [el.getAttribute('x'), el.getAttribute('y')]
+          .map(parseFloat)
+          .map(pos => pos + barWidth / 2);
+      });
+}
+
 export function findClosestPointIndex(
   xPos: number,
   owner: View,
   isRotated: boolean,
 ) {
-  if (owner.isBar && owner.isGroup) {
+  if (owner.isBar) {
     const offsets = getBarsOffsets(owner)
       .map(pos => pos[isRotated ? 1 : 0])
       .map(offset =>
@@ -43,10 +65,8 @@ export function findClosestPointIndex(
     (prev, curr) => (prev > curr.values.length ? prev : curr.values.length),
     0,
   );
-
   const w = isRotated ? owner.size.grid.height : owner.size.grid.width;
-  const idx = Math.round((xPos * count) / w);
-  return Math.min(Math.max(0, idx), count - 1);
+  return Math.min(Math.max(0, Math.round((xPos * count) / w)), count - 1);
 }
 
 export function isPercentage(num: number | string): num is Percentage {
@@ -64,17 +84,6 @@ export function isHtml(str: string) {
 
 export function abs(value: number) {
   return Math.abs(value);
-}
-
-export function getBarsOffsets(owner: View) {
-  const containerEl =
-    typeof owner.options.container === 'string'
-      ? document.querySelector(owner.options.container)
-      : owner.options.container;
-
-  return Array.from(
-    containerEl.querySelectorAll(`.${CLASS_NAME.bars} .${CLASS_NAME.bar}`),
-  ).map(el => getElTransFormPosition(el));
 }
 
 export function getElTransFormPosition(el: Element) {
