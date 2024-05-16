@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.13
+
+### Patch Changes
+
+- [#47](https://github.com/alauda/chart/pull/47) [`66b18a7`](https://github.com/alauda/chart/commit/66b18a7f84cb9f7b08be3a09ef3221bb2d49372f) Thanks [@yangxiaolang](https://github.com/yangxiaolang)! - fix: bar tooltip position error
+
 ## 0.1.12
 
 ### Patch Changes
