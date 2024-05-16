@@ -59,7 +59,7 @@ const Template: Story = () => {
       });
     }, 2000);
   }, 0);
-  return `<div >
+  return `<div style="width: 500px; height: 250px">
     <div style="max-width: 300px; height: 300px;border:1px solid #eee; " id="pieChart"></div>
   </div>`;
 };

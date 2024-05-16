@@ -1,5 +1,4 @@
 import { Story, Meta } from '@storybook/html';
-import { timeFormat } from 'd3';
 
 import { barData } from './data';
 
@@ -28,13 +27,13 @@ const Template: Story = () => {
         // bandwidth: 10,
       },
       data: barData,
-      xAxis: {
-        // type: ScaleType.TIME,
-        tickFormatter: () => timeFormat('%H:%M'),
-      },
+      legend: {},
     });
   }, 0);
-  return `<div style="width: 100%; height: 220px" id="baseBar"></div>`;
+  return `
+  <div style="width: 500px; height: 250px">
+  <div style="width: 100%; height: 250px" id="baseBar"></div>
+  </div>`;
 };
 
 export const BaseBar = Template.bind({});
