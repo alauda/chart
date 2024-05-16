@@ -1,6 +1,6 @@
 {
   "name": "@alauda/chart",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "type": "module",
   "description": "Alauda Chart components by Alauda Frontend Team",
   "repository": "git+https://github.com/alauda/chart.git",
