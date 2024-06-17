@@ -5,16 +5,20 @@ import { Annotation } from '../components/annotation.js';
 import { Axis } from '../components/axis.js';
 import { Legend, Tooltip } from '../components/index.js';
 import { Scale } from '../components/scale.js';
-import { Shape } from '../components/shape/index.js';
+import { PolarShape, Shape } from '../components/shape/index.js';
 import { autoPadRight } from '../components/uplot-lib/axis.js';
 import { ChartEvent, Data, LegendItemActive, Size } from '../types/index.js';
-import { generateName, SHAPE_TYPES } from '../utils/index.js';
+import {
+  generateName,
+  POLAR_SHAPE_TYPES,
+  SHAPE_TYPES,
+} from '../utils/index.js';
 
 import { ViewStrategy } from './abstract.js';
 import { UPLOT_DEFAULT_OPTIONS } from './config.js';
 import { Quadtree } from './quadtree.js';
 
-const CURSOR_X = 'u-cursor-x';
+const CURSOR_X = '.u-cursor-x';
 const SHAPES = SHAPE_TYPES;
 /**
  * 渲染策略
@@ -62,6 +66,10 @@ export class UPlotViewStrategy extends ViewStrategy {
       if (this.uPlot) {
         this.uPlot.redraw();
       }
+      POLAR_SHAPE_TYPES.map(name => {
+        const comp = this.ctrl.shapeComponents.get(name) as PolarShape;
+        comp?.redraw();
+      });
     });
 
     // 监听 legend item click
@@ -199,6 +207,9 @@ export class UPlotViewStrategy extends ViewStrategy {
             this.cursor.style.left = '0';
             u.over.append(this.cursor);
             this.ctrl.emit(ChartEvent.U_PLOT_READY);
+            requestAnimationFrame(() => {
+              this.render();
+            });
           },
         ],
       },
@@ -215,7 +226,7 @@ export class UPlotViewStrategy extends ViewStrategy {
       interaction,
       (objValue: unknown, srcValue: unknown, key: string) => {
         if (Array.isArray(objValue) && Array.isArray(srcValue)) {
-          if (key === 'plugins') {
+          if (key === 'plugins' || key === 'drawClear') {
             return objValue.concat(srcValue);
           }
           if (key === 'axes') {
@@ -251,7 +262,14 @@ export class UPlotViewStrategy extends ViewStrategy {
     if (!data.length) {
       return [];
     }
-    const values = data.map(value => value.values);
+    const labels: string[] = this.ctrl.getShapeDataName();
+    const values = data
+      .filter(v => labels.includes(v.name))
+      .sort(
+        (a, b) =>
+          labels.indexOf(a.id || a.name) - labels.indexOf(a.id || b.name),
+      )
+      .map(value => value.values);
     // type-coverage:ignore-next-line
     const x = values[0].map(value => value.x);
     // const yItem = values.map(data => data.map(d => d.y));
@@ -270,13 +288,14 @@ export class UPlotViewStrategy extends ViewStrategy {
    * @returns uPlot series
    */
   getSeries() {
-    const shapeSeries = this.shapes.reduce((prev, name) => {
-      const comp = this.ctrl.shapeComponents.get(name) as Shape;
-      return comp ? [comp.getSeries(), ...prev] : prev;
-    }, []);
+    const series = this.ctrl
+      .getShapeList()
+      .map((shape: Shape) => {
+        return shape.getSeries();
+      })
+      .flat();
 
-    // console.log('shapeComp', shapeSeries.flat());
-    return [{}, ...shapeSeries.flat()];
+    return [{}, ...series];
   }
 
   /**
@@ -368,7 +387,7 @@ export class UPlotViewStrategy extends ViewStrategy {
         init: (u: UPlot) => {
           over = u.over;
           bound = over;
-          const cursorX = u.over.querySelector(CURSOR_X);
+          const cursorX = u.over.querySelector(CURSOR_X) as HTMLElement;
           if (cursorX) {
             cursorX.style.visibility = 'hidden';
           }
@@ -432,8 +451,8 @@ export class UPlotViewStrategy extends ViewStrategy {
                 ]
               : prev;
           }, []);
-          const cursorX = u.over.querySelector(CURSOR_X);
-          const cursorY = u.over.querySelector('.u-cursor-y');
+          const cursorX = u.over.querySelector(CURSOR_X) as HTMLElement;
+          const cursorY = u.over.querySelector('.u-cursor-y') as HTMLElement;
           const noData = !values.some(d => d.y !== null);
           const visibility = noData ? 'hidden' : 'visible';
           const visibilityX =

@@ -36,6 +36,7 @@ export default class Bar extends Shape<Bar> {
 
   constructor(ctrl: View, opt: ShapeOptions = {}) {
     super(ctrl, opt);
+    this.ctrl.setShape(this.type, this);
     const option: BarShapeOption = get(this.ctrl.getOption(), this.type);
     if (typeof option === 'object') {
       this.option = option;

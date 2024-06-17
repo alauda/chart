@@ -150,8 +150,8 @@ export class Annotation extends BaseComponent<AnnotationOption> {
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  lineY(options: AnnotationLineOption) {
-    this.setOptions('lineY', options);
+  lineY(options: AnnotationLineOption, empty?: boolean) {
+    this.setOptions('lineY', options, empty);
     if (this.annotationYFn.length) {
       this.ctrl.redraw();
       return this;
@@ -208,7 +208,14 @@ export class Annotation extends BaseComponent<AnnotationOption> {
     this.annotationYFn.push(fn);
   }
 
-  setOptions(type: 'lineY' | 'lineX', options: AnnotationLineOption) {
+  setOptions(
+    type: 'lineY' | 'lineX',
+    options: AnnotationLineOption,
+    empty?: boolean,
+  ) {
+    if (empty) {
+      this.ctrl.setOption([this.name, type], [options]);
+    }
     const option = get(this.ctrl.getOption(), [this.name, type]) || [];
     const data = uniqBy([...option, options], 'data');
     this.ctrl.setOption([this.name, type], data);

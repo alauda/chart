@@ -5,6 +5,7 @@ import {
   isBoolean,
   isElement,
   isFunction,
+  isNil,
   isString,
 } from 'lodash';
 import placement from 'placement.js';
@@ -158,12 +159,16 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     }
     return items
       ?.map(item => {
-        const value = this.handleTemplateString(item.value, valueFormatter);
+        const value = this.handleTemplateString(
+          item.value,
+          valueFormatter,
+          item,
+        );
         const name = this.handleTemplateString(
           String(item.name),
           nameFormatter,
+          item,
         );
-
         return `<li class="${css(
           styles['tooltip-list-item'],
         )}" style="background: ${
@@ -177,7 +182,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         )}">${name || NOT_AVAILABLE}</span>
             <span class="${generateName('tooltip-value')} ${css(
           styles['tooltip-value'],
-        )}">${value || NOT_AVAILABLE}</span>
+        )}">${isNil(value) ? NOT_AVAILABLE : value}</span>
           </li>`;
       })
       .join('');
@@ -185,14 +190,15 @@ export class Tooltip extends BaseComponent<TooltipOption> {
 
   handleTemplateString(
     text: string | number,
-    formatter: string | ((v: string | number) => string),
+    formatter: string | ((v: string | number, data: TooltipValue) => string),
+    data?: TooltipValue,
   ) {
     let value = text;
     if (isString(formatter)) {
       value = template(formatter, { value: text });
     }
     if (isFunction(formatter)) {
-      value = formatter(value);
+      value = formatter(value, data);
     }
     return value;
   }

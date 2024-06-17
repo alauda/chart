@@ -4,6 +4,7 @@ import { UPlotViewStrategy } from '../strategy/index.js';
 import { ScaleOption } from '../types/index.js';
 
 import { BaseComponent } from './base.js';
+import uPlot from 'uplot';
 
 export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
   name = 'scale';
@@ -60,15 +61,29 @@ export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
 
   private getYOptions() {
     const { max, min } = this.option.y || {};
-    const notAuto = !isNumber(max) && !isNumber(min);
     return {
-      auto: notAuto,
+      auto: true,
       range: (_u: uPlot, dataMin: number, dataMax: number) => {
-        const minV = min
-          ? Math.max(dataMin, min || 0)
-          : Math.min(dataMin, min || 0);
-        const maxV = Math.max(dataMax, max || 1);
-        return [minV, maxV > 1 ? maxV + 1 : maxV];
+        const rangeConfig: uPlot.Range.Config = {
+          min: {
+            pad: 0.1,
+            hard: min ?? -Infinity,
+            soft: 0,
+            mode: 3,
+          },
+          max: {
+            pad: 0.1,
+            hard: max ?? Infinity,
+            soft: 0,
+            mode: 3,
+          },
+        };
+        const minMax = uPlot.rangeNum(
+          min != null && min != undefined ? min : dataMin,
+          max != null && max != undefined ? max : dataMax,
+          rangeConfig,
+        );
+        return [minMax[0], minMax[1]];
       },
     };
   }

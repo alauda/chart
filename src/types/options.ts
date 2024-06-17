@@ -69,6 +69,7 @@ export type Data = DataItem[];
 
 export interface DataItem {
   name: string;
+  id?: string;
   color?: string;
   value?: number;
   // type-coverage:ignore-next-line
@@ -112,7 +113,9 @@ export interface CoordinateOpt {
 export type AxisOption = AxisOpt | boolean;
 export interface AxisOpt {
   autoSize?: boolean; // 默认 true
-  formatter?: string | ((value: string | number) => string);
+  formatter?:
+    | string
+    | ((value: string | number, uPlotParams?: unknown) => string);
 }
 
 export type TooltipOption = TooltipOpt | boolean;
@@ -120,16 +123,16 @@ export interface TooltipOpt {
   showTitle?: boolean;
   popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
   titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
-  nameFormatter?: string | ((name: string) => string);
-  valueFormatter?: string | ((value: number) => string);
+  nameFormatter?: string | ((name: string, data?: TooltipValue) => string);
+  valueFormatter?: string | ((value: number, data?: TooltipValue) => string);
   itemFormatter?: (value: TooltipValue[]) => string | TooltipValue[] | Element;
   sort?: (a: TooltipValue, b: TooltipValue) => number;
 }
 
-export interface ShapeOption {
+export interface ShapeOption extends uPlot.Series {
   name?: string; // 指定 data name
   connectNulls?: boolean; // 是否链接空值 默认 false
-  points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
+  // points?: Omit<uPlot.Series.Points, 'show'> | boolean; // 默认 false
   width?: number; // 线宽
   alpha?: number;
   map?: string;
@@ -185,6 +188,12 @@ export interface GaugeShapeOption {
     position?: {
       x?: number;
       y?: number;
+    };
+    textStyle?: {
+      color?: string;
+    };
+    descriptionStyle?: {
+      color?: string;
     };
   };
   text?: {

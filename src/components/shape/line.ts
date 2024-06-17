@@ -27,6 +27,7 @@ export default class Line extends Shape<Line> {
 
   constructor(ctrl: View, opt: ShapeOptions = {}) {
     super(ctrl, opt);
+    this.ctrl.setShape(this.type, this);
     const option: LineShapeOption = get(this.ctrl.getOption(), this.type);
     if (typeof option === 'object' && option.step) {
       this.stepType = option.step;
@@ -34,15 +35,21 @@ export default class Line extends Shape<Line> {
   }
 
   getSeries() {
+    const baseSeries = this.getBaseSeries();
     return this.getData().map(({ color, name }) => {
       return {
         stroke: color,
         label: name,
         spanGaps: this.connectNulls,
-        points: {
-          show: !!this.option.points,
-        },
         ...getSeriesPathType(this.type, color, this.option, this.stepType),
+        ...this.option,
+        ...(baseSeries.points && {
+          points: {
+            ...baseSeries.points,
+            fill: color,
+            space: 0,
+          },
+        }),
       };
     });
   }

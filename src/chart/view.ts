@@ -88,6 +88,8 @@ export class View extends EventEmitter {
     height: 0,
   };
 
+  shapeCache = new Map<string, Array<Shape | PolarShape>>();
+
   constructor(props: ViewOption) {
     super();
     const {
@@ -360,12 +362,38 @@ export class View extends EventEmitter {
   // 命令式设置 option
   setOption(name: string | string[], option: unknown) {
     set(this.options, name, option);
-    // console.log(this.options)
     return this;
   }
 
   redraw() {
     this.emit(ChartEvent.HOOKS_REDRAW);
+  }
+
+  setShape(name: string, shape: any) {
+    const shapeValue = this.shapeCache.get(name);
+    if (shapeValue) {
+      this.shapeCache.set(name, [...shapeValue, shape]);
+      return;
+    }
+    this.shapeCache.set(name, [shape]);
+  }
+
+  getShapeList() {
+    const keys = Array.from(this.shapeCache.keys());
+    return keys
+      .map(key => {
+        return this.shapeCache.get(key).flat();
+      })
+      .flat();
+  }
+
+  getShapeDataName() {
+    return this.getShapeList()
+      .map((shape: Shape) => {
+        return shape.getSeries();
+      })
+      .flat()
+      .map(s => s.label);
   }
 
   /**
@@ -375,6 +403,7 @@ export class View extends EventEmitter {
     // ...
     this.chartContainer.innerHTML = '';
     this.options = {};
+    this.shapeCache.clear();
     this.reactivity.unsubscribe();
     [...this.components.values()].forEach(c => c.destroy());
     [...this.shapeComponents.values()].forEach(c => c.destroy());

@@ -6,4 +6,3 @@ lib
 .vercel
 .*cache
 *.tsbuildinfo
-.git

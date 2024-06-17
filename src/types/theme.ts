@@ -61,6 +61,12 @@ export interface ThemeOptions {
 
   // tooltip
   tooltip?: Tooltip;
+
+  gauge?: Gauge;
+}
+interface Gauge {
+  textColor: string;
+  descriptionColor: string;
 }
 
 export type LightTheme = {

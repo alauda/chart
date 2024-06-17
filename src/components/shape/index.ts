@@ -30,9 +30,11 @@ export abstract class Shape<T = unknown> {
   getData() {
     const data = this.ctrl.getData();
     const values = this.mapName
-      ? data.filter(d => d.name === this.mapName)
+      ? data.filter(d =>
+          d.id ? d.id === this.mapName : d.name === this.mapName,
+        )
       : data;
-    return values.length ? values : data;
+    return values;
   }
 
   getBaseSeries() {
@@ -70,6 +72,8 @@ export abstract class PolarShape<T = unknown> {
   abstract init(): void;
 
   abstract render(): void;
+
+  abstract redraw(): void;
 
   constructor(ctrl: View, opt = {}) {
     this.ctrl = ctrl;

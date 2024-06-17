@@ -174,6 +174,8 @@ export default class Pie extends PolarShape<PieShapeOption> {
         .style('transform', 'translate(-50%, -50%)');
     }
   }
+
+  redraw() {}
 }
 
 export function getPath(config: {

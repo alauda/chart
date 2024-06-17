@@ -54,7 +54,9 @@ export class Header {
     );
     if (!this.container) {
       this.container = header || document.createElement('div');
-      header.style.wordBreak = 'break-all;';
+      if (header) {
+        header.style.wordBreak = 'break-all;';
+      }
       this.container.style.display = 'flex';
       this.container.style.justifyContent = 'flex-end';
       if (!header) {

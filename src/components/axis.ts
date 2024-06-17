@@ -44,17 +44,40 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
   private getYOptions() {
     const { autoSize, formatter: yFormatter } = this.option.y || {};
     const yValues = yFormatter
-      ? (_u: uPlot, splits: string[]) =>
-          splits.map(d => {
+      ? (u: uPlot, splits: string[], axisIdx: number, tickSpace: number, tickIncr: number) => {
+          const params = {u, splits, axisIdx, tickSpace, tickIncr }
+          return splits.map(d => {
             return isFunction(yFormatter)
-              ? yFormatter(String(d))
+              ? yFormatter(String(d), params)
               : template(yFormatter, { value: d });
-          })
+          });
+        }
       : null;
     const ySize = autoSize === false ? {} : { size: axisAutoSize };
     return {
       values: yValues,
       ...ySize,
+      // space: function (self: uPlot, axisIdx: number): number {
+      //   const axis = self.axes[axisIdx];
+      //   const scale = self.scales[axis.scale!];
+
+      //   // for axis left & right
+      //   if (axis.side !== 2 || !scale) {
+      //     return 30;
+      //   }
+
+      //   const defaultSpacing = 40;
+
+      //   return defaultSpacing;
+      // },
+      // gap: 5,
+      // side: 3,
+      // show: true,
+      // ticks: {
+      //   show: true,
+      //   size: 3,
+      //   width: 0.5,
+      // },
     };
   }
 }

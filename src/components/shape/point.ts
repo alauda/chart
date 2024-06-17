@@ -4,10 +4,11 @@ import uPlot from 'uplot';
 import { UPLOT_DEFAULT_OPTIONS } from '../../strategy/config.js';
 import { UPlotViewStrategy } from '../../strategy/index.js';
 import { pointWithin, Quadtree } from '../../strategy/quadtree.js';
-import { Nilable } from '../../types/index.js';
+import { Nilable, ShapeOptions } from '../../types/index.js';
 import { convertRgba, ShapeType } from '../../utils/index.js';
 
 import { Shape } from './index.js';
+import { View } from '../../chart/view.js';
 
 export type SizeCallback = (...args: unknown[]) => number;
 
@@ -77,6 +78,11 @@ export default class Point extends Shape<Point> {
     return this;
   }
 
+  constructor(ctrl: View, opt: ShapeOptions = {}) {
+    super(ctrl, opt);
+    this.ctrl.setShape(this.type, this);
+  }
+
   getSeries() {
     const baseSeries = this.getBaseSeries();
     return this.getData().map(({ color, name }) => {
@@ -89,8 +95,8 @@ export default class Point extends Shape<Point> {
               unit: 3, // raw CSS pixels
               values: (_, seriesIdx: number) => {
                 const chartData = this.ctrl.getData();
-                const data = chartData[seriesIdx - 1].values;
-                return data.map(d => {
+                const data = chartData[seriesIdx - 1]?.values;
+                return data?.map(d => {
                   const field: number =
                     get(d, this.sizeField) || this.pointSize;
                   const [min, max] = this.sizeRange;

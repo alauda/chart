@@ -65,6 +65,11 @@ const TOOLTIP = {
   activeBg: COLORS['b-6'],
 };
 
+const GAUGE = {
+  textColor: COLORS['n-1'],
+  descriptionColor: COLORS['n-2'],
+};
+
 /**
  * Light theme.
  */
@@ -77,6 +82,7 @@ export const Light = (options?: ThemeOptions): ThemeOptions => {
     yAxis: AXIS,
     shape: SHAPE,
     tooltip: TOOLTIP,
+    gauge: GAUGE,
   };
   return { ...defaultOptions, ...options };
 };

@@ -4,6 +4,7 @@ import { StepType } from '../components/shape/line.js';
 import { ShapeOption } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
 import { convertRgba } from '../utils/index.js';
+import { getOpacityGradientFn } from './color-untils.js';
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function scaleGradient(
   u: UPlot,
@@ -86,7 +87,7 @@ export function getSeriesPathType(
   const defaultType = UPlot.paths.spline();
   const defaultOptions = {
     width: options.width ?? 1.5,
-    alpha: options.alpha ?? 1,
+    // alpha: options.alpha ?? 1,
   };
   const stroke = convertRgba(color, 1);
   return (
@@ -104,15 +105,7 @@ export function getSeriesPathType(
         paths: defaultType,
         ...defaultOptions,
         stroke,
-        fill: (u: UPlot, seriesIdx: number) => {
-          const s = u.series[seriesIdx];
-          const sc = u.scales[s.scale];
-          return scaleGradient(u, s.scale, 1, [
-            [sc.min, convertRgba(color, 0)],
-            [sc.max / 2, convertRgba(color, 0.1)],
-            [sc.max * 2, stroke],
-          ]);
-        },
+        fill: getOpacityGradientFn(stroke, options.alpha || 0.8),
       },
       [ShapeType.Bar]: {
         ...defaultOptions,
