@@ -7,6 +7,7 @@ import { createSvg, getChartColor, PolarShapeType } from '../../utils/index.js';
 import { Tooltip } from '../tooltip.js';
 
 import { PolarShape } from './index.js';
+import { get } from 'lodash';
 
 export const DEFAULT_RADIUS_DIFF = 8;
 export const ACTIVE_RADIUS_ENLARGE_SIZE = 2;
@@ -54,6 +55,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
   render() {
     this.svgEl = this.svgEl || createSvg(select(this.ctrl.container));
     this.container = this.container || this.svgEl.append('g');
+    this.option = get(this.ctrl.getOption(), this.type, this.option || {});
     this.renderPie();
     this.renderLabel();
 

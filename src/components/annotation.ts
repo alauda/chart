@@ -168,6 +168,9 @@ export class Annotation extends BaseComponent<AnnotationOption> {
           text,
           style = { lineDash: [8, 5], width: 2, stroke: 'red' },
         } = item;
+        if (+data < u.scales.y.min || +data > u.scales.y.max) {
+          return;
+        }
         ctx.save();
         const isTransposed = u.scales.y.ori === 0 && u.axes[1].side === 2;
         const [i0, i1] = u.series[0].idxs;
