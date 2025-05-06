@@ -1,4 +1,4 @@
-import { cloneDeep, merge, mergeWith, omit, isFunction, get } from 'lodash';
+import { cloneDeep, merge, mergeWith, omit, isFunction, get } from 'lodash-es';
 import UPlot from 'uplot';
 
 import { Annotation } from '../components/annotation.js';

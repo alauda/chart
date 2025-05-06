@@ -1,4 +1,4 @@
-import { get, isNumber } from 'lodash';
+import { get, isNumber } from 'lodash-es';
 
 import { UPlotViewStrategy } from '../strategy/index.js';
 import { ScaleOption } from '../types/index.js';
@@ -14,12 +14,12 @@ export class Scale extends BaseComponent<Record<'x' | 'y', ScaleOption>> {
   }
 
   render() {
-    this.option = get(this.ctrl.getOption(), this.name, {});
+    this.option = get(this.ctrl.getOption(), this.name, { x: {}, y: {} });
   }
 
   update() {
     // ..
-    this.option = get(this.ctrl.getOption(), this.name, {});
+    this.option = get(this.ctrl.getOption(), this.name, { x: {}, y: {} });
     const x = get(this.option, 'x');
     const y = get(this.option, 'y');
 

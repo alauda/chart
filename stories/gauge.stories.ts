@@ -62,6 +62,7 @@ const Template: Story = () => {
     }
     initChart();
     function initChart() {
+  
       chart = new Chart(getOp('.chart', groupPieData));
       chart.gauge({
         // outerRadius: 60,
@@ -85,11 +86,26 @@ const Template: Story = () => {
       });
       chart.interaction('element-active');
       chart.render();
+      // const pie = document.getElementsByClassName(
+      //   'pie-chart',
+      // )[0] as HTMLElement;
+      // pie.style.width = `${window.innerWidth - 100}px`;
+      // // pie.style.height = `${window.innerHeight - 100}px`;
+      // pie.style.height = `188px`;
     }
+
+    window.addEventListener('resize', () => {
+      const dom = document.querySelector('.chart') as unknown as HTMLElement
+      // console.log(dom)
+      dom.innerHTML = ''
+      setTimeout(() => {
+        initChart();
+      })
+    });
   });
 
   return `
-  <div style="width: 100%; height: 260px; display: flex;">
+  <div style="width: 100%; height: 100%; display: flex;" class="pie-chart">
   <div  style="width:100%;height:100%;padding: 20px 16px ;  box-sizing: border-box; flex: 2;">
     <div class="chart"></div>
   </div>

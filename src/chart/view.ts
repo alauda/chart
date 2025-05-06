@@ -1,4 +1,4 @@
-import { isBoolean, isObject, merge, set, cloneDeep } from 'lodash';
+import { isBoolean, isObject, merge, set, cloneDeep } from 'lodash-es';
 
 import { Annotation } from '../components/annotation.js';
 import { BaseComponent } from '../components/base.js';
@@ -178,10 +178,10 @@ export class View extends EventEmitter {
    */
   private initViewStrategy() {
     this.strategyManage = new ViewStrategyManager();
-    const uPlot = new UPlotViewStrategy(this);
     const internal = new InternalViewStrategy(this);
-    this.strategyManage.add(uPlot);
     this.strategyManage.add(internal);
+    const uPlot = new UPlotViewStrategy(this);
+    this.strategyManage.add(uPlot);
     this.strategy = this.strategyManage.getAllStrategy();
   }
 

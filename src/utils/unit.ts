@@ -1,4 +1,4 @@
-import { template as _template } from 'lodash';
+import { template as _template } from 'lodash-es';
 
 import { CHART_PREFIX, DEFAULT_COLORS } from './constant.js';
 

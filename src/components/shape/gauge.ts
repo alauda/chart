@@ -1,6 +1,6 @@
 import { select } from 'd3';
 import * as d3 from 'd3';
-import { get, isFunction } from 'lodash';
+import { get, isFunction } from 'lodash-es';
 
 import { measureText } from '../../strategy/utils.js';
 import { Data, GaugeShapeOption, PieShapeOption } from '../../types/index.js';
@@ -105,7 +105,9 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
   renderPie() {
     const { clientWidth, clientHeight } = this.svgEl.node()!;
     const radius = Math.min(clientWidth, clientHeight) / 2;
-
+    if (!clientWidth && !clientHeight) {
+      return;
+    }
     const colors = this?.option?.colors
       ?.sort((a, b) => b[0] - a[0])
       ?.reduce((pre, cur) => {
@@ -199,7 +201,7 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   renderLabel() {
-    if (this.option.label) {
+    if (this.option?.label) {
       const { colors } = this.option;
       const { text, description, position, textStyle, descriptionStyle } =
         this.option?.label;
@@ -233,7 +235,8 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
         const str = isFunction(description)
           ? (description as (data: Data) => string)(data)
           : template(description, { data });
-        centerDesc.style('font-size', fontSize + 'px').text(str);
+        centerDesc.style('font-size', fontSize + 'px')
+          .text(this.truncateText(str, fontSize, clientWidth * 0.8));
       }
       if (text) {
         const centerText = this.pieGuide
@@ -248,9 +251,38 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
         const str = isFunction(text)
           ? text(data, this.total)
           : template(text, { value: this.total, data }) || text;
-        centerText.style('font-size', fontSize + 'px').text(str);
+        centerText.style('font-size', fontSize + 'px')
+          .text(this.truncateText(str, fontSize, clientWidth * 0.8));
       }
     }
+  }
+
+  /**
+   * 截断文本并添加省略号
+   * @param text 原始文本
+   * @param fontSize 字体大小
+   * @param maxWidth 最大宽度
+   * @returns 处理后的文本
+   */
+  truncateText(text: string, fontSize: number, maxWidth: number): string {
+    if (!text) return '';
+    
+    const { width } = measureText(text, fontSize);
+    if (width <= maxWidth) return text;
+    
+    // 如果文本宽度超过最大宽度，则进行截断
+    const ellipsis = '...';
+    const ellipsisWidth = measureText(ellipsis, fontSize).width;
+    let truncatedText = text;
+    let truncatedWidth = width;
+    
+    // 逐个字符截断直到文本宽度小于最大宽度
+    while (truncatedWidth > maxWidth - ellipsisWidth && truncatedText.length > 0) {
+      truncatedText = truncatedText.slice(0, -1);
+      truncatedWidth = measureText(truncatedText, fontSize).width;
+    }
+    
+    return truncatedText + ellipsis;
   }
 
   override redraw() {

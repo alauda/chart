@@ -1,5 +1,5 @@
 import { select } from 'd3';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 
 import { Size } from '../index.js';
 
@@ -78,5 +78,5 @@ export function createSvg(
     .style('width', width || '100%')
     .style('height', height || '100%')
     .style('overflow', 'hidden')
-    .style('display', 'inline-block');
+    .style('display', 'block');
 }

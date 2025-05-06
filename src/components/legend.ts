@@ -1,5 +1,5 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get, isBoolean, isObject } from 'lodash';
+import { get, isBoolean, isObject } from 'lodash-es';
 
 import { ChartEvent, DIRECTION, LegendOption } from '../types/index.js';
 import { generateName } from '../utils/index.js';

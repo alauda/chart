@@ -43,9 +43,13 @@ export class Chart extends View {
     }
     ele.style.position = 'relative';
     ele.style.height = '100%';
+    // ele.style.display = 'flex';
+    // ele.style.flexDirection = 'column';
+
     chartEle.style.flexDirection = 'column';
     chartEle.style.display = 'flex';
     ele.style.flex = '1';
+
     if (width) {
       chartEle.style.width = `${width}px`;
     }

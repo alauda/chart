@@ -40,18 +40,18 @@ const Template: Story = () => {
           {
             name: 'area1',
             // color: 'rgb(var(--aui-color-green))',
-            values: d1,
+            values: d1.map(d => ({ ...d, y: 2 })),
           },
-          {
-            name: 'area2',
-            values: d2,
-          },
+          // {
+          //   name: 'area2',
+          //   values: d2,
+          // },
         ],
         options: {
           // title: { text: '1231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312123123123123121231231231231212312312312312' },
           title: { text: '11' },
           legend: {
-            position: 'bottom-right',
+            position: 'bottom-left',
             // position: 'bottom-right',
           },
           axis: {
@@ -68,6 +68,25 @@ const Template: Story = () => {
           },
 
           annotation: {
+            areaY: [
+              {
+                data: -Infinity,
+                text: {
+                  content: 'line',
+                  position: 'right',
+                },
+              },
+              {
+                data: 1,
+                text: {
+                  content: 'line',
+                  position: 'right',
+                },
+                style: {
+                  stroke: '#EAB839',
+                },
+              },
+            ],
             // lineX: [
             //   {
             //     data: null,
@@ -97,42 +116,45 @@ const Template: Story = () => {
     // chart.data(data);
     // chart.title(false)
     // chart.legend(false);
-    chart.line({ alpha: 1, width: 1 }).map('area1');
-    chart.area({ alpha: 1, width: 1 }).map('area2');
+    chart.line();
+    // chart.line({ alpha: 1, width: 1 }).map('area1');
+    // chart.area({ alpha: 1, width: 1 }).map('area2');
     // chart.annotation().lineY({
-    //   data: 20,
+    //   data: 1,
     //   text: {
     //     content: 'line',
     //     position: 'right',
     //   },
     // });
-    chart.annotation().lineX({
-      data: d1[10].x,
-      text: {
-        // border: {
-        //  style: '2px solid red',
-        //  padding: [0, 5]
-        // },
-        style: {
-          fontSize: '20px',
-          color: 'red',
-        },
-        content: '1111',
-      },
-    });
+
+    // chart.annotation().areaY();
+    // chart.annotation().lineX({
+    //   data: d1[10].x,
+    //   text: {
+    //     // border: {
+    //     //  style: '2px solid red',
+    //     //  padding: [0, 5]
+    //     // },
+    //     style: {
+    //       fontSize: '20px',
+    //       color: 'red',
+    //     },
+    //     content: '1111',
+    //   },
+    // });
     // chart.axis('y', {autoSize: false})
     // chart.shape('bar', { name: 'line2' });
-    chart.interaction('brush-x', {
-      end: [
-        {
-          trigger: ChartEvent.PLOT_MOUSEUP,
-          action: ActionType.BRUSH_X_END,
-          callback: e => {
-            console.log('brush-x', e);
-          },
-        },
-      ],
-    });
+    // chart.interaction('brush-x', {
+    //   end: [
+    //     {
+    //       trigger: ChartEvent.PLOT_MOUSEUP,
+    //       action: ActionType.BRUSH_X_END,
+    //       callback: e => {
+    //         console.log('brush-x', e);
+    //       },
+    //     },
+    //   ],
+    // });
     chart.render();
     // let bb = true;
     let ind = 1;
@@ -157,13 +179,13 @@ const Template: Story = () => {
       // ]);
       // bb = !bb;
       ind += 1;
-      chart.annotation().lineY({
-        data: ind,
-        text: {
-          content: 'line',
-          position: 'left',
-        },
-      });
+      // chart.annotation().lineY({
+      //   data: ind,
+      //   text: {
+      //     content: 'line',
+      //     position: 'left',
+      //   },
+      // });
       // chart.setScale
       // chart.setScale('y', { max: 200 });
       chart.annotation().lineX({
@@ -194,13 +216,13 @@ const Template: Story = () => {
     let index = 0;
     function update() {
       index += 3;
-      chart.annotation().lineY({
-        data: index,
-        text: {
-          content: 'line',
-          position: 'left',
-        },
-      });
+      // chart.annotation().lineY({
+      //   data: index,
+      //   text: {
+      //     content: 'line',
+      //     position: 'left',
+      //   },
+      // });
       // const end = new Date(start).valueOf() / 1000 + total * step;
       // interval = setInterval(() => {
       //   index += 1;
@@ -264,7 +286,7 @@ const Template: Story = () => {
   return `
   <button id="autoUpdate" type="close">自动更新</button>
   <span class="text">close</span>
-  <div style="width: 100%; height: 200px; display: flex;">
+  <div style="width: 100%; height: 300px; display: flex;">
   <div  style="width:100%;height:100%;padding: 20px 16px ;  box-sizing: border-box; flex: 2;">
     <div class="chart-area"></div>
   </div>

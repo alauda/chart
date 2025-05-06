@@ -2,12 +2,11 @@ import { StyleSheet, css } from 'aphrodite/no-important.js';
 import {
   get,
   isArray,
-  isBoolean,
   isElement,
   isFunction,
   isNil,
   isString,
-} from 'lodash';
+} from 'lodash-es';
 import placement from 'placement.js';
 
 import {
@@ -85,12 +84,11 @@ export class Tooltip extends BaseComponent<TooltipOption> {
   }
 
   create() {
-    if (!isBoolean(this.option)) {
+    if (this.option) {
       if (!this.container) {
-        const { popupContainer } = this.option;
         const overlay = document.createElement('div');
         overlay.className = `${generateName('tooltip')} ${css(styles.overlay)}`;
-        (popupContainer || document.body).append(overlay);
+        (get(this.option, 'popupContainer') || document.body).append(overlay);
         overlay.style.visibility = 'hidden';
         this.container = overlay;
       }
@@ -223,7 +221,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
     this.ctrl.on(
       ChartEvent.U_PLOT_SET_CURSOR,
       ({ anchor, title, values, position }: TooltipItemActive) => {
-        if (title && values?.length) {
+        if (values?.length) {
           // @ts-ignore
           placement(anchor, this.container, {
             placement: position || 'right',

@@ -1,4 +1,4 @@
-import { get, isFunction, merge } from 'lodash';
+import { get, isFunction, merge } from 'lodash-es';
 import uPlot from 'uplot';
 
 import { UPLOT_DEFAULT_OPTIONS } from '../../strategy/config.js';

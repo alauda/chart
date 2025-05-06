@@ -7,7 +7,7 @@
  * @returns string rgba
  */
 
-import { trim } from 'lodash';
+import { trim } from 'lodash-es';
 
 // eslint-disable-next-line regexp/no-unused-capturing-group
 const isValidHex = (hex: string) => /^#([\dA-Fa-f]{3,4}){1,2}$/.test(hex);

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import uPlot from 'uplot';
 
 import { Action } from './action.js';

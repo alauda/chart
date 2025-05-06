@@ -1,9 +1,10 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get, merge, set, uniqBy } from 'lodash';
+import { get, merge, set, uniqBy } from 'lodash-es';
 
 import { AnnotationLineOption, AnnotationOption } from '../types/index.js';
 
 import { BaseComponent } from './base.js';
+import { addAreas, addLines } from '../strategy/gradient-fills.js';
 
 const TEXT_SPACE = 4;
 
@@ -37,8 +38,10 @@ export class Annotation extends BaseComponent<AnnotationOption> {
     this.option = get(opt, this.name, {});
     const x = get(this.option, 'lineX');
     const yList = get(this.option, 'lineY', []);
+    const yAreaList = get(this.option, 'areaY', []);
     this.lineX(x);
     yList?.forEach(y => this.lineY(y));
+    this.areaY(yAreaList || []);
   }
 
   update() {
@@ -211,16 +214,73 @@ export class Annotation extends BaseComponent<AnnotationOption> {
     this.annotationYFn.push(fn);
   }
 
+  areaY(options: AnnotationLineOption[], empty?: boolean) {
+    this.setOptions('areaY', options, empty);
+    const fn = (u: uPlot) => {
+      const ctx = u.ctx;
+      const { min: xMin, max: xMax } = u.scales.x;
+      const { min: yMin, max: yMax } = u.scales.y;
+
+      if (
+        xMin == null ||
+        xMax == null ||
+        yMin == null ||
+        yMax == null ||
+        !options?.length
+      ) {
+        return;
+      }
+
+      // if (mode === ThresholdsMode.Percentage) {
+      //   let [min, max] = getGradientRange(
+      //     u,
+      //     scaleKey,
+      //     hardMin,
+      //     hardMax,
+      //     softMin,
+      //     softMax,
+      //   );
+      //   let range = max - min;
+
+      //   steps = steps.map(step => ({
+      //     ...step,
+      //     value: min + range * (step.value / 100),
+      //   }));
+      // }
+
+      ctx.save();
+      addAreas(u, 'y', options, this);
+      addLines(u, 'y', options, this);
+      // switch (config.mode) {
+      //   case GraphTresholdsStyleMode.Line:
+      //   case GraphTresholdsStyleMode.Dashed:
+      //     addLines(u, scaleKey, steps, theme);
+      //     break;
+      //   case GraphTresholdsStyleMode.Area:
+      //     addAreas(u, scaleKey, steps, theme);
+      //     break;
+      //   case GraphTresholdsStyleMode.LineAndArea:
+      //   case GraphTresholdsStyleMode.DashedAndArea:
+      //     addAreas(u, scaleKey, steps, theme);
+      //     addLines(u, scaleKey, steps, theme);
+      // }
+
+      ctx.restore();
+    };
+    this.annotationYFn.push(fn);
+  }
+
   setOptions(
-    type: 'lineY' | 'lineX',
-    options: AnnotationLineOption,
+    type: 'lineY' | 'lineX' | 'areaX' | 'areaY',
+    options: AnnotationLineOption | AnnotationLineOption[],
     empty?: boolean,
   ) {
+    const value = Array.isArray(options) ? options : [options];
     if (empty) {
-      this.ctrl.setOption([this.name, type], [options]);
+      this.ctrl.setOption([this.name, type], value);
     }
     const option = get(this.ctrl.getOption(), [this.name, type]) || [];
-    const data = uniqBy([...option, options], 'data');
+    const data = uniqBy([...option, ...value], 'data');
     this.ctrl.setOption([this.name, type], data);
   }
 

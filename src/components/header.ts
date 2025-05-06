@@ -2,7 +2,7 @@ import { StyleSheet, css } from 'aphrodite/no-important.js';
 
 import { View } from '../chart/view.js';
 import { DIRECTION } from '../types/index.js';
-import { generateName, resizeObserver } from '../utils/index.js';
+import { generateName } from '../utils/index.js';
 
 const styles = StyleSheet.create({
   top: {
@@ -38,9 +38,9 @@ export class Header {
     this.ctrl = ctrl;
     this.position = position;
     this.render();
-    this.sizeObserver = resizeObserver(this.container, () => {
-      this.ctrl.render();
-    });
+    // this.sizeObserver = resizeObserver(this.container, () => {
+    //   this.ctrl.render();
+    // });
   }
 
   render(): void {

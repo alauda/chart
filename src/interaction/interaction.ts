@@ -1,4 +1,4 @@
-import { each } from 'lodash';
+import { each } from 'lodash-es';
 
 import { View } from '../chart/view.js';
 import {

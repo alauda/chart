@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { View } from '../../chart/view.js';
 import { getSeriesPathType } from '../../strategy/utils.js';
 import { ShapeOptions } from '../../types/options.js';

@@ -1,4 +1,4 @@
-import { get, isFunction } from 'lodash';
+import { get, isFunction } from 'lodash-es';
 
 import { AXES_X_VALUES } from '../strategy/config.js';
 import { AxisOpt } from '../types/index.js';
@@ -13,7 +13,7 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
   render() {
     // ..
     const opt = this.ctrl.getOption();
-    this.option = get(opt, this.name, {});
+    this.option = get(opt, this.name, { x: {}, y: {} });
   }
 
   update() {
@@ -27,7 +27,7 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
   }
 
   private getXOptions() {
-    const { formatter: xFormatter } = this.option.x || {};
+    const { formatter: xFormatter, show } = this.option.x || {};
     const xValues = xFormatter
       ? (_u: uPlot, splits: string[]) =>
           splits.map(d => {
@@ -37,15 +37,22 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
           })
       : AXES_X_VALUES;
     return {
+      show: show !== false,
       values: xValues,
     };
   }
 
   private getYOptions() {
-    const { autoSize, formatter: yFormatter } = this.option.y || {};
+    const { autoSize, formatter: yFormatter, show } = this.option.y || {};
     const yValues = yFormatter
-      ? (u: uPlot, splits: string[], axisIdx: number, tickSpace: number, tickIncr: number) => {
-          const params = {u, splits, axisIdx, tickSpace, tickIncr }
+      ? (
+          u: uPlot,
+          splits: string[],
+          axisIdx: number,
+          tickSpace: number,
+          tickIncr: number,
+        ) => {
+          const params = { u, splits, axisIdx, tickSpace, tickIncr };
           return splits.map(d => {
             return isFunction(yFormatter)
               ? yFormatter(String(d), params)
@@ -55,6 +62,7 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
       : null;
     const ySize = autoSize === false ? {} : { size: axisAutoSize };
     return {
+      show: show !== false,
       values: yValues,
       ...ySize,
       // space: function (self: uPlot, axisIdx: number): number {

@@ -1,5 +1,5 @@
 import { StyleSheet, css } from 'aphrodite/no-important.js';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import { TitleOption } from '../types/index.js';
 import { generateName, template } from '../utils/index.js';

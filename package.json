@@ -1,6 +1,6 @@
 {
   "name": "zz-chart",
-  "version": "0.1.1-beta.42",
+  "version": "0.1.1-beta.51",
   "type": "module",
   "description": "Alauda Chart components by Alauda Frontend Team",
   "repository": "git+https://github.com/alauda/chart.git",
@@ -56,17 +56,19 @@
   },
   "peerDependencies": {
     "d3": "^7.1.1",
-    "lodash": "^4.17.21"
+    "lodash-es": "^4.17.21"
   },
   "peerDependenciesMeta": {
-    "lodash": {
+    "lodash-es": {
       "optional": true
     }
   },
   "dependencies": {
+    "@types/tinycolor2": "^1.4.6",
     "aphrodite": "^2.4.0",
     "on-change": "^4.0.2",
     "placement.js": "^1.0.0-beta.5",
+    "tinycolor2": "^1.6.0",
     "uplot": "^1.6.30"
   },
   "devDependencies": {
@@ -84,9 +86,10 @@
     "@storybook/preset-scss": "^1.0.3",
     "@types/d3": "^7.4.0",
     "@types/lodash": "^4.14.182",
+    "@types/lodash-es": "^4.17.12",
     "@types/web": "^0.0.69",
     "d3": "^7.6.1",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "resolve-typescript-plugin": "^1.2.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",

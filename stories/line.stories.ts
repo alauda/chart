@@ -20,10 +20,10 @@ const Template: Story = () => {
           name: 'line',
           values: d1,
         },
-        {
-          name: 'line2',
-          values: generateData('2023-01-31 09:00:00', 60, 60),
-        },
+        // {
+        //   name: 'line2',
+        //   values: generateData('2023-01-31 09:00:00', 60, 60),
+        // },
       ],
       options: {
         title: { text: 'chart' },
@@ -37,12 +37,14 @@ const Template: Story = () => {
           //     content: i,
           //   }
           // },
-          lineY: {
-            data: '3',
-            text: {
-              content: '1111',
+          lineY: [
+            {
+              data: '3',
+              text: {
+                content: '1111',
+              },
             },
-          },
+          ],
         },
         scale: {
           // y: { max: 100, min: 10 },

@@ -1,4 +1,4 @@
-import { isObjectLike, merge } from 'lodash';
+import { isObjectLike, merge } from 'lodash-es';
 import onChange, { ApplyData } from 'on-change';
 
 import { View } from '../chart/view.js';

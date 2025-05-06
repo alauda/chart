@@ -112,6 +112,7 @@ export interface CoordinateOpt {
 
 export type AxisOption = AxisOpt | boolean;
 export interface AxisOpt {
+  show?: boolean;
   autoSize?: boolean; // 默认 true
   formatter?:
     | string
@@ -160,6 +161,7 @@ export interface PieShapeOption {
   outerRadius?: number; // 外半径
   startAngle?: number; // 开始角度
   endAngle?: number; // 结束角度
+  padAngle?: number; 
   label?: {
     text?: string | ((value: number, total?: number) => string);
     description?: string | ((data: Data) => string);
@@ -167,6 +169,13 @@ export interface PieShapeOption {
       x?: number;
       y?: number;
     };
+  };
+  labelLine?: {
+    labels?: Array<'name' | 'value' | 'percent'>;
+    show?: boolean;
+    formatter?:
+      | string
+      | ((name: string, value: number, percent: number) => string);
   };
   total?: number; // 指定总量
   backgroundColor?: string;
@@ -211,7 +220,9 @@ export type ShapeOptions =
 
 export interface AnnotationOption {
   lineX?: AnnotationLineOption;
+  areaX?: AnnotationLineOption;
   lineY?: AnnotationLineOption[];
+  areaY?: AnnotationLineOption[];
 }
 
 export interface AnnotationLineOption {
@@ -226,6 +237,7 @@ export interface AnnotationLineOption {
     };
   };
   style?: {
+    line?: boolean;
     stroke?: string;
     width?: number;
     lineDash?: [number, number];
