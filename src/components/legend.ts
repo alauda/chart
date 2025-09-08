@@ -63,6 +63,7 @@ export class Legend extends BaseComponent<LegendOption> {
   render() {
     const opt = this.ctrl.getOption();
     this.option = get(opt, this.name, {});
+    this.inactivatedSet = this.ctrl.inactivatedSet;
     if (!this.container) {
       this.create();
     } else {
@@ -123,6 +124,7 @@ export class Legend extends BaseComponent<LegendOption> {
           symbolStyle.line,
         )}" style="background: ${value.color};"></span> 
         <span class="${css(styles.name)}">${value.name}</span>`;
+        li.style.opacity = this.inactivatedSet.has(value.name) ? '0.5' : '1';
         ul.append(li);
         // TODO: 挪到 interaction 管理
         li.addEventListener('click', () => {

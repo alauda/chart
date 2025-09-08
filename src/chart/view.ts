@@ -68,6 +68,8 @@ export class View extends EventEmitter {
 
   private mediaQuery: MediaQueryList;
 
+  inactivatedSet: Set<string> = new Set();
+
   systemThemeType: 'light' | 'dark' = 'light';
 
   size: Size = { width: 0, height: 0 };
@@ -107,6 +109,9 @@ export class View extends EventEmitter {
     this.reactivity = reactive(chartOption, this);
     this.chartContainer = chartEle;
     this.container = ele;
+    if (chartOption.inactivatedSet) {
+      this.inactivatedSet = chartOption.inactivatedSet;
+    }
     if (options) {
       this.options = { ...options, padding };
     }

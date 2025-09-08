@@ -100,6 +100,10 @@ export class UPlotViewStrategy extends ViewStrategy {
 
         this.getSeries().forEach((s: uPlot.Series, index) => {
           const no = ySeries.every(d => d.label !== s.label);
+          const ii = this.uPlot.series.findIndex(res => res.label === s.label);
+          this.uPlot.setSeries(ii, {
+            show: !legend.inactivatedSet.has(s.label),
+          });
           if (legend.inactivatedSet.has(s.label)) {
             s.show = false;
           }
@@ -263,22 +267,27 @@ export class UPlotViewStrategy extends ViewStrategy {
       return [];
     }
     const labels: string[] = this.ctrl.getShapeDataName();
-    const values = data
+    const nData = data
       .filter(v => labels.includes(v.name))
       .sort(
         (a, b) =>
           labels.indexOf(a.id || a.name) - labels.indexOf(a.id || b.name),
-      )
-      .map(value => value.values);
-    // type-coverage:ignore-next-line
-    const x = values[0].map(value => value.x);
+      );
+
+    if (nData[0].floatValues?.length) {
+      const values = nData.map(value => value.floatValues);
+      const yItem = values.map(data => {
+        return data[1];
+      });
+      return [values[0][0], ...yItem];
+    }
+    const values = nData.map(value => value.values);
+    const x = values[0].map(v => v.x) as number[];
     // const yItem = values.map(data => data.map(d => d.y));
 
-    const yItem = values.map(data =>
-      data.map(d =>
-        isNaN(+d.y) || !isFinite(+d.y) || d.y === null ? null : +d.y,
-      ),
-    );
+    const yItem = values.map(data => {
+      return data.map(d => d.y);
+    });
     return [x, ...yItem];
   }
 
@@ -399,6 +408,16 @@ export class UPlotViewStrategy extends ViewStrategy {
                 u.valToIdx(u.posToVal(this.transposed ? top : left, 'x'))
               ];
             const values = data.reduce((pre, cur) => {
+              if (cur.floatValues.length) {
+                const index = cur.floatValues[0].findIndex(c => c === x);
+                return {
+                  ...{
+                    x: cur.floatValues[0][index],
+                    y: cur.floatValues[1][index],
+                  },
+                  ...omit(cur, 'values'),
+                };
+              }
               const items = cur.values.find(c => c.x === x);
               const values = { ...items, ...omit(cur, 'values') };
               return [...pre, values];
@@ -414,7 +433,13 @@ export class UPlotViewStrategy extends ViewStrategy {
               const noData = !Array.from(u.data.slice(1))
                 .flat()
                 .some(d => d !== null);
-              if (!noData && !this.ctrl.hideTooltip && !this.isElementAction) {
+              const x = u.data[0][u.cursor.idx];
+              if (
+                !noData &&
+                !this.ctrl.hideTooltip &&
+                !this.isElementAction &&
+                x
+              ) {
                 (this.ctrl.components.get('tooltip') as Tooltip).showTooltip();
               }
             }
@@ -438,22 +463,26 @@ export class UPlotViewStrategy extends ViewStrategy {
 
           const values = data.reduce((prev, curr, index) => {
             const allow = this.isElementAction ? idxs[index + 1] : true;
+
+            const value = curr.floatValues?.length
+              ? curr.floatValues[1][idx || 0]
+              : curr.values[idx || 0]?.y;
             return ySeries[index]?.show && allow
               ? [
                   ...prev,
                   {
+                    ...curr?.values?.[idx || 0],
                     name: curr.name,
                     color: curr.color,
-                    value: curr.values[idx || 0]?.y,
+                    value: value,
                     activated: this.activeId === index + 1,
-                    ...curr.values[idx || 0],
                   },
                 ]
               : prev;
           }, []);
           const cursorX = u.over.querySelector(CURSOR_X) as HTMLElement;
           const cursorY = u.over.querySelector('.u-cursor-y') as HTMLElement;
-          const noData = !values.some(d => d.y !== null);
+          const noData = !values.some(d => d.value !== null);
           const visibility = noData ? 'hidden' : 'visible';
           const visibilityX =
             noData || this.ctrl.hideTooltip ? 'hidden' : 'visible';

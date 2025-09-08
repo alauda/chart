@@ -4,7 +4,7 @@ import uPlot from 'uplot';
 import { UPLOT_DEFAULT_OPTIONS } from '../../strategy/config.js';
 import { UPlotViewStrategy } from '../../strategy/index.js';
 import { pointWithin, Quadtree } from '../../strategy/quadtree.js';
-import { Nilable, ShapeOptions } from '../../types/index.js';
+import { DataValue, Nilable, ShapeOptions } from '../../types/index.js';
 import { convertRgba, ShapeType } from '../../utils/index.js';
 
 import { Shape } from './index.js';
@@ -84,18 +84,23 @@ export default class Point extends Shape<Point> {
   }
 
   getSeries() {
-    const baseSeries = this.getBaseSeries();
+    // const baseSeries = this.getBaseSeries();
     return this.getData().map(({ color, name }) => {
       return {
         stroke: color,
         label: name,
+        // paths: (): null => null,
         paths: makeDrawPoints({
           disp: {
             size: {
               unit: 3, // raw CSS pixels
               values: (_, seriesIdx: number) => {
                 const chartData = this.ctrl.getData();
-                const data = chartData[seriesIdx - 1]?.values;
+                const dataValues = chartData[seriesIdx - 1];
+                const data = (dataValues.floatValues?.length
+                  ? dataValues.floatValues[1]
+                  : dataValues.values) as DataValue[];
+
                 return data?.map(d => {
                   const field: number =
                     get(d, this.sizeField) || this.pointSize;
@@ -106,7 +111,7 @@ export default class Point extends Shape<Point> {
                   } else if (field > max) {
                     value = max;
                   }
-                  if (d.y === null) {
+                  if (d === null || get(d, 'y') === null) {
                     return 0;
                   }
                   return this.sizeCallback ? this.sizeCallback(value) : value;
@@ -136,11 +141,9 @@ export default class Point extends Shape<Point> {
             });
           },
         }),
-        points: {
-          show: false,
-        },
+        points: {},
         // ...getSeriesPathType(this.type, color),
-        ...baseSeries,
+        // ...baseSeries,
         fill: convertRgba(color, 0.3),
       };
     });

@@ -118,10 +118,9 @@ export default class Pie extends PolarShape<PieShapeOption> {
     const formatter = this.option.labelLine.formatter;
     if (formatter) {
       labelText = isFunction(formatter)
-        ? formatter(data.name, data.value, percent)
+        ? formatter(data, percent)
         : template(formatter, {
-            name: data.name,
-            value: data.value,
+            data,
             percent,
           });
     }
@@ -260,10 +259,9 @@ export default class Pie extends PolarShape<PieShapeOption> {
         const formatter = this.option.labelLine.formatter;
         if (formatter) {
           labelText = isFunction(formatter)
-            ? formatter(d.data.name, d.data.value, percent)
+            ? formatter(d.data, percent)
             : template(formatter, {
-                name: d.data.name,
-                value: d.data.value,
+                data: d.data,
                 percent,
               });
         }

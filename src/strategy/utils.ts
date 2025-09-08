@@ -105,7 +105,6 @@ export function getSeriesPathType(
         paths: defaultType,
         ...defaultOptions,
         stroke,
-        alpha: options.alpha,
         fill: getOpacityGradientFn(stroke, options.alpha || 0.8),
       },
       [ShapeType.Bar]: {

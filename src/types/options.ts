@@ -14,6 +14,7 @@ export interface ChartOption {
   container: string | HTMLElement;
   data?: Data;
   autoFit?: boolean; // true
+  inactivatedSet?: Set<string>;
   // 图表宽高度 不设置默认根据父容器高度自适应
   width?: number;
   height?: number;
@@ -25,6 +26,23 @@ export interface ChartOption {
   options?: Options;
   /** 主题 */
   theme?: Theme; // default system
+}
+
+export type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Uint8ClampedArray
+  | Float32Array
+  | Float64Array;
+
+export interface DataValue {
+  x: any;
+  y: number;
+  size?: number;
 }
 
 export interface ViewOption {
@@ -73,7 +91,8 @@ export interface DataItem {
   color?: string;
   value?: number;
   // type-coverage:ignore-next-line
-  values?: Array<{ x: any; y: number; size?: number }>;
+  values?: DataValue[];
+  floatValues?: TypedArray[];
 }
 
 export type TitleOption = TitleOpt | false;
@@ -161,7 +180,7 @@ export interface PieShapeOption {
   outerRadius?: number; // 外半径
   startAngle?: number; // 开始角度
   endAngle?: number; // 结束角度
-  padAngle?: number; 
+  padAngle?: number;
   label?: {
     text?: string | ((value: number, total?: number) => string);
     description?: string | ((data: Data) => string);
@@ -173,9 +192,7 @@ export interface PieShapeOption {
   labelLine?: {
     labels?: Array<'name' | 'value' | 'percent'>;
     show?: boolean;
-    formatter?:
-      | string
-      | ((name: string, value: number, percent: number) => string);
+    formatter?: string | ((data: unknown, percent: number) => string);
   };
   total?: number; // 指定总量
   backgroundColor?: string;
