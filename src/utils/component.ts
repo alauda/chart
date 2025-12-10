@@ -14,6 +14,7 @@ export const SHAPE_TYPES = Object.values(ShapeType);
 export const PolarShapeType = {
   Pie: 'pie',
   Gauge: 'gauge',
+  BarStacked: 'barStacked',
 };
 export type PolarShapeType = ValueOf<typeof PolarShapeType>;
 

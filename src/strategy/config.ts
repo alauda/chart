@@ -14,7 +14,8 @@ export const AXES_X_VALUES = [
   [1, '{HH}:{mm}', null, null, null, null, null, null, 1],
   [0.001, '{mm}:{ss}', null, null, null, null, null, null, 1],
 ];
-const DEFAULT_FONT = '12px "Roboto", "Helvetica", "Arial", sans-serif';
+export const AXIS_FONT_SIZE = 12;
+const DEFAULT_FONT = `${AXIS_FONT_SIZE}px "Roboto", "Helvetica", "Arial", sans-serif`;
 export const UPLOT_DEFAULT_OPTIONS = {
   padding: [16, 8, 0, 0],
   legend: {

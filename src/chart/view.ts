@@ -1,4 +1,4 @@
-import { isBoolean, isObject, merge, set, cloneDeep } from 'lodash-es';
+import { isBoolean, isObject, merge, set, cloneDeep, camelCase } from 'lodash-es';
 
 import { Annotation } from '../components/annotation.js';
 import { BaseComponent } from '../components/base.js';
@@ -34,7 +34,7 @@ import {
   ViewOption,
 } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
-import { getChartColor } from '../utils/index.js';
+import { cleanupChartColors, getChartColor, resetColorMap } from '../utils/index.js';
 
 import EventEmitter from './event-emitter.js';
 
@@ -105,7 +105,11 @@ export class View extends EventEmitter {
       chartOption,
       padding,
       defaultInteractions,
+      manualResetColor
     } = props;
+    if(!manualResetColor) {
+      this.initialColorMap();
+    }
     this.reactivity = reactive(chartOption, this);
     this.chartContainer = chartEle;
     this.container = ele;
@@ -256,12 +260,13 @@ export class View extends EventEmitter {
    * @returns View
    */
   data(data: Data): View {
-    data.forEach((d, index) => {
+    data.forEach((d) => {
       if (!d.color) {
-        d.color = getChartColor(index);
+        d.color = getChartColor(d.name);
       }
     });
     set(this.options, 'data', data);
+    cleanupChartColors(data.map(d => d.name));
     this.emit(ChartEvent.DATA_CHANGE, data);
     return this;
   }
@@ -400,6 +405,10 @@ export class View extends EventEmitter {
       .flat()
       .map(s => s.label);
   }
+  
+  initialColorMap() {
+    resetColorMap();
+  }
 
   /**
    * 生命周期：销毁，完全无法使用。
@@ -425,7 +434,7 @@ export class View extends EventEmitter {
  * @returns Geometry
  */
 export function registerShape(name: string, Ctor: ShapeCtor) {
-  const key = name.toLowerCase() as ShapeType;
+  const key = camelCase(name) as ShapeType;
   // 语法糖，在 view API 上增加原型方法
   View.prototype[key] = function (options?: ShapeOptions) {
     const shape = new Ctor(this, options);

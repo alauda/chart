@@ -10,6 +10,7 @@ import Gauge from './components/shape/gauge.js';
 import Line from './components/shape/line.js';
 import Pie from './components/shape/pie.js';
 import Point from './components/shape/point.js';
+import BarStacked from './components/shape/bar-stacked.js';
 import { Title } from './components/title.js';
 import { Tooltip } from './components/tooltip.js';
 import { BrushXAction } from './interaction/action/brush-x.js';
@@ -23,6 +24,7 @@ import { ActionType, ChartEvent } from './types/index.js';
 import {
   AreaShapeOption,
   BarShapeOption,
+  BarStackedShapeOption,
   GaugeShapeOption,
   LineShapeOption,
   PieShapeOption,
@@ -68,6 +70,9 @@ declare module './chart/view.js' {
     pie(option?: PieShapeOption): Pie;
 
     gauge(option?: GaugeShapeOption): Pie;
+
+    barStacked(option?: BarStackedShapeOption): BarStacked;
+
   }
 }
 
@@ -83,6 +88,8 @@ registerShape('Bar', Bar);
 registerShape('Pie', Pie);
 
 registerShape('Gauge', Gauge);
+
+registerShape('BarStacked', BarStacked);
 
 // register interaction action
 registerAction('tooltip', TooltipAction);

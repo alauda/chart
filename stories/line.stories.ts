@@ -18,7 +18,7 @@ const Template: Story = () => {
       data: [
         {
           name: 'line',
-          values: d1,
+          floatValues: d1,
         },
         // {
         //   name: 'line2',
@@ -67,7 +67,7 @@ const Template: Story = () => {
     // chart.shape('line');
     // chart.shape('bar', { name: 'line2' });
     chart.render();
-    const reactive: any = chart.reactive();
+    // const reactive: any = chart.reactive();
 
     const btn = document.querySelector('#change');
     // let bb = true;
@@ -82,20 +82,20 @@ const Template: Story = () => {
       //   showTitle: bb,
       //   titleFormatter: '{title}111'
       // }
-      reactive.options.annotation = {
-        // lineX: {
-        //   data: d1[i].x,
-        //   text: {
-        //     content: i,
-        //   }
-        // },
-        lineY: {
-          data: d1[i].y,
-          text: {
-            content: String(i),
-          },
-        },
-      };
+      // reactive.options.annotation = {
+      //   // lineX: {
+      //   //   data: d1[i].x,
+      //   //   text: {
+      //   //     content: i,
+      //   //   }
+      //   // },
+      //   lineY: {
+      //     data: d1[i].y,
+      //     text: {
+      //       content: String(i),
+      //     },
+      //   },
+      // };
       // reactive.options.scale = {
       //   y: { max: 100, min: 10 },
       // };

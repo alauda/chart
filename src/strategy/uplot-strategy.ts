@@ -433,12 +433,10 @@ export class UPlotViewStrategy extends ViewStrategy {
               const noData = !Array.from(u.data.slice(1))
                 .flat()
                 .some(d => d !== null);
-              const x = u.data[0][u.cursor.idx];
               if (
                 !noData &&
                 !this.ctrl.hideTooltip &&
-                !this.isElementAction &&
-                x
+                !this.isElementAction 
               ) {
                 (this.ctrl.components.get('tooltip') as Tooltip).showTooltip();
               }

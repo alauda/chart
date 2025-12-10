@@ -304,7 +304,7 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
 }
 
 function calculatePaths(
-  data: Array<{ color: string; value: number; values?: any }>,
+  data: Array<{ name: string; color: string; value: number; values?: any }>,
   option: PieShapeOption,
   color: string,
   angleMin?: number,
@@ -372,7 +372,7 @@ function calculatePaths(
             endAngle,
           })!,
           config: {
-            color: data[ind].color || getChartColor(ind)!,
+            color: data[ind].color || getChartColor(data[ind].name)!,
             startAngle,
             endAngle,
             ...baseConifg,

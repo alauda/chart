@@ -21,7 +21,14 @@ export function generateData(
 ) {
   const s = new Date(start).valueOf() / 1000;
   const [max, min] = range;
-
+  return [
+    Array.from({ length: num + 1 })
+      .fill(0)
+      .map((_, i) => i * step + s),
+    Array.from({ length: num + 1 })
+      .fill(0)
+      .map(() => getRandom(range)),
+  ] as any;
   return Array.from({ length: num + 1 })
     .fill(0)
     .map((_, i) => {

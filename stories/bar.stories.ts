@@ -1,6 +1,6 @@
 import { Story, Meta } from '@storybook/html';
 
-import { dealWithTime, generateData } from './utilt';
+import { dealWithTime } from './utilt';
 
 import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
@@ -14,32 +14,38 @@ const Template: Story = () => {
     const chart = new Chart({
       container: '.chart-bar',
       data: [
-        // {
-        //   name: 'bar1',
-        //   values: [
-        //     { x: 'a', y: 2 },
-        //     { x: 'b', y: 4 },
-        //     { x: 'c', y: 1 },
-        //   ],
-        // },
+        {
+          name: 'bar1',
+          values: [
+            { x: 'a', y: 2 },
+            { x: 'b', y: 4 },
+            { x: 'c', y: 1 },
+          ],
+        },
+        {
+          name: 'bar2',
+          values: [
+            { x: 'a', y: 4 },
+            { x: 'b', y: 2 },
+            { x: 'c', y: 1 },
+          ],
+        },
+        {
+          name: 'bar3',
+          values: [
+            { x: 'a', y: 1 },
+            { x: 'b', y: 1 },
+            { x: 'c', y: 1 },
+          ],
+        },
         // {
         //   name: 'bar2',
-        //   values: [
-        //     { x: 'a', y: 4 },
-        //     { x: 'b', y: 2 },
-        //     { x: 'c', y: 1 },
-        //   ],
+        //   floatValues: generateData('2023-01-31 09:00:00', 2, 2),
         // },
         // {
         //   name: 'bar3',
-        //   values: [
-        //     { x: 'a', y: 1 },
-        //     { x: 'b', y: 1 },
-        //     { x: 'c', y: 1 },
-        //   ],
+        //   floatValues: generateData('2023-01-31 09:00:00', 2, 2),
         // },
-        { name: 'bar2', values: generateData('2023-01-31 09:00:00', 2, 2) },
-        { name: 'bar3', values: generateData('2023-01-31 09:00:00', 2, 2) },
       ],
       options: {
         title: { text: 'bar chart' },

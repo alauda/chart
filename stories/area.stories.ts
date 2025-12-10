@@ -4,7 +4,7 @@ import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode';
 
 import { generateTime, generateY } from './utilt';
 
-import { ActionType, Chart, ChartEvent, resizeObserver } from '@alauda/chart';
+import { Chart, ChartEvent, resizeObserver } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
 export default {
@@ -25,13 +25,13 @@ const Template: Story = () => {
     const step = 720;
     const start = '2023-01-31 09:00:00';
     const range1: [number, number] = [0, 100];
-    const range2: [number, number] = [0, 100];
+    // const range2: [number, number] = [0, 100];
     const timeData = generateTime(start, total, step);
     const yData1 = generateY(total, range1);
-    const yData2 = generateY(total, range2);
+    // const yData2 = generateY(total, range2);
 
     const d1 = timeData.map((x, i) => ({ x, y: yData1[i] }));
-    const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
+    // const d2 = timeData.map((x, i) => ({ x, y: yData2[i] }));
     function getOp(container: string): any {
       return {
         container,
@@ -40,7 +40,8 @@ const Template: Story = () => {
           {
             name: 'area1',
             // color: 'rgb(var(--aui-color-green))',
-            values: d1.map(d => ({ ...d, y: 2 })),
+            // values: [timeData, d1.map(item => item.y)],
+            floatValues: [timeData, d1.map(item => item.y)],
           },
           // {
           //   name: 'area2',
@@ -68,25 +69,25 @@ const Template: Story = () => {
           },
 
           annotation: {
-            areaY: [
-              {
-                data: -Infinity,
-                text: {
-                  content: 'line',
-                  position: 'right',
-                },
-              },
-              {
-                data: 1,
-                text: {
-                  content: 'line',
-                  position: 'right',
-                },
-                style: {
-                  stroke: '#EAB839',
-                },
-              },
-            ],
+            // areaY: [
+            //   {
+            //     data: -Infinity,
+            //     text: {
+            //       content: 'line',
+            //       position: 'right',
+            //     },
+            //   },
+            //   {
+            //     data: 1,
+            //     text: {
+            //       content: 'line',
+            //       position: 'right',
+            //     },
+            //     style: {
+            //       stroke: '#EAB839',
+            //     },
+            //   },
+            // ],
             // lineX: [
             //   {
             //     data: null,
@@ -157,7 +158,6 @@ const Template: Story = () => {
     // });
     chart.render();
     // let bb = true;
-    let ind = 1;
     chart.on(ChartEvent.PLOT_CLICK, e => {
       console.log('e', e);
       // const timeData = generateTime(start, total, step);
@@ -178,7 +178,7 @@ const Template: Story = () => {
       //   },
       // ]);
       // bb = !bb;
-      ind += 1;
+      // ind += 1;
       // chart.annotation().lineY({
       //   data: ind,
       //   text: {
@@ -213,9 +213,9 @@ const Template: Story = () => {
 
     let interval: NodeJS.Timer;
     let animationFrame: number;
-    let index = 0;
+    // let index = 0;
     function update() {
-      index += 3;
+      // index += 3;
       // chart.annotation().lineY({
       //   data: index,
       //   text: {
@@ -243,7 +243,6 @@ const Template: Story = () => {
       //   ];
       //   chart.data(data);
       // }, 200);
-
       // index += 1;
       // const time = end + index * step;
       // const current = dealWithTime(new Date(time * 1000));
@@ -261,7 +260,6 @@ const Template: Story = () => {
       //   },
       // ];
       // chart.data(data);
-
       // animationFrame = requestAnimationFrame(update);
     }
 

@@ -17,40 +17,55 @@ const Template: Story = () => {
   });
 
   setTimeout(() => {
-    const groupPieData = [
-      {
-        name: '部署',
-        value: 7038600,
-        color: '#999',
-      },
+    // const groupPieData = [
+    //   {
+    //     name: '部署',
+    //     value: 7038600,
+    //     color: '#999',
+    //   },
 
-      {
-        name: '有状态',
-        value: 7038360,
-        color: '#0abf5b',
-      },
-      {
-        name: '守护',
-        value: 7039320,
-        color: '#006eff',
-      },
-      {
-        name: 'sss',
-        value: 52186903,
-        color: '#999',
-      },
-    ];
+    //   {
+    //     name: '有状态',
+    //     value: 7038360,
+    //     color: '#0abf5b',
+    //   },
+    //   {
+    //     name: '守护',
+    //     value: 7039320,
+    //     color: '#006eff',
+    //   },
+    //   {
+    //     name: 'sss',
+    //     value: 52186903,
+    //     color: '#999',
+    //   },
+    // ];
 
-    const data =[
-      { name: '123', value: 7038600 },
-      { name: 7038360, value: 7038360 },
-      { name: 7039320, value: 7039320 },
-      { name: 52186903, value: 52186903 },
-      { name: 397374320, value: 397374320 },
-      { name: 485002955, value: 485002955 },
-      { name: 19920191, value: 19920191 },
-      { name: 731859161, value: 731859161 },
-      { name: '11231231231112312312311123123123111231231231112311231231231232312311123123123111231231231', value: 736941297 },
+    const data = [
+      {
+        name: '{"__name__":"shared_dict_free","endpoint":"https-metrics","instance":"192.168.139.138:11782","job":"alb2-global-alb2","name":"http_certs_cache","namespace":"cpaas-system","node_name":"192.168.139.138","pod":"global-alb2-654b589d9d-f5vsh","service":"global-alb2"}',
+        value: 1,
+      },
+      {
+        name: '{"__name__":"shared_dict_free","endpoint":"https-metrics","instance":"192.168.139.138:11782","job":"alb2-global-alb2","name":"http_alb_cache","namespace":"cpaas-system","node_name":"192.168.139.138","pod":"global-alb2-654b589d9d-f5vsh","service":"global-alb2"}',
+        value: 1,
+      },
+      { name: '52186903', value: 4 },
+      {
+        name: '397374320397374320397374320397374320397374320397374320397374320',
+        value: 5,
+      },
+      { name: '1', value: 4 },
+      { name: '2', value: 3 },
+      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },      { name: '1', value: 4 },
+      { name: '2', value: 3 },
     ];
 
     function getOp(container: string, data: any): any {
@@ -59,9 +74,7 @@ const Template: Story = () => {
         // data: [],
         data,
         options: {
-          legend: {
-            position: 'bottom-left'
-          },
+          legend: false,
           tooltip: true,
           pie: {
             // startAngle: -(Math.PI / 1.4),
@@ -69,7 +82,7 @@ const Template: Story = () => {
             // padAngle: 0.05,
             // total: 100,
             labelLine: {
-              labels: ['name','percent'],
+              labels: ['name'],
               show: true,
             },
             // label: {
@@ -98,7 +111,7 @@ const Template: Story = () => {
       // pie.style.height = `${window.innerHeight - 100}px`;
       pie.style.height = `188px`;
 
-      window.addEventListener('resize', e => {
+      window.addEventListener('resize', () => {
         const pie = document.getElementsByClassName(
           'pie-chart',
         )[0] as HTMLElement;

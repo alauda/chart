@@ -18,11 +18,11 @@ const Template: Story = () => {
       data: [
         {
           name: 'point1',
-          values: generateData('2023-01-31 09:00:00', 60, 60),
+          floatValues: generateData('2023-01-31 09:00:00', 60, 60),
         },
         {
           name: 'point2',
-          values: generateData('2023-01-31 09:00:00', 60, 60, [2, 5]),
+          floatValues: generateData('2023-01-31 09:00:00', 60, 60, [2, 5]),
         },
       ],
       options: {

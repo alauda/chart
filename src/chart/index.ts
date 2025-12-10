@@ -28,6 +28,7 @@ export class Chart extends View {
       defaultInteractions = DEFAULT_INTERACTIONS,
       options,
       data,
+      manualResetColor,
     } = props;
     const chartEle: HTMLElement = getElement(container);
     const header = document.createElement('div');
@@ -65,6 +66,7 @@ export class Chart extends View {
       data,
       options,
       defaultInteractions,
+      manualResetColor,
       chartOption: props,
     };
     super(opts);

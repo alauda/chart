@@ -27,7 +27,7 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
   }
 
   private getXOptions() {
-    const { formatter: xFormatter, show } = this.option.x || {};
+    const { formatter: xFormatter, show, categories  } = this.option.x || {};
     const xValues = xFormatter
       ? (_u: uPlot, splits: string[]) =>
           splits.map(d => {
@@ -37,6 +37,7 @@ export class Axis extends BaseComponent<Record<'x' | 'y', AxisOpt>> {
           })
       : AXES_X_VALUES;
     return {
+      categories,
       show: show !== false,
       values: xValues,
     };

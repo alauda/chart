@@ -26,6 +26,8 @@ export interface ChartOption {
   options?: Options;
   /** 主题 */
   theme?: Theme; // default system
+
+  manualResetColor?: boolean;
 }
 
 export type TypedArray =
@@ -57,6 +59,8 @@ export interface ViewOption {
   defaultInteractions: string[];
   /** 主题 */
   theme?: Theme; // default system
+
+  manualResetColor?: boolean;
 }
 
 export interface Options {
@@ -81,6 +85,7 @@ export interface Options {
   bar?: BarShapeOption;
   point?: PointShapeOption;
   gauge?: GaugeShapeOption;
+  barStacked?: BarStackedShapeOption;
 }
 
 export type Data = DataItem[];
@@ -90,6 +95,7 @@ export interface DataItem {
   id?: string;
   color?: string;
   value?: number;
+  stack?: string;
   // type-coverage:ignore-next-line
   values?: DataValue[];
   floatValues?: TypedArray[];
@@ -132,6 +138,7 @@ export interface CoordinateOpt {
 export type AxisOption = AxisOpt | boolean;
 export interface AxisOpt {
   show?: boolean;
+  categories?: string[];
   autoSize?: boolean; // 默认 true
   formatter?:
     | string
@@ -227,6 +234,10 @@ export interface GaugeShapeOption {
     size?: number; // 12
     color?: string | ((value: number) => string); // n-4
   };
+}
+
+export interface BarStackedShapeOption extends ShapeOption {
+  barWidth?: number;
 }
 
 export type ShapeOptions =
