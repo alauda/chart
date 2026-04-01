@@ -14,8 +14,8 @@ export const symbolStyle = StyleSheet.create({
     height: 12,
   },
   circle: {
-    width: 12,
-    height: 12,
+    width: 4,
+    height: 4,
     borderRadius: '50%',
   },
 });

@@ -123,7 +123,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
 
   private getTooltipTitle(title: string, values: TooltipValue[]) {
     const { showTitle, titleFormatter } = this.option as TooltipOpt;
-    if (String(showTitle) === 'false' || !title) {
+    if ((String(showTitle) === 'false' || !title) && !titleFormatter) {
       return '';
     }
     let tpl: string = title || NOT_AVAILABLE;
@@ -155,6 +155,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
         items = itemValue;
       }
     }
+    const isPie = this.ctrl.shapeComponents.get('pie');
     return items
       ?.map(item => {
         const value = this.handleTemplateString(
@@ -173,7 +174,7 @@ export class Tooltip extends BaseComponent<TooltipOption> {
           item.activated ? this.ctrl.getTheme().tooltip.activeBg : 'unset'
         }">
             <span class="${css(symbolStyle.symbol)} ${css(
-          symbolStyle.line,
+          isPie ? symbolStyle.circle : symbolStyle.line,
         )}" style="background: ${item.color};"></span>
             <span class="${generateName('tooltip-name')} ${css(
           styles['tooltip-name'],

@@ -7,7 +7,6 @@ import { Data, DataItem, PieShapeOption } from '../../types/options.js';
 import {
   createSvg,
   generateName,
-  getChartColor,
   PolarShapeType,
   template,
 } from '../../utils/index.js';
@@ -15,6 +14,7 @@ import { Legend } from '../legend.js';
 
 import { PolarShape } from './index.js';
 import { Tooltip } from '../tooltip.js';
+import { View } from '../../chart/view.js';
 
 export const DEFAULT_RADIUS_DIFF = 8;
 export const ACTIVE_RADIUS_ENLARGE_SIZE = 2;
@@ -154,7 +154,6 @@ export default class Pie extends PolarShape<PieShapeOption> {
           ?.clientHeight || 0;
 
       const height = clientHeight - legendH - headerH;
-
       this.renderPie(height);
       this.renderLabel();
 
@@ -207,44 +206,47 @@ export default class Pie extends PolarShape<PieShapeOption> {
 
   renderPie(clientHeight: number) {
     const { clientWidth } = this.svgEl.node()!;
-    // 初始半径（基于宽高的最小值）
+
+    // 1. 基础半径：容器宽高的一半，减去 hover 放大所需的 buffer (2px)
     let radius =
       Math.min(clientWidth, clientHeight) / 2 - ACTIVE_RADIUS_ENLARGE_SIZE;
 
-    // 1. 水平方向约束 (防止左右标签溢出)
-    let maxLabelCharLength = 0;
-    this.data.forEach(d => {
-      const len = this.calculateLabelLength(d);
-      if (len > maxLabelCharLength) maxLabelCharLength = len;
-    });
+    // 只有当需要显示引导线时，才计算复杂的避让半径
+    if (this.option.labelLine?.show) {
+      let maxLabelCharLength = 0;
+      this.data.forEach(d => {
+        const len = this.calculateLabelLength(d);
+        if (len > maxLabelCharLength) maxLabelCharLength = len;
+      });
 
-    const maxAllowedLabelWidth = clientWidth * 0.4; // 允许标签占单侧宽度的 40%
-    const estimatedLabelWidth =
-      maxLabelCharLength * 12 + LAYOUT_CONFIG.lineLength + 10;
-    const finalLabelWidth = Math.min(estimatedLabelWidth, maxAllowedLabelWidth);
+      const maxAllowedLabelWidth = clientWidth * 0.4;
+      const estimatedLabelWidth =
+        maxLabelCharLength * 12 + LAYOUT_CONFIG.lineLength + 10;
+      const finalLabelWidth = Math.min(
+        estimatedLabelWidth,
+        maxAllowedLabelWidth,
+      );
 
-    const maxRadiusHorizontal = clientWidth / 2 - finalLabelWidth;
+      const maxRadiusHorizontal = clientWidth / 2 - finalLabelWidth;
 
-    // 2. 垂直方向约束 (关键优化：防止顶部/底部引导线溢出)
-    // 逻辑：引导线最远会到达 r * scale 的位置。
-    const verticalPadding = 20; // 顶部底部预留空间 (文字高度 + 少量留白)
-    const maxRadiusVertical =
-      (clientHeight / 2 - verticalPadding) / LAYOUT_CONFIG.elbowRadiusScale;
+      const verticalPadding = 20;
 
-    // 3. 取所有限制中的最小值
-    const maxRadius = Math.min(
-      maxRadiusHorizontal,
-      maxRadiusVertical,
-      clientHeight / 2 - 10, // 最后的保底，防止贴边
-    );
+      const maxRadiusVertical =
+        (clientHeight / 2 - verticalPadding) / LAYOUT_CONFIG.elbowRadiusScale;
 
-    // 4. 最小半径保护 (防止过度挤压导致饼图消失)
+      const maxRadius = Math.min(
+        maxRadiusHorizontal,
+        maxRadiusVertical,
+        clientHeight / 2 - 10,
+      );
+
+      radius = Math.min(radius, maxRadius);
+    }
+
     const minRadius = Math.min(clientWidth, clientHeight) * 0.15;
 
-    radius = Math.max(Math.min(radius, maxRadius), minRadius);
+    radius = Math.max(radius, minRadius);
 
-    // --- 优化结束 ---
-    // 1. 获取原始路径数据
     const rawPaths = calculatePaths(
       this.data,
       {
@@ -255,6 +257,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
           : this.option?.backgroundColor || this.colorVar['n-8'],
       },
       this.colorVar['n-8'],
+      this.ctrl,
     );
 
     const paths = rawPaths.map((p, i) => ({
@@ -289,9 +292,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
     const r0 = outerRadius + LAYOUT_CONFIG.anchorOffset;
     const r1 = outerRadius * LAYOUT_CONFIG.elbowRadiusScale;
     const spacing = LAYOUT_CONFIG.labelHeight + LAYOUT_CONFIG.paddingY;
-    const maxY = r1 * 1.5; // 画布垂直边界限制
 
-    // 1. 初始化
     let allLabels: TemporaryLabelData[] = validPaths.map((d: any) => {
       const midAngle = (d.config.startAngle + d.config.endAngle) / 2;
       const normalizedAngle = midAngle % (Math.PI * 2);
@@ -316,7 +317,6 @@ export default class Pie extends PolarShape<PieShapeOption> {
       .filter(d => d.isRightSide)
       .sort((a, b) => a.idealP1[1] - b.idealP1[1]);
 
-    // 2. 布局计算与可见性过滤函数
     const processSide = (labels: TemporaryLabelData[], isRight: boolean) => {
       if (labels.length === 0) return [];
 
@@ -335,41 +335,57 @@ export default class Pie extends PolarShape<PieShapeOption> {
       }
 
       let results: LabelLayoutData[] = [];
-      let lastVisibleY = -Infinity; 
+      let lastVisibleY = -Infinity;
+
+      const { clientHeight } = this.ctrl.container;
+
+      const safeMaxY = clientHeight / 2 - 40;
+      const totalAvailableHeight = safeMaxY * 2;
 
       groups.forEach(group => {
+        let currentSpacing = spacing;
+        const itemCount = group.items.length;
+        const totalNeededHeight = itemCount * spacing;
+        if (totalNeededHeight > totalAvailableHeight) {
+          const compressedSpacing = totalAvailableHeight / itemCount;
+          // 设置最小间距极限，防止文字重叠
+          const minSpacing = LAYOUT_CONFIG.labelHeight * 0.85;
+          currentSpacing = Math.max(compressedSpacing, minSpacing);
+        }
+
+        const groupHeight = itemCount * currentSpacing;
         const boundary = group.getBoundary(spacing);
-        let currentY = boundary.top + spacing / 2;
+        let startY = boundary.top;
+
+        if (startY < -safeMaxY) startY = -safeMaxY;
+        if (startY + groupHeight > safeMaxY) {
+          startY = safeMaxY - groupHeight;
+          if (startY < -safeMaxY) startY = -safeMaxY;
+        }
+        if (startY < lastVisibleY + LAYOUT_CONFIG.paddingY) {
+          startY = lastVisibleY + LAYOUT_CONFIG.paddingY;
+        }
+
+        let currentY = startY + currentSpacing / 2;
 
         group.items.forEach(item => {
-         
-          const stackedY = Math.max(-maxY, Math.min(maxY, currentY));
-
           let visible = true;
-          if (Math.abs(stackedY) > r1 * 1.2) visible = false;
-          if (
-            visible &&
-            stackedY - LAYOUT_CONFIG.labelHeight / 2 <
-              lastVisibleY + LAYOUT_CONFIG.paddingY
-          ) {
-            visible = false;
-          }
+          if (Math.abs(currentY) > safeMaxY) visible = false;
 
-          let finalY: number;
-
+          let finalY = currentY;
           if (visible) {
-            finalY = stackedY;
             lastVisibleY = finalY + LAYOUT_CONFIG.labelHeight / 2;
-          } else {
-            finalY = Math.max(-maxY, Math.min(maxY, item.idealP1[1]));
           }
+
+          const p0 = item.p0; // 获取锚点 P0
 
           let xAbs = 0;
-          if (Math.abs(finalY) < r1) {
+          if (Math.abs(finalY) < r1 - 0.001) {
             xAbs = Math.sqrt(r1 * r1 - finalY * finalY);
-          } else {
-            xAbs = 10;
           }
+
+          const minSafeXAbs = Math.abs(p0[0]) * 1.02;
+          xAbs = Math.max(xAbs, minSafeXAbs);
 
           const p1: [number, number] = [isRight ? xAbs : -xAbs, finalY];
           const p2: [number, number] = [
@@ -392,8 +408,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
             visible: visible,
           });
 
-          currentY += spacing;
-
+          currentY += currentSpacing;
         });
       });
       return results;
@@ -455,7 +470,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
       .style('stroke-linejoin', 'miter')
       .text(d => {
         const absX = Math.abs(d.textX);
-        const halfWidth = clientWidth / 2; 
+        const halfWidth = clientWidth / 2;
         const maxTextWidth = halfWidth - absX - 10;
         return truncateText(d.labelText, Math.max(0, maxTextWidth));
       })
@@ -473,15 +488,26 @@ export default class Pie extends PolarShape<PieShapeOption> {
     });
 
     const ctrl = this.ctrl;
-    const container = this.container; 
-
+    const container = this.container;
+    const tooltip = ctrl.components.get('tooltip') as Tooltip;
     pieItems
       .on('mouseover', function (event: MouseEvent, data: any) {
         ctrl.emit(ChartEvent.ELEMENT_MOUSEMOVE, { self: this, event, data });
         if (!ctrl.hideTooltip) {
+          const tooltipOption = tooltip.option;
+          const mode = get(tooltipOption, 'mode') || 'single'; // 默认为 single
+
+          let valuesToEmit: DataItem[] = [];
+
+          if (mode === 'all') {
+            valuesToEmit = data.source;
+          } else {
+            valuesToEmit = [data.data];
+          }
           ctrl.emit(ChartEvent.U_PLOT_SET_CURSOR, {
             anchor: event.target,
-            values: [data.data],
+            values: valuesToEmit,
+            position: 'top',
           });
           (ctrl.components.get('tooltip') as Tooltip).showTooltip();
         }
@@ -490,10 +516,7 @@ export default class Pie extends PolarShape<PieShapeOption> {
         const currentIndex = (data as any).originalIndex;
         const currentGroup = container.selectAll(`.label-item-${currentIndex}`);
 
-        currentGroup
-          .attr('opacity', 1) 
-          .style('font-weight', 'bold')
-          .raise();
+        currentGroup.attr('opacity', 1).style('font-weight', 'bold').raise();
       })
       .on('mouseover.highlight', (_, d: any) => {
         container
@@ -531,27 +554,65 @@ export default class Pie extends PolarShape<PieShapeOption> {
 
   onMousemove(res: { self: unknown; data: PieItemValue; event: MouseEvent }) {
     const item = res.data;
+    const sel = d3.select(res.self as any);
+    const config = item.config;
+
+    const newOuterRadius = config.outerRadius + ACTIVE_RADIUS_ENLARGE_SIZE;
+
+    const originalBorderWidth = config.borderWidth || 0;
+    const newBorderWidth = Math.max(
+      0,
+      originalBorderWidth - ACTIVE_RADIUS_ENLARGE_SIZE,
+    );
+    const thickness = newOuterRadius - config.innerRadius;
+    const safeBorderRadius = Math.min(config.borderRadius || 0, thickness / 2);
     const path = getPath({
-      ...item.config,
-      padAngle: item.config.padAngle,
-      innerRadius: item.config.innerRadius,
-      outerRadius: item.config.outerRadius + ACTIVE_RADIUS_ENLARGE_SIZE,
-      borderWidth: item.config.borderWidth - ACTIVE_RADIUS_ENLARGE_SIZE,
+      ...config,
+      outerRadius: newOuterRadius,
+      borderWidth: newBorderWidth,
+      borderRadius: safeBorderRadius,
+      padAngle: config.padAngle,
     });
-    d3.select(res.self as any)
-      .attr('opacity', 0.9)
-      .transition()
-      .attr('d', path);
+
+    sel.interrupt();
+
+    sel.attr('opacity', 0.9).attr('d', path);
   }
 
   onMouseleave(res: { self: unknown; data: PieItemValue; event: MouseEvent }) {
     const item = res.data;
-    d3.select(res.self as any)
+    const originalConfig = item.config;
+    const sel = d3.select(res.self as any);
+
+    // 获取当前状态（即放大后的状态）作为动画起点
+    // 注意：这里手动构建放大的 config，确保和 mousemove/mouseover 里的逻辑一致
+    const enlargedConfig = {
+      ...originalConfig,
+      outerRadius: originalConfig.outerRadius + ACTIVE_RADIUS_ENLARGE_SIZE,
+      // 注意：这里需要重新计算 mousemove 时使用的 borderWidth 和 borderRadius
+      // 否则插值起点会跳变
+      borderWidth: Math.max(
+        0,
+        (originalConfig.borderWidth || 0) - ACTIVE_RADIUS_ENLARGE_SIZE,
+      ),
+      // 这里的 radius 不重要，因为 getPath 会自动 clamp，
+      // 但为了平滑，最好给一个稍微大一点的值或保持原值
+      borderRadius: originalConfig.borderRadius,
+    };
+
+    sel
+      .interrupt() // 必不可少
       .attr('opacity', 1)
       .transition()
-      .attr('d', getPath(item.config));
+      .duration(200)
+      .ease(d3.easeQuadOut)
+      .attrTween('d', function () {
+        const interpolator = d3.interpolate(enlargedConfig, originalConfig);
+        return function (t) {
+          return getPath(interpolator(t));
+        };
+      });
   }
-
   renderLabel() {
     if (this.option.label) {
       const { x = 0, y = 0 } = this.option.label.position || {};
@@ -574,19 +635,31 @@ export default class Pie extends PolarShape<PieShapeOption> {
 }
 
 export function getPath(config: {
-  padAngle: number;
+  padAngle?: number; // 设为可选
   startAngle: number;
   endAngle: number;
   innerRadius: number;
   outerRadius: number;
   borderRadius: number;
-  borderWidth: number;
-  color: string;
+  borderWidth?: number; // 设为可选
+  color?: string;
 }) {
+  let userPadAngle = config.padAngle ?? 0;
+  if (userPadAngle > 1 && config.outerRadius > 0) {
+    userPadAngle = userPadAngle / config.outerRadius;
+  }
+  const fallbackPadAngle = config.borderWidth
+    ? (config.borderWidth * Math.PI) / 180
+    : 0;
+
+  const finalPadAngle =
+    config.padAngle !== undefined ? userPadAngle : fallbackPadAngle;
+
   const arc = d3
     .arc()
     .cornerRadius(config.borderRadius)
-    .padAngle(config.padAngle || (config.borderWidth * Math.PI) / 180);
+    .padAngle(finalPadAngle);
+
   return arc({
     innerRadius: config.innerRadius,
     outerRadius: config.outerRadius,
@@ -599,6 +672,7 @@ export function calculatePaths(
   data: Data,
   option: PieShapeOption,
   color: string,
+  ctrl: View,
 ) {
   const rawTotal = data.reduce((acc, curr) => acc + curr.value, 0);
   const total = Math.max(option.total || 0, rawTotal);
@@ -608,7 +682,7 @@ export function calculatePaths(
     endAngle < startAngle
       ? ((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI
       : endAngle - startAngle;
-  const angles = data.map(data => (data.value / total || 0) * diffAngle);
+  let angles = data.map(data => (data.value / total || 0) * diffAngle);
 
   const { outerRadius, innerRadius } = getRadius({
     ...option,
@@ -618,13 +692,25 @@ export function calculatePaths(
         : option.innerRadius || option.padAngle - 0.01,
   });
 
+  // ================= padAngle 自适应计算 =================
+  let finalPadAngle = 0;
+  if (data.length > 1) {
+    const userPad = option.padAngle;
+
+    if (isNumber(userPad)) {
+      if (userPad > 1) {
+        finalPadAngle = userPad / outerRadius;
+      } else {
+        finalPadAngle = userPad;
+      }
+    }
+  }
+
   const { borderRadius = 2, borderWidth = 0 } = option?.itemStyle || {};
-  const arc = d3
-    .arc()
-    .cornerRadius(borderRadius)
-    .padAngle(data.length === 1 ? 0 : option.padAngle || 0);
+  const arc = d3.arc().cornerRadius(borderRadius).padAngle(finalPadAngle);
 
   let accumulate = startAngle;
+
   const baseConfig: Partial<PieItemConfig> = {
     padAngle: data.length === 1 || !data?.length ? 0 : option.padAngle || 0,
     innerRadius,
@@ -632,25 +718,73 @@ export function calculatePaths(
     borderRadius,
     borderWidth,
   };
-  const padding = 14;
-  const innerDisc = option.innerDisc
-    ? [
-        {
-          path: arc({
-            innerRadius: innerRadius - padding,
-            outerRadius: innerRadius - padding - 4,
-            startAngle,
-            endAngle,
-          })!,
-          config: {
-            color,
-            startAngle,
-            endAngle,
-            ...baseConfig,
-          },
+
+  // ================== 默认最小角度处理 ==================
+  const DEFAULT_MIN_DEGREE = 8;
+  const minRadian = (DEFAULT_MIN_DEGREE * Math.PI) / 180;
+
+  const smallIndices = angles
+    .map((a, i) => (a > 0 && a < minRadian ? i : -1))
+    .filter(i => i !== -1);
+
+  if (smallIndices.length > 0 && smallIndices.length * minRadian < diffAngle) {
+    const largeIndices = angles
+      .map((a, i) => (a >= minRadian ? i : -1))
+      .filter(i => i !== -1);
+
+    const totalLargeAngle = largeIndices.reduce((sum, i) => sum + angles[i], 0);
+
+    const totalMinNeeded = smallIndices.length * minRadian;
+    const remainingSpace = diffAngle - totalMinNeeded;
+
+    if (totalLargeAngle > 0) {
+      const scale = remainingSpace / totalLargeAngle;
+
+      const newAngles = [...angles];
+
+      smallIndices.forEach(i => {
+        newAngles[i] = minRadian;
+      });
+
+      largeIndices.forEach(i => {
+        newAngles[i] = angles[i] * scale;
+      });
+
+      angles = newAngles;
+    }
+  }
+
+  // ================== 内环处理  ==================
+  let innerDiscItems = [];
+  if (option.innerDisc) {
+    const gap = getAdaptiveSize(0.1, innerRadius, 0.1);
+
+    let width = getAdaptiveSize(0.05, innerRadius, 0.04);
+    // 保证线条不要太细看不清
+    width = Math.max(width, 1.5);
+
+    // 计算半径
+    const discOuterRadius = Math.max(0, innerRadius - gap);
+    const discInnerRadius = Math.max(0, discOuterRadius - width);
+
+    if (discOuterRadius > 0 && discInnerRadius >= 0) {
+      innerDiscItems.push({
+        path: arc({
+          innerRadius: discInnerRadius,
+          outerRadius: discOuterRadius,
+          startAngle,
+          endAngle,
+        })!,
+        config: {
+          color,
+          startAngle,
+          endAngle,
+          ...baseConfig,
         },
-      ]
-    : [];
+      });
+    }
+  }
+
   return angles.reduce(
     (acc, curr, ind) => {
       const startAngle = accumulate;
@@ -679,12 +813,13 @@ export function calculatePaths(
             endAngle,
           })!,
           config: {
-            color: data[ind].color || getChartColor(data[ind].name)!,
+            color: data[ind].color || ctrl.color.getChartColor(data[ind].name)!,
             startAngle,
             endAngle,
             ...baseConfig,
           },
           data: data[ind],
+          source: data,
           polylinePoints,
         },
       ];
@@ -694,7 +829,7 @@ export function calculatePaths(
     [
       {
         path: arc({
-          innerRadius: 0,
+          innerRadius: option.backgroundArc ? innerRadius : 0,
           outerRadius,
           startAngle: option.startAngle || startAngle,
           endAngle: option.endAngle || endAngle,
@@ -707,7 +842,7 @@ export function calculatePaths(
         },
         data: null,
       },
-      ...innerDisc,
+      ...innerDiscItems,
     ],
   );
 }
@@ -715,9 +850,6 @@ export function calculatePaths(
 export function getRadius(option: PieShapeOption) {
   let outerRadius = option.outerRadius;
   let innerRadius = outerRadius * option.innerRadius || 0;
-  if (!outerRadius && !innerRadius) {
-    throw new Error('Either outerRadius or innerRadius is required!');
-  }
   if (!innerRadius && innerRadius !== 0) {
     innerRadius = outerRadius - DEFAULT_RADIUS_DIFF;
   }
@@ -753,4 +885,18 @@ function truncateText(text: string, maxWidth: number, fontSize: number = 12) {
     result += char;
   }
   return text;
+}
+
+function getAdaptiveSize(
+  val: number | string | undefined,
+  base: number,
+  defaultRatio: number,
+) {
+  if (typeof val === 'string' && val.includes('%')) {
+    return (parseFloat(val) / 100) * base;
+  }
+  if (isNumber(val)) {
+    return val <= 1 && val > 0 ? val * base : val;
+  }
+  return base * defaultRatio;
 }

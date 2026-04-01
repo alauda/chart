@@ -86,6 +86,7 @@ export interface Options {
   point?: PointShapeOption;
   gauge?: GaugeShapeOption;
   barStacked?: BarStackedShapeOption;
+  pie?: PieShapeOption;
 }
 
 export type Data = DataItem[];
@@ -147,6 +148,7 @@ export interface AxisOpt {
 
 export type TooltipOption = TooltipOpt | boolean;
 export interface TooltipOpt {
+  mode?: 'single' | 'all'; // 坐标系默认 single， pie 支持 all
   showTitle?: boolean;
   popupContainer?: HTMLElement; // tooltip 渲染父节点 默认 body
   titleFormatter?: string | ((title: string, values: TooltipValue[]) => string);
@@ -203,6 +205,7 @@ export interface PieShapeOption {
   };
   total?: number; // 指定总量
   backgroundColor?: string;
+  backgroundArc?: boolean; // 背景圆弧
   itemStyle?: {
     borderRadius?: number; //  item 圆角
     borderWidth?: number; // item间隔宽度

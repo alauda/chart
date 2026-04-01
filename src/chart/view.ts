@@ -1,4 +1,11 @@
-import { isBoolean, isObject, merge, set, cloneDeep, camelCase } from 'lodash-es';
+import {
+  isBoolean,
+  isObject,
+  merge,
+  set,
+  cloneDeep,
+  camelCase,
+} from 'lodash-es';
 
 import { Annotation } from '../components/annotation.js';
 import { BaseComponent } from '../components/base.js';
@@ -34,9 +41,9 @@ import {
   ViewOption,
 } from '../types/index.js';
 import { ShapeType } from '../utils/component.js';
-import { cleanupChartColors, getChartColor, resetColorMap } from '../utils/index.js';
 
 import EventEmitter from './event-emitter.js';
+import { ChartColorManager } from './color.js';
 
 export class View extends EventEmitter {
   /** 所有的组件  */
@@ -92,8 +99,11 @@ export class View extends EventEmitter {
 
   shapeCache = new Map<string, Array<Shape | PolarShape>>();
 
+  color: ChartColorManager;
+
   constructor(props: ViewOption) {
     super();
+    this.color = new ChartColorManager();
     const {
       width,
       height,
@@ -105,9 +115,9 @@ export class View extends EventEmitter {
       chartOption,
       padding,
       defaultInteractions,
-      manualResetColor
+      manualResetColor,
     } = props;
-    if(!manualResetColor) {
+    if (!manualResetColor) {
       this.initialColorMap();
     }
     this.reactivity = reactive(chartOption, this);
@@ -260,13 +270,13 @@ export class View extends EventEmitter {
    * @returns View
    */
   data(data: Data): View {
-    data.forEach((d) => {
+    data.forEach(d => {
       if (!d.color) {
-        d.color = getChartColor(d.name);
+        d.color = this.color.getChartColor(d.name);
       }
     });
     set(this.options, 'data', data);
-    cleanupChartColors(data.map(d => d.name));
+    this.color.cleanupChartColors(data.map(d => d.name));
     this.emit(ChartEvent.DATA_CHANGE, data);
     return this;
   }
@@ -405,9 +415,9 @@ export class View extends EventEmitter {
       .flat()
       .map(s => s.label);
   }
-  
+
   initialColorMap() {
-    resetColorMap();
+    this.color.reset();
   }
 
   /**

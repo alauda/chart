@@ -6,7 +6,6 @@ import { measureText } from '../../strategy/utils.js';
 import { Data, GaugeShapeOption, PieShapeOption } from '../../types/index.js';
 import {
   createSvg,
-  getChartColor,
   PolarShapeType,
   template,
 } from '../../utils/index.js';
@@ -14,6 +13,7 @@ import {
 import { getRadius } from './pie.js';
 
 import { PolarShape } from './index.js';
+import { View } from '../../chart/view.js';
 
 const START_ANGLE = -(Math.PI / 1.5);
 const END_ANGLE = Math.PI / 1.5;
@@ -139,6 +139,7 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
             backgroundColor: this.colorVar['n-8'],
           },
           this.colorVar['n-8'],
+          this.ctrl,
         )
       : [];
     const outerRadius = this.option?.outerRadius ?? radius;
@@ -170,6 +171,7 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
         backgroundColor: this.colorVar['n-8'],
       },
       this.colorVar['n-8'],
+      this.ctrl,
       0.01,
     );
     this.container
@@ -235,7 +237,8 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
         const str = isFunction(description)
           ? (description as (data: Data) => string)(data)
           : template(description, { data });
-        centerDesc.style('font-size', fontSize + 'px')
+        centerDesc
+          .style('font-size', fontSize + 'px')
           .text(this.truncateText(str, fontSize, clientWidth * 0.8));
       }
       if (text) {
@@ -251,7 +254,8 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
         const str = isFunction(text)
           ? text(data, this.total)
           : template(text, { value: this.total, data }) || text;
-        centerText.style('font-size', fontSize + 'px')
+        centerText
+          .style('font-size', fontSize + 'px')
           .text(this.truncateText(str, fontSize, clientWidth * 0.8));
       }
     }
@@ -266,22 +270,25 @@ export default class Gauge extends PolarShape<GaugeShapeOption> {
    */
   truncateText(text: string, fontSize: number, maxWidth: number): string {
     if (!text) return '';
-    
+
     const { width } = measureText(text, fontSize);
     if (width <= maxWidth) return text;
-    
+
     // 如果文本宽度超过最大宽度，则进行截断
     const ellipsis = '...';
     const ellipsisWidth = measureText(ellipsis, fontSize).width;
     let truncatedText = text;
     let truncatedWidth = width;
-    
+
     // 逐个字符截断直到文本宽度小于最大宽度
-    while (truncatedWidth > maxWidth - ellipsisWidth && truncatedText.length > 0) {
+    while (
+      truncatedWidth > maxWidth - ellipsisWidth &&
+      truncatedText.length > 0
+    ) {
       truncatedText = truncatedText.slice(0, -1);
       truncatedWidth = measureText(truncatedText, fontSize).width;
     }
-    
+
     return truncatedText + ellipsis;
   }
 
@@ -307,6 +314,7 @@ function calculatePaths(
   data: Array<{ name: string; color: string; value: number; values?: any }>,
   option: PieShapeOption,
   color: string,
+  ctrl: View,
   angleMin?: number,
 ) {
   const sum = data.reduce((acc, curr) => acc + curr.value, 0);
@@ -372,7 +380,7 @@ function calculatePaths(
             endAngle,
           })!,
           config: {
-            color: data[ind].color || getChartColor(data[ind].name)!,
+            color: data[ind].color || ctrl.color.getChartColor(data[ind].name)!,
             startAngle,
             endAngle,
             ...baseConifg,

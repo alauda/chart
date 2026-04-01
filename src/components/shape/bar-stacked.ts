@@ -6,7 +6,6 @@ import { BarStackedShapeOption } from '../../types/options.js';
 import {
   createSvg,
   generateName,
-  getChartColor,
   PolarShapeType,
 } from '../../utils/index.js';
 
@@ -214,7 +213,7 @@ export default class BarStacked extends PolarShape<BarStackedShapeOption> {
         .join('g')
         .attr('fill', d => {
           const value = items.find(item => item.name === d.key);
-          return value?.color || getChartColor(value.name || d.key);
+          return value?.color || this.ctrl.color.getChartColor(value.name || d.key);
         })
         .selectAll('rect')
         .data(d => d)
