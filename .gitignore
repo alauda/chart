@@ -7,3 +7,4 @@ lib
 .*cache
 *.tsbuildinfo
 .omx
+.omc
