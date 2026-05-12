@@ -16,6 +16,33 @@ import { measureText } from '../../strategy/utils.js';
 import { UPLOT_DEFAULT_OPTIONS } from '../../strategy/config.js';
 import { Tooltip } from '../tooltip.js';
 
+function getRightRoundedRectPath(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const safeWidth = Math.max(0, width);
+  const safeRadius = Math.min(radius, safeWidth, height / 2);
+  const right = x + safeWidth;
+  const bottom = y + height;
+
+  if (safeRadius <= 0) {
+    return `M${x},${y}H${right}V${bottom}H${x}Z`;
+  }
+
+  return [
+    `M${x},${y}`,
+    `H${right - safeRadius}`,
+    `Q${right},${y} ${right},${y + safeRadius}`,
+    `V${bottom - safeRadius}`,
+    `Q${right},${bottom} ${right - safeRadius},${bottom}`,
+    `H${x}`,
+    'Z',
+  ].join('');
+}
+
 /**
  * 堆叠 柱状图
  */
@@ -147,6 +174,9 @@ export default class BarStacked extends PolarShape<BarStackedShapeOption> {
     barH = Math.max(1, barH);
     const groupHeight = (barH / groupCount) * 0.8; // 给堆叠组之间留空隙
     const groupPadding = (barH / groupCount) * 0.5;
+    const totalGroupHeight =
+      groupCount * groupHeight + Math.max(0, groupCount - 1) * groupPadding;
+    const borderRadius = Math.max(0, this.option.itemStyle?.borderRadius || 0);
 
     const maxValue =
       d3.max(this.categories, (_cat, i) => {
@@ -201,6 +231,9 @@ export default class BarStacked extends PolarShape<BarStackedShapeOption> {
         const obj: Record<string, any> = { category: cat };
         items.forEach(s => {
           obj[s.name] = s.values[i].y;
+          if (s.values[i].y > 0) {
+            obj.__lastStackKey = s.name;
+          }
           obj.color = s.color;
         });
         return obj;
@@ -215,21 +248,30 @@ export default class BarStacked extends PolarShape<BarStackedShapeOption> {
           const value = items.find(item => item.name === d.key);
           return value?.color || this.ctrl.color.getChartColor(value.name || d.key);
         })
-        .selectAll('rect')
-        .data(d => d)
-        .join('rect')
-        .attr('y', d => {
-          return (
-            this.yScale(d.data.category) +
+        .selectAll('path')
+        .data(d => d.map(point => ({ key: d.key, point })))
+        .join('path')
+        .attr('d', d => {
+          const rectX = x(d.point[0]);
+          const rectY =
+            this.yScale(d.point.data.category) +
             band / 2 -
-            groupHeight -
-            groupPadding / 2 +
-            groupIndex * (groupHeight + groupPadding)
+            totalGroupHeight / 2 +
+            groupIndex * (groupHeight + groupPadding);
+          const rectWidth = x(d.point[1]) - rectX;
+          const radius =
+            String(d.point.data.__lastStackKey) === String(d.key)
+              ? borderRadius
+              : 0;
+
+          return getRightRoundedRectPath(
+            rectX,
+            rectY,
+            rectWidth,
+            groupHeight,
+            radius,
           );
-        })
-        .attr('x', d => x(d[0]))
-        .attr('width', d => x(d[1]) - x(d[0]))
-        .attr('height', groupHeight);
+        });
 
       groupIndex++;
     }

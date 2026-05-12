@@ -29,6 +29,9 @@ new Chart({ barStacked: option });
 ```ts
 export interface BarStackedShapeOption extends ShapeOption {
   barWidth?: number; // 柱宽
+  itemStyle?: {
+    borderRadius?: number; // 柱体外侧圆角
+  };
 }
 
 // 基础图形配置
@@ -134,6 +137,9 @@ const chart = new Chart({
     },
     barStacked: {
       barWidth: 40,
+      itemStyle: {
+        borderRadius: 4,
+      },
     },
   },
 });

@@ -64,6 +64,9 @@ const Template: Story = () => {
         },
         barStacked: {
           barWidth: 60,
+          itemStyle: {
+            borderRadius: 20,
+          },
         },
         legend: {
           position: 'top-right',

@@ -241,6 +241,9 @@ export interface GaugeShapeOption {
 
 export interface BarStackedShapeOption extends ShapeOption {
   barWidth?: number;
+  itemStyle?: {
+    borderRadius?: number;
+  };
 }
 
 export type ShapeOptions =
