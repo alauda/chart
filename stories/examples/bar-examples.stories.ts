@@ -1,7 +1,5 @@
 import { Story, Meta, StoryObj } from '@storybook/html';
 
-import { dealWithTime } from '../utilt';
-
 import { Chart } from '@alauda/chart';
 import 'uplot/dist/uPlot.min.css';
 
@@ -31,6 +29,12 @@ const Template: Story = () => {
         scale: {
           x: {
             time: false,
+          },
+        },
+        bar: {
+          barWidth: 50,
+          itemStyle: {
+            borderRadius: 10,
           },
         },
       },
@@ -86,6 +90,10 @@ const GroupedBarTemplate: Story = () => {
           },
         },
         bar: {
+          barWidth: 10,
+          itemStyle: {
+            borderRadius: 1,
+          },
           adjust: {
             type: 'group',
             marginRatio: 0.2,
@@ -147,6 +155,10 @@ const StackedBarTemplate: Story = () => {
           },
         },
         bar: {
+          barWidth: 10,
+          itemStyle: {
+            borderRadius: 1,
+          },
           adjust: {
             type: 'stack',
           },
@@ -193,6 +205,12 @@ const HorizontalBarTemplate: Story = () => {
         },
         coordinate: {
           transposed: true,
+        },
+        bar: {
+          barWidth: 10,
+          itemStyle: {
+            borderRadius: 1,
+          },
         },
       },
     });
@@ -241,6 +259,10 @@ const CustomColorTemplate: Story = () => {
           },
         },
         bar: {
+          barWidth: 10,
+          itemStyle: {
+            borderRadius: 1,
+          },
           adjust: {
             type: 'group',
           },

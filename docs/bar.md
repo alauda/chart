@@ -27,6 +27,11 @@ new Chart({ bar: option });
 
 ```ts
 export interface BarShapeOption extends ShapeOption {
+  barWidth?: number; // 柱宽，单位 px
+  bandWidth?: number; // 柱宽别名，兼容旧 chart API，单位 px
+  itemStyle?: {
+    borderRadius?: number; // 柱子圆角，单位 px，需配合 barWidth/bandWidth 使用
+  };
   adjust?: AdjustOption; // 调整配置
 }
 
@@ -123,6 +128,10 @@ const chart = new Chart({
   options: {
     title: { text: '分组柱状图' },
     bar: {
+      barWidth: 10,
+      itemStyle: {
+        borderRadius: 1,
+      },
       adjust: {
         type: 'group',
         marginRatio: 0.2,

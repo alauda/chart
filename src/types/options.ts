@@ -175,6 +175,11 @@ export interface LineShapeOption extends ShapeOption {
 export interface AreaShapeOption extends ShapeOption {}
 
 export interface BarShapeOption extends ShapeOption {
+  barWidth?: number;
+  bandWidth?: number;
+  itemStyle?: {
+    borderRadius?: number;
+  };
   adjust?: AdjustOption;
 }
 

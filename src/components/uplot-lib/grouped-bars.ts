@@ -5,12 +5,18 @@ import { pointWithin, Quadtree } from '../../strategy/quadtree.js';
 interface SeriesBarsPluginProps {
   time: boolean;
   radius?: number;
+  barWidth?: number;
   marginRatio?: number;
   ori: number;
   dir: number;
   stacked?: boolean;
   ignore?: number[];
   disp?: any;
+}
+
+interface BarLayout {
+  offs: number[];
+  size: number[];
 }
 
 const SPACE_BETWEEN = 1;
@@ -71,6 +77,7 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
     time,
     ignore = [],
     radius: _radius,
+    barWidth: _barWidth,
     ori: _ori,
     dir: _dir,
     stacked: _stacked,
@@ -79,6 +86,7 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
   } = opts;
 
   const radius = _radius ?? 0;
+  const maxBarWidth = _barWidth ?? Infinity;
 
   // function setPxRatio() {
   //   pxRatio = devicePixelRatio;
@@ -99,14 +107,33 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
   const barWidth = 1 - (marginRatio || 0);
   const barDistr = SPACE_BETWEEN;
 
+  function centerBars(
+    layout: BarLayout[],
+    maxSize: number,
+  ) {
+    if (!isFinite(maxSize)) {
+      return layout;
+    }
+
+    return layout.map(({ offs, size }) => ({
+      offs: offs.map((offset, index) => {
+        const currentSize = size[index];
+        return currentSize > maxSize
+          ? offset + (currentSize - maxSize) / 2
+          : offset;
+      }),
+      size: size.map(currentSize => Math.min(currentSize, maxSize)),
+    }));
+  }
+
   function distrTwo(
     groupCount: number,
     barCount: number,
     _groupWidth = groupWidth,
   ) {
-    const out = Array.from({ length: barCount }, () => ({
-      offs: Array.from({ length: groupCount }).fill(0),
-      size: Array.from({ length: groupCount }).fill(0),
+    const out: BarLayout[] = Array.from({ length: barCount }, () => ({
+      offs: Array.from<number>({ length: groupCount }).fill(0),
+      size: Array.from<number>({ length: groupCount }).fill(0),
     }));
 
     distr(
@@ -132,9 +159,9 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
   }
 
   function distrOne(groupCount: number, barCount: number) {
-    const out = Array.from({ length: barCount }, () => ({
-      offs: Array.from({ length: groupCount }).fill(0),
-      size: Array.from({ length: groupCount }).fill(0),
+    const out: BarLayout[] = Array.from({ length: barCount }, () => ({
+      offs: Array.from<number>({ length: groupCount }).fill(0),
+      size: Array.from<number>({ length: groupCount }).fill(0),
     }));
 
     distr(
@@ -272,18 +299,29 @@ export function seriesBarsPlugin(opts: SeriesBarsPluginProps) {
           s._paths = null;
         });
 
+        const maxBarSize =
+          maxBarWidth / (ori === 1 ? u.bbox.height : u.bbox.width);
+
         if (stacked)
           barsPctLayout = [null].concat(
-            distrOne(u.data.length - 1 - ignore.length, u.data[0].length),
+            centerBars(
+              distrOne(u.data.length - 1 - ignore.length, u.data[0].length),
+              maxBarSize,
+            ),
           );
         else if (u.series.length === 2)
-          barsPctLayout = [null].concat(distrOne(u.data[0].length, 1));
+          barsPctLayout = [null].concat(
+            centerBars(distrOne(u.data[0].length, 1), maxBarSize),
+          );
         else
           barsPctLayout = [null].concat(
-            distrTwo(
-              u.data[0].length,
-              u.data.length - 1 - ignore.length,
-              u.data[0].length === 1 ? 1 : groupWidth,
+            centerBars(
+              distrTwo(
+                u.data[0].length,
+                u.data.length - 1 - ignore.length,
+                u.data[0].length === 1 ? 1 : groupWidth,
+              ),
+              maxBarSize,
             ),
           );
 

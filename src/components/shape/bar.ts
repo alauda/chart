@@ -78,6 +78,8 @@ export default class Bar extends Shape<Bar> {
     const data = this.strategy.getData();
     const isStack = this.adjustOption.type === 'stack';
     const stackOpt = isStack ? stack(data) : {};
+    const option = this.option as BarShapeOption;
+    const barWidth = option.barWidth ?? option.bandWidth;
     return {
       ...stackOpt,
       plugins: [
@@ -86,6 +88,11 @@ export default class Bar extends Shape<Bar> {
           ori: this.transposed ? 1 : 0,
           dir: this.transposed ? -1 : 1,
           stacked: isStack,
+          barWidth,
+          radius:
+            barWidth && option.itemStyle?.borderRadius
+              ? option.itemStyle.borderRadius / barWidth
+              : undefined,
           marginRatio: this.adjustOption.marginRatio / 10,
         }),
       ],

@@ -27,7 +27,10 @@ const Template: Story = () => {
       data: [
         {
           name: 'area1',
-          floatValues: [timeData, d1.map(item => item.y)],
+          floatValues: [
+            Float64Array.from(timeData),
+            Float64Array.from(d1.map(item => item.y)),
+          ],
         },
       ],
       options: {
